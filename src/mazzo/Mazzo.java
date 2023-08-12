@@ -2,10 +2,22 @@ package mazzo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
-public class Mazzo {
+public class Mazzo implements Iterator<Carta>{
 	private ArrayList<Carta> mazzo = new ArrayList<>(52);
 	private int posizioneCarta = 0;
+	
+	private static Mazzo instance;
+	
+	public Mazzo() {
+		mescola();
+	}
+	
+	public Mazzo getInstance() {
+		if (instance == null) instance = new Mazzo();
+		return instance;
+	}
 	
 	// Metodo Di Riempimento semplice del mazzo
 	private ArrayList<Carta> riempimento() {
@@ -25,6 +37,21 @@ public class Mazzo {
 		return mazzo;
 	}
 	
-	
+	public ArrayList<Carta> getMazzo() {
+		return mazzo;
+	}
+
+	@Override
+	public boolean hasNext() {
+		return posizioneCarta < mazzo.size();
+	}
+
+	@Override
+	public Carta next() {
+		if(hasNext()) {
+			return mazzo.get(posizioneCarta++);
+		}
+		return null;
+	}
 	
 }
