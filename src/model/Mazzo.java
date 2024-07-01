@@ -1,4 +1,4 @@
-package mazzo;
+package model;
 
 import java.util.ArrayList;
 import java.util.Collections;

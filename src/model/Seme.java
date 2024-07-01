@@ -1,4 +1,4 @@
-package mazzo;
+package model;
 
 public enum Seme {
 	CUORI("Cuori"),

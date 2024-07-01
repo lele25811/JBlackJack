@@ -1,4 +1,4 @@
-package mazzo;
+package model;
 
 public enum Valore {
 	ASSO(1,"Asso"),

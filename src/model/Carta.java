@@ -1,4 +1,4 @@
-package mazzo;
+package model;
 
 public class Carta {
 	private Seme seme;

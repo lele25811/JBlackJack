@@ -1,7 +1,5 @@
+package model;
 import java.util.ArrayList;
-
-import mazzo.Carta;
-import mazzo.Mazzo;
 
 public class Mazziere {
 	
@@ -13,6 +11,11 @@ public class Mazziere {
 	
 	public Mazziere() {
 		m = new Mazzo();
+	}
+	
+	
+	public void mazzoStampa() {
+		System.out.println(m.toString());
 	}
 	
 	
