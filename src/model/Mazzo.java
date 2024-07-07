@@ -20,24 +20,12 @@ public class Mazzo implements Iterator<Carta>{
 	 */
 	private int posizioneCarta = 0;
 	
-	/*
-	 * Istanza mazzo
-	 */
-	private static Mazzo instance;
 	
 	/*
 	 * Costruttore della classe mazzo che mescola le carte appena viene creato il mazzo
 	 */
 	public Mazzo() {
 		mescola();
-	}
-	
-	/*
-	 * Metodo che permette di non creare altri mazzi (singleton pattern)
-	 */
-	public Mazzo getInstance() {
-		if (instance == null) instance = new Mazzo();
-		return instance;
 	}
 	
 	/*

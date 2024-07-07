@@ -13,6 +13,7 @@ public enum Valore {
 	SETTE(7, "Sette"),
 	OTTO(8,"Otto"),
 	NOVE(9, "Nove"),
+	DIECI(10, "Dieci"),
 	JACK(10, "Jack"),
 	DONNA(10, "Donna"),
 	KAPPA(10, "Kappa");
