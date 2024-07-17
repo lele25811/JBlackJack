@@ -1,10 +1,14 @@
 package model;
 
+import java.io.Serializable;
+
 /*
  * Classe che definisce il giocatore (superclasse)
  */
-public class Player {
+public class Player implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
+
 	/*
 	 * nickname definisce il nome del giocatore
 	 */
@@ -42,7 +46,7 @@ public class Player {
 	 */
 	@Override
 	public String toString() {
-		return "Player [ " + nickname + "," + avatar + "]";
+		return "Player [" + nickname + "," + avatar + "]";
 	}
 	
 }

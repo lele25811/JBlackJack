@@ -5,6 +5,7 @@ package model;
  */
 public class BlackJackPlayer extends Player{
 
+
 	/*
 	 * numeroPartite definisce il numero delle partite giocate da un giocatore
 	 */
@@ -79,4 +80,12 @@ public class BlackJackPlayer extends Player{
 	private void levelUp() {
 		livello++;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " BlackJackPlayer [numeroPartite=" + numeroPartite + ", numeroVittorie=" + numeroVittorie + ", livello="
+				+ livello + "]";
+	}
+	
+	
 }
