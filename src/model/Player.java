@@ -12,19 +12,25 @@ public class Player implements Serializable{
 	/*
 	 * nickname definisce il nome del giocatore
 	 */
-	protected String nickname;
+	private String nickname;
 	
 	/*
 	 * avatar definisce l'immagine di profilo del giocatore
 	 */
-	protected String avatar;
+	private String avatar;
+	
+	/*
+	 * Definisce se il giocatore è un bot o è il player
+	 */
+	private boolean isBot;
 	
 	/*
 	 * Costruttore della classe Player
 	 */
-	public Player(String nickname, String avatar) {
+	public Player(String nickname, String avatar, boolean isBot) {
 		this.nickname = nickname;
 		this.avatar = avatar;
+		this.isBot = isBot;
 	}
 	
 	/*
@@ -39,6 +45,10 @@ public class Player implements Serializable{
 	 */
 	public String getAvatar() {
 		return avatar;
+	}
+	
+	public boolean isBot() {
+		return isBot;
 	}
 
 	/*

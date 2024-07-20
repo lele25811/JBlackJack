@@ -1,10 +1,12 @@
 package model;
 
+import java.util.ArrayList;
+
 /*
  * Classe che definisce un giocatore di BlackJack con le sue statistiche
  */
 public class BlackJackPlayer extends Player{
-
+	private ArrayList<Carta> mano = new ArrayList<Carta>();
 
 	/*
 	 * numeroPartite definisce il numero delle partite giocate da un giocatore
@@ -24,11 +26,27 @@ public class BlackJackPlayer extends Player{
 	/*
 	 * Costruttore della classe che richiama il construttore della sua Superclasse
 	 */
-	public BlackJackPlayer(String nickname, String avatar) {
-		super(nickname, avatar);
+	public BlackJackPlayer(String nickname, String avatar, boolean isBot) {
+		super(nickname, avatar, isBot);
 		numeroPartite = 0;
 		numeroVittorie = 0;
 		livello = 0;
+	}
+	
+	public void addCarta(Carta carta) {
+		mano.add(carta);
+	}
+	
+	public ArrayList<Carta> getMano() {
+		return mano;
+	}
+	
+	public int[] getValoreMano() {
+		int valore = mano.stream().mapToInt(carta -> carta.getValore()).sum();
+		boolean asso = mano.stream().anyMatch(carta -> "Asso".equals(carta.getStringValore()));
+		System.out.println("asso "+asso);
+		if(asso) return new int[] {valore, valore+10};
+		else return new int[] {valore};
 	}
 	
 	/*

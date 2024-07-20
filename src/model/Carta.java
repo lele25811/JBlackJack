@@ -36,6 +36,11 @@ public class Carta {
 		return valore.getValore();
 	}
 	
+	
+	public String getStringValore() {
+		return valore.stampaValore();
+	}
+	
 	/*
 	 * toStirng: stampa la coppia attuale di (valore,seme) 
 	 * che compone la carta attuale
