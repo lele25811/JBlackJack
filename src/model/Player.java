@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /*
  * Classe che definisce il giocatore (superclasse)
@@ -8,6 +9,8 @@ import java.io.Serializable;
 public class Player implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
+	
+	private ArrayList<Carta> mano = new ArrayList<Carta>();
 
 	/*
 	 * nickname definisce il nome del giocatore
@@ -20,17 +23,11 @@ public class Player implements Serializable{
 	private String avatar;
 	
 	/*
-	 * Definisce se il giocatore è un bot o è il player
-	 */
-	private boolean isBot;
-	
-	/*
 	 * Costruttore della classe Player
 	 */
-	public Player(String nickname, String avatar, boolean isBot) {
+	public Player(String nickname, String avatar) {
 		this.nickname = nickname;
 		this.avatar = avatar;
-		this.isBot = isBot;
 	}
 	
 	/*
@@ -46,10 +43,6 @@ public class Player implements Serializable{
 	public String getAvatar() {
 		return avatar;
 	}
-	
-	public boolean isBot() {
-		return isBot;
-	}
 
 	/*
 	 * Metodo che ritorna la stringa di Player
@@ -59,4 +52,19 @@ public class Player implements Serializable{
 		return "Player [" + nickname + "," + avatar + "]";
 	}
 	
+	public void addCarta(Carta carta) {
+		mano.add(carta);
+	}
+	
+	public ArrayList<Carta> getMano() {
+		return mano;
+	}
+	
+	public int[] getValoreMano() {
+		int valore = mano.stream().mapToInt(carta -> carta.getValore()).sum();
+		boolean asso = mano.stream().anyMatch(carta -> "Asso".equals(carta.getStringValore()));
+		System.out.println("asso "+asso);
+		if(asso) return new int[] {valore, valore+10};
+		else return new int[] {valore};
+	}
 }

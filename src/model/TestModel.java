@@ -5,7 +5,7 @@ import java.util.List;
 
 public class TestModel {
 	public static void main(String[] args) {
-		BlackJackPlayer bp1 = new BlackJackPlayer("Emanuele", "avatar", false);
+		BlackJackPlayer bp1 = new BlackJackPlayer("Emanuele", "avatar");
 		Database bd = Database.getIstance();
 		//bd.clearDatabase();
 		//bd.addPlayer(bp1);
@@ -15,6 +15,6 @@ public class TestModel {
 		
 		TavoloDaGioco tdg = new TavoloDaGioco(bp1);
 		tdg.startGame();
-		tdg.provaStampa();
+		//tdg.provaStampa();
 	}
 }
