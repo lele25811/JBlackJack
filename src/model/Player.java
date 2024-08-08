@@ -60,11 +60,23 @@ public class Player implements Serializable{
 		return mano;
 	}
 	
-	public int[] getValoreMano() {
+	public int[] getValoreManoIniziale() {
 		int valore = mano.stream().mapToInt(carta -> carta.getValore()).sum();
-		boolean asso = mano.stream().anyMatch(carta -> "Asso".equals(carta.getStringValore()));
-		System.out.println("asso "+asso);
-		if(asso) return new int[] {valore, valore+10};
+		boolean isAsso = mano.stream().anyMatch(carta -> "Asso".equals(carta.getStringValore()));
+		if(isAsso) return new int[] {valore, valore+10};
 		else return new int[] {valore};
+	}
+	
+	public int[] getValoreMano(int valoreAttuale) {
+		boolean isAsso = mano.stream()
+                .reduce((primo, secondo) -> secondo)
+                .map(carta -> "Asso".equalsIgnoreCase(carta.getStringValore()))
+                .orElse(false);
+		int valoreUltimaCarta = mano.stream()
+                  .map(Carta::getValore)
+                  .reduce((primo, secondo) -> secondo)
+                  .orElseThrow(() -> new IllegalStateException("La lista è vuota"));
+		if (isAsso) return new int[] {valoreUltimaCarta+valoreAttuale, valoreUltimaCarta+valoreAttuale+10};
+		else return new int[] {valoreUltimaCarta+valoreAttuale};
 	}
 }

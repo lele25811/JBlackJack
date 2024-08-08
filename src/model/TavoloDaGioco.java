@@ -39,7 +39,7 @@ public class TavoloDaGioco {
 		for(Player p: giocatori) {
 			System.out.println(p.toString());
 			System.out.println(p.getMano());
-			int[] puntiMano = p.getValoreMano();
+			int[] puntiMano = p.getValoreManoIniziale();
 			for(int i=0; i<puntiMano.length; i++) {
 				System.out.println(puntiMano[i]);
 			}
@@ -57,8 +57,9 @@ public class TavoloDaGioco {
 	private void turnazione() {
 		for(Player p: giocatori) {
 			if(p instanceof BlackJackBot) {
-				turnoBot(p);
+				//turnoBot(p);
 				System.out.println("È un bot, "+p.getNickname());
+				provaTurnoBot(p);
 			}
 			if(p instanceof BlackJackPlayer) {
 				System.out.println("È un Player, "+p.getNickname());
@@ -66,11 +67,97 @@ public class TavoloDaGioco {
 			}
 		}
 	}
+	
+	private int provaTurnoBot(Player p) {
+		boolean isBanco = ((BlackJackBot) p).getIsBanco();
+		Random random = new Random();
+		int valoreAggiornato = 0;
+		int[] valori = p.getValoreManoIniziale();
+		while(true) {
+			
+			System.out.println("------mano: "+p.getMano());
+			System.out.println("valoreAggiornato" +valoreAggiornato);
+			for(int i=0; i<valori.length; i++) {
+				System.out.println(valori[i]);
+			}
+			System.out.println("valoreAggiornato"+ valoreAggiornato);
+			if(valoreAggiornato > 21) {
+				System.out.println("CAIO###HO SBALLATO CON "+valoreAggiornato+"###");
+				return 0;
+			}
+			if(valori.length > 1 && valori[1] > 21) {
+				valori = new int[]{valori[0]};
+			}
+			if(valori.length > 1) {
+				if(valori[1] >= 18) {
+					System.out.println("###STO CON "+valori[1] +"###");
+					return valori[1];
+				}else {
+					int sceltaCarta = random.nextInt(2); // scelta valore[0] o [1]
+					int sceltaMossa = random.nextInt(2); // scelta mossa (carta o raddoppio)
+					if(isBanco) {
+						sceltaMossa = 0;
+					}
+					switch(0) {
+						case 0:
+							valoreAggiornato = valori[sceltaCarta];
+							carta(valori[sceltaCarta], p);
+							System.out.println("###CARTA CON "+valori[sceltaCarta] +"###");
+							break;
+						case 1:
+							//valoreAggiornato = valori[sceltaCarta];
+							// TODO: definisci operazioni
+							//raddoppio(valori[sceltaCarta]);
+							System.out.println("###RADDOPPIO CON "+valori[sceltaCarta] +"###");
+							break;
+						default: carta(valori[0], p);
+					}
+				}
+			//Controllo valori singoli
+			}else if(valori.length == 1) {
+				if(valori[0] > 21) {
+					System.out.println("###HO SBALLATO CON"+valori[0]+"###");
+					return 0;
+				}
+				if(valori[0] >= 18) {
+					System.out.println("###STO CON "+valori[0] +"###");
+					return valori[0];
+				}else {
+					int sceltaMossa = random.nextInt(2);
+					if(isBanco) {
+						sceltaMossa = 0;
+					}
+					switch(0) {
+					case 0:
+						valoreAggiornato = valori[0];
+						carta(valori[0], p);
+						System.out.println("###CARTA CON "+valori[0] +"###");
+						break;
+					case 1:
+						//valoreAggiornato = valori[0];
+						// TODO: definisci operazioni
+						//raddoppio(valori[sceltaCarta]);
+						System.out.println("###RADDOPPIO CON "+valori[0] +"###");
+						break;
+					default: carta(valori[0], p);
+					}
+				}
+			}
+			valori = p.getValoreMano(valoreAggiornato);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
 
 	private void turnoBot(Player p) {
 		boolean isBanco = ((BlackJackBot) p).getIsBanco();
-		int[] valori = p.getValoreMano();
-		boolean isCarta = Arrays.stream(valori).max().orElse(0) <= 18;
+		int[] valori = p.getValoreManoIniziale();
+		boolean isCarta = Arrays.stream(valori).max().orElse(0) <= 18; // credo possa essere deprecato
 		System.out.println("isCarta:"+isCarta);
 		System.out.println("Valori mano:");
 		for(int i=0; i<valori.length; i++) {
@@ -92,12 +179,12 @@ public class TavoloDaGioco {
 				}
 				switch(sceltaMossa) {
 					case 0:
-						carta(valori[sceltaCarta]);
+						//carta(valori[sceltaCarta]);
 						break;
 					case 1:
 						raddoppio(valori[sceltaCarta]);
 						break;
-					default: carta(valori[0]);
+					default: //carta(valori[0]);
 				}
 			}
 		}
@@ -111,12 +198,12 @@ public class TavoloDaGioco {
 				}
 				switch(sceltaMossa) {
 					case 0:
-						carta(valori[0]);
+						//carta(valori[0]);
 						break;
 					case 1:
 						raddoppio(valori[0]);
 						break;
-					default: carta(valori[0]);
+					default: //carta(valori[0]);
 				}
 			}
 		}
@@ -126,8 +213,9 @@ public class TavoloDaGioco {
 		System.out.println("Raddoppio con "+valori);
 	}
 
-	private void carta(int valori) {
-		System.out.println("Richiedo carta con "+valori);
+	private void carta(int valori, Player p) {
+		p.addCarta(mazzo.prossimaCarta());
+		System.out.println("Mano attuale "+p.getMano());
 	}
 
 	private int stai(int punti) {
