@@ -2,13 +2,16 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Observable;
 import java.util.OptionalInt;
 import java.util.Random;
 
 /*
  * Classe che modella le regole di gioco, le mani, i punti e la logica
  */
-public class TavoloDaGioco {
+@SuppressWarnings("deprecation")
+public class TavoloDaGioco extends Observable{
+	
 	// punteggio per mano, [player,...,mazziere]
 	private int[] punti;
 	private MazzoDaGioco mazzo;
@@ -33,6 +36,7 @@ public class TavoloDaGioco {
 		BlackJackBot Baldassarre = new BlackJackBot("Baldassarre", "avatarBaldassare", false);
 		BlackJackBot Banco = new BlackJackBot("Banco", "avatarBanco", true);
 		giocatori.addAll(Arrays.asList(Franco, player, Baldassarre, Banco));
+		System.out.println("Mandato notify");
 	}
 	
 	public void provaStampa() {
@@ -48,6 +52,8 @@ public class TavoloDaGioco {
 	
 	// metodo di inizio gioco
 	public void startGame() {
+		setChanged();
+		notifyObservers(getNumeroGiocatori());
 		distribuisciCarteIniziali();
 		turnazione();
 		
@@ -56,6 +62,7 @@ public class TavoloDaGioco {
 	
 	private void turnazione() {
 		for(Player p: giocatori) {
+			System.out.println();
 			if(p instanceof BlackJackBot) {
 				//turnoBot(p);
 				System.out.println("È un bot, "+p.getNickname());
@@ -70,20 +77,26 @@ public class TavoloDaGioco {
 	
 	private int provaTurnoBot(Player p) {
 		boolean isBanco = ((BlackJackBot) p).getIsBanco();
+		boolean isRaddoppio = false;
 		Random random = new Random();
 		int valoreAggiornato = 0;
 		int[] valori = p.getValoreManoIniziale();
 		while(true) {
 			
-			System.out.println("------mano: "+p.getMano());
-			System.out.println("valoreAggiornato" +valoreAggiornato);
 			for(int i=0; i<valori.length; i++) {
 				System.out.println(valori[i]);
 			}
-			System.out.println("valoreAggiornato"+ valoreAggiornato);
 			if(valoreAggiornato > 21) {
 				System.out.println("CAIO###HO SBALLATO CON "+valoreAggiornato+"###");
 				return 0;
+			}
+			// gestione uscita raddoppio
+			if(isRaddoppio) {
+				System.out.println("Il raddoppio mi ha lasciato:");
+				System.out.println("Lung array "+ valori.length);
+				System.out.println(valori[0]);
+				return valori[0];
+				
 			}
 			if(valori.length > 1 && valori[1] > 21) {
 				valori = new int[]{valori[0]};
@@ -98,17 +111,17 @@ public class TavoloDaGioco {
 					if(isBanco) {
 						sceltaMossa = 0;
 					}
-					switch(0) {
+					switch(sceltaMossa) {
 						case 0:
 							valoreAggiornato = valori[sceltaCarta];
-							carta(valori[sceltaCarta], p);
 							System.out.println("###CARTA CON "+valori[sceltaCarta] +"###");
+							carta(valori[sceltaCarta], p);
 							break;
 						case 1:
-							//valoreAggiornato = valori[sceltaCarta];
-							// TODO: definisci operazioni
-							//raddoppio(valori[sceltaCarta]);
+							valoreAggiornato = valori[sceltaCarta];
 							System.out.println("###RADDOPPIO CON "+valori[sceltaCarta] +"###");
+							isRaddoppio = true;
+							raddoppio(valori[sceltaCarta], p);
 							break;
 						default: carta(valori[0], p);
 					}
@@ -127,16 +140,17 @@ public class TavoloDaGioco {
 					if(isBanco) {
 						sceltaMossa = 0;
 					}
-					switch(0) {
+					switch(sceltaMossa) {
 					case 0:
 						valoreAggiornato = valori[0];
 						carta(valori[0], p);
 						System.out.println("###CARTA CON "+valori[0] +"###");
 						break;
 					case 1:
-						//valoreAggiornato = valori[0];
+						valoreAggiornato = valori[0];
 						// TODO: definisci operazioni
-						//raddoppio(valori[sceltaCarta]);
+						isRaddoppio = true;
+						raddoppio(valori[0], p);
 						System.out.println("###RADDOPPIO CON "+valori[0] +"###");
 						break;
 					default: carta(valori[0], p);
@@ -146,82 +160,15 @@ public class TavoloDaGioco {
 			valori = p.getValoreMano(valoreAggiornato);
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
 
-	private void turnoBot(Player p) {
-		boolean isBanco = ((BlackJackBot) p).getIsBanco();
-		int[] valori = p.getValoreManoIniziale();
-		boolean isCarta = Arrays.stream(valori).max().orElse(0) <= 18; // credo possa essere deprecato
-		System.out.println("isCarta:"+isCarta);
-		System.out.println("Valori mano:");
-		for(int i=0; i<valori.length; i++) {
-			System.out.println(valori[i]);
-		}
-		sceltaBot(isCarta, valori, isBanco);
-	}
-	
-	private void sceltaBot(boolean isCarta, int[] valori, boolean isBanco) {
-		Random random = new Random();
-		if(valori.length > 1) { // && carte diverse
-			if(!isCarta) {
-				stai(valori[1]);
-			}else {
-				int sceltaCarta = random.nextInt(2); // scelta valore[0] o [1]
-				int sceltaMossa = random.nextInt(2); // scelta mossa (carta o raddoppio)
-				if(isBanco) {
-					sceltaMossa = 0;
-				}
-				switch(sceltaMossa) {
-					case 0:
-						//carta(valori[sceltaCarta]);
-						break;
-					case 1:
-						raddoppio(valori[sceltaCarta]);
-						break;
-					default: //carta(valori[0]);
-				}
-			}
-		}
-		if(valori.length == 1) {
-			if(!isCarta) {
-				stai(valori[0]);
-			}else{
-				int sceltaMossa = random.nextInt(2); // scelta mossa (carta o raddoppio)
-				if(isBanco) {
-					sceltaMossa = 0;
-				}
-				switch(sceltaMossa) {
-					case 0:
-						//carta(valori[0]);
-						break;
-					case 1:
-						raddoppio(valori[0]);
-						break;
-					default: //carta(valori[0]);
-				}
-			}
-		}
-	}
-
-	private void raddoppio(int valori) {
-		System.out.println("Raddoppio con "+valori);
+	private void raddoppio(int valori, Player p) {
+		p.addCarta(mazzo.prossimaCarta());
+		System.out.println("Mano attuale "+p.getMano());
 	}
 
 	private void carta(int valori, Player p) {
 		p.addCarta(mazzo.prossimaCarta());
 		System.out.println("Mano attuale "+p.getMano());
-	}
-
-	private int stai(int punti) {
-		System.out.println("Sto con "+punti);
-		return punti;
-		
 	}
 
 	private void distribuisciCarteIniziali() {
@@ -230,6 +177,10 @@ public class TavoloDaGioco {
 				p.addCarta(mazzo.prossimaCarta());
 			}
 		}
+	}
+
+	public int getNumeroGiocatori() {
+		return giocatori.size();
 	}
 	
 	

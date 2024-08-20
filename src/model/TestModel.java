@@ -2,7 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/*
 public class TestModel {
 	public static void main(String[] args) {
 		BlackJackPlayer bp1 = new BlackJackPlayer("Emanuele", "avatar");
@@ -18,3 +18,4 @@ public class TestModel {
 		//tdg.provaStampa();
 	}
 }
+*/
