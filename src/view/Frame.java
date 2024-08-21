@@ -20,7 +20,11 @@ public class Frame extends JFrame implements Observer{
 	
 	private CardLayout cardLayout;
 	private JPanel mainPanel;
+	private LoginPanel loginPanel;
+	private SplashScreenPanel splashPanel;
+	private MenuPanel tablePanel;
 	
+	// todo:
 	private int nGiocatori = 0;
 	
 	public Frame() {
@@ -33,23 +37,29 @@ public class Frame extends JFrame implements Observer{
 		// Creiamo un CardLayout per passare da un pannello all'altro
 		cardLayout = new CardLayout();
 		mainPanel = new JPanel(cardLayout);
-		// Creaiamo due pannelli
-		SplashScreenPanel splashPanel = new SplashScreenPanel();
-        LoginPanel loginPanel = new LoginPanel();
-
+		// Creaiamo i pannelli
+		splashPanel = new SplashScreenPanel();
+        loginPanel = new LoginPanel(this);
+        tablePanel = new MenuPanel();
+        
         // Aggiungiamo i pannelli al CardLayout
         mainPanel.add(splashPanel, "splash");
-        mainPanel.add(loginPanel, "boardGame");
+        mainPanel.add(loginPanel, "playerSelect");
+        mainPanel.add(tablePanel, "menuPanel");
 
-        splashPanel.addPlayButtonActionListener(e -> cardLayout.show(mainPanel, "boardGame"));
+        splashPanel.addPlayButtonActionListener(e -> cardLayout.show(mainPanel, "playerSelect"));
         
         // Aggiungiamo il mainPanel al JFrame
         add(mainPanel);
 
         // Mostriamo lo splashPanel all'inizio
         cardLayout.show(mainPanel, "splash");
+        
     }
 
+	public void showPanel(String panelName) {
+		cardLayout.show(mainPanel, panelName);
+	}
 
 	@Override
 	public void update(Observable o, Object arg) {
