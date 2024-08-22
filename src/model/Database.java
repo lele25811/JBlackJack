@@ -32,7 +32,8 @@ public class Database {
 		savePlayer();
 	}
 	
-	public BlackJackPlayer getPlayerName(String player) {
+	//TODO
+	public BlackJackPlayer getPlayerByName(String player) {
 		
 		return null;
 	}
@@ -78,15 +79,19 @@ public class Database {
 	
 	// Stampa la lista dei giocatori salvati
 	public void stampaPlayers() {
+		System.out.println("Grandezza ArrayList<BJPLAYER> "+bjPlayers.size());
 		if(bjPlayers.size() > 0) {
 			for(BlackJackPlayer p : bjPlayers) {
-				System.out.println("Grandezza ArrayList<BJPLAYER> "+bjPlayers.size());
 				System.out.println(p.toString());
 			}
 		}else {
 			System.out.println("Nessun Player Presente");
 		}
 	}
-	
+
+	public List<BlackJackPlayer> getPlayers() {
+		return loadPlayer();
+		
+	}
 	
 }

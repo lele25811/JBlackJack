@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,20 +12,27 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 
 import model.BlackJackPlayer;
 import model.Database;
+import model.Player;
 /*
  * Classe che definisce la grafica del tavolo da gioco 
  */
@@ -32,12 +40,11 @@ public class LoginPanel extends JPanel{
 	private Image backgroudImage;
 	
 	private JFrame frame;
+	// Register
 	private JPanel newPlayer;
 	private JButton buttonNewPlayer;
 	private JLabel nicknameLabel;
 	private JTextField nicknameTextField;
-	private JPanel loadPlayer;
-	private JButton buttonLoadPlayer;
 	// Avatar 
 	private JLabel avatar1ImageLabel;
 	private JRadioButton avatar1Button;
@@ -47,6 +54,11 @@ public class LoginPanel extends JPanel{
 	private JRadioButton avatar3Button;
 	private JLabel avatar4ImageLabel;
 	private JRadioButton avatar4Button;
+	// Login
+	private JPanel loadPlayer;
+	private JButton buttonLoadPlayer;
+	private JList listaGiocatori;
+	
 	
 	
 	@SuppressWarnings("deprecation")
@@ -56,6 +68,9 @@ public class LoginPanel extends JPanel{
 		//Carica l'immagine dal percorso specificato
 		ImageIcon icon = new ImageIcon("./src/graphics/backgroundGame.png");
 		backgroudImage = icon.getImage();
+		
+		// prende l'istance del database per aggiungere/caricare un Giocatore
+		Database db = Database.getIstance();
 		
 		newPlayer = new JPanel();
 		newPlayer.setPreferredSize(new Dimension(640, 360));
@@ -84,28 +99,27 @@ public class LoginPanel extends JPanel{
 		group.add(avatar3Button);
 		group.add(avatar4Button);
 		
-		ImageIcon avatar1ImageIcon = new ImageIcon("./src/graphics/avatar/Avatar1.png"); 
+		ImageIcon avatar1ImageIcon = new ImageIcon("./src/graphics/avatar/Male.png"); 
 		Image image = avatar1ImageIcon.getImage();
 		avatar1ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar1ImageLabel = new JLabel(avatar1ImageIcon);
 		
-		ImageIcon avatar2ImageIcon = new ImageIcon("./src/graphics/avatar/Avatar2.png"); 
+		ImageIcon avatar2ImageIcon = new ImageIcon("./src/graphics/avatar/Female.png"); 
 		image = avatar2ImageIcon.getImage();
 		avatar2ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar2ImageLabel = new JLabel(avatar2ImageIcon);
 		
-		ImageIcon avatar3ImageIcon = new ImageIcon("./src/graphics/avatar/Avatar3.png"); 
+		ImageIcon avatar3ImageIcon = new ImageIcon("./src/graphics/avatar/Alien.png"); 
 		image = avatar3ImageIcon.getImage();
 		avatar3ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar3ImageLabel = new JLabel(avatar3ImageIcon);
 		
-		ImageIcon avatar4ImageIcon = new ImageIcon("./src/graphics/avatar/Avatar4.png"); 
+		ImageIcon avatar4ImageIcon = new ImageIcon("./src/graphics/avatar/Dog.png"); 
 		image = avatar4ImageIcon.getImage();
 		avatar4ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar4ImageLabel = new JLabel(avatar4ImageIcon);
         
 
-		newPlayer.setLayout(new GridBagLayout());
 		TitledBorder border = BorderFactory.createTitledBorder("Add Player");
         border.setTitleJustification(TitledBorder.CENTER); // Centra il titolo sul bordo
         newPlayer.setBorder(border);
@@ -157,10 +171,7 @@ public class LoginPanel extends JPanel{
         gbc.gridx = 1; 
         gbc.gridy = 4;
         newPlayer.add(avatar4ImageLabel, gbc);
-        
-        
-        
-        
+
         // Button
         gbc.anchor = GridBagConstraints.SOUTH;
         gbc.gridx = 0; 
@@ -174,38 +185,70 @@ public class LoginPanel extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				String nickname = nicknameTextField.getText();
 				String avatar = group.getSelection().getActionCommand();
-				//System.out.println("Nickname: "+nickname+" Avatar: "+avatar);
 				
-				Database bd = Database.getIstance();
 				BlackJackPlayer player = new BlackJackPlayer(nickname, avatar);
-				System.out.println(player.toString());
-				
-				/*
-				 * TODO: gestisci il logic del giocatore, vai a comunicare al model 
-				 * e quindi al bd per salvare il player.
-				 */
-				
+				db.addPlayer(player);
+				db.stampaPlayers();
 				frame.showPanel("menuPanel");
 			}
 		});
 		
 		
 		
-		
-		
-		
+		//Load Player
 		loadPlayer = new JPanel();
-		//loadPlayer.setBackground(Color.BLUE);
 		loadPlayer.setPreferredSize(new Dimension(640, 360));
+		TitledBorder borderLoadPlayer = BorderFactory.createTitledBorder("Load Player");
+        borderLoadPlayer.setTitleJustification(TitledBorder.CENTER); // Centra il titolo sul bordo
+        loadPlayer.setBorder(borderLoadPlayer);
+        loadPlayer.setBackground(new Color(120, 0, 0, 0));
+		loadPlayer.setOpaque(true);
+        
+        
 		buttonLoadPlayer = new JButton("load Player");
 		loadPlayer.setLayout(new BorderLayout());
 		loadPlayer.add(buttonLoadPlayer, BorderLayout.SOUTH);
 		
+		List<BlackJackPlayer> giocatori = db.getPlayers();
+	    String[] playersName = giocatori.stream().map(Player::getNickname).toArray(String[]::new);
+	    String[] avatarName = giocatori.stream().map(Player::getAvatar).toArray(String[]::new);
+	    String[] playersNameAvatar = new String[playersName.length];
+	    for(int i=0; i<playersName.length; i++) {
+	    	playersNameAvatar[i] = "Nickname: "+ playersName[i] + ", Avatar: " + avatarName[i];
+	    }
+	    
+		listaGiocatori = new JList<String>(playersNameAvatar);
+		listaGiocatori.setBackground(new Color(0, 0, 0, 0));
+		listaGiocatori.setOpaque(true);
+		Font font = listaGiocatori.getFont();
+	    Font newFont = font.deriveFont(font.getSize() + 10f); // Aumenta la dimensione di 10 punti
+	    listaGiocatori.setFont(newFont);
+	    listaGiocatori.setFixedCellHeight(25); 
 		
-		setLayout(new BorderLayout());
+		listaGiocatori.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		loadPlayer.add(listaGiocatori, BorderLayout.CENTER);
+		
+		JScrollPane scrollPane = new JScrollPane(listaGiocatori);
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
+		loadPlayer.add(scrollPane, BorderLayout.CENTER);
+		
+		buttonLoadPlayer.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String nickname = (String)listaGiocatori.getSelectedValue();	
+				System.out.println("È stato selezionato "+nickname);
+				/*
+				 * TODO: gestisci il passaggio al model (recupera il player).
+				 */
+				frame.showPanel("menuPanel");
+			}
+		});
+		
+        setLayout(new BorderLayout());
 		add(newPlayer, BorderLayout.WEST);
 		add(loadPlayer, BorderLayout.EAST);
-		
 		
 	}
 	
