@@ -33,6 +33,7 @@ import javax.swing.border.TitledBorder;
 import model.BlackJackPlayer;
 import model.Database;
 import model.Player;
+import model.TavoloDaGioco;
 /*
  * Classe che definisce la grafica del tavolo da gioco 
  */
@@ -59,10 +60,12 @@ public class LoginPanel extends JPanel{
 	private JButton buttonLoadPlayer;
 	private JList listaGiocatori;
 	
+	private Database db;
+	
 	
 	
 	@SuppressWarnings("deprecation")
-	public LoginPanel(Frame frame) {
+	public LoginPanel(Frame frame, Database db) {
 		this.frame = frame;
 		setLayout(new BorderLayout());
 		//Carica l'immagine dal percorso specificato
@@ -70,7 +73,7 @@ public class LoginPanel extends JPanel{
 		backgroudImage = icon.getImage();
 		
 		// prende l'istance del database per aggiungere/caricare un Giocatore
-		Database db = Database.getIstance();
+		this.db = db;
 		
 		newPlayer = new JPanel();
 		newPlayer.setPreferredSize(new Dimension(640, 360));
@@ -118,7 +121,6 @@ public class LoginPanel extends JPanel{
 		image = avatar4ImageIcon.getImage();
 		avatar4ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar4ImageLabel = new JLabel(avatar4ImageIcon);
-        
 
 		TitledBorder border = BorderFactory.createTitledBorder("Add Player");
         border.setTitleJustification(TitledBorder.CENTER); // Centra il titolo sul bordo

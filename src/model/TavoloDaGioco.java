@@ -13,14 +13,19 @@ import java.util.Random;
 public class TavoloDaGioco extends Observable{
 	
 	// punteggio per mano, [player,...,mazziere]
+	
+	// non sicuro se veramente usata.
 	private int[] punti;
 	private MazzoDaGioco mazzo;
 	private ArrayList<Player> giocatori = new ArrayList<Player>();
+	private BlackJackPlayer player;
 	
-	public TavoloDaGioco(BlackJackPlayer player) {
-		addBot(player);
-		addPunti(giocatori.size());
+	public TavoloDaGioco() {
 		mazzo = new MazzoDaGioco();
+	}
+	
+	public void addPlayer(BlackJackPlayer player) {
+		this.player = player;
 	}
 	
 	private void addPunti(int size) {
@@ -29,14 +34,30 @@ public class TavoloDaGioco extends Observable{
 			punti[0] = 0;
 		}
 	}
-
-	// Da modificare per dare la possibilità di scegliere quanti avversari
-	public void addBot(BlackJackPlayer player) {
-		BlackJackBot Franco = new BlackJackBot("Franco", "avatarFranco", false);
-		BlackJackBot Baldassarre = new BlackJackBot("Baldassarre", "avatarBaldassare", false);
-		BlackJackBot Banco = new BlackJackBot("Banco", "avatarBanco", true);
-		giocatori.addAll(Arrays.asList(Franco, player, Baldassarre, Banco));
-		System.out.println("Mandato notify");
+	
+	public void addBot(String nBot) {
+		BlackJackBot banco = new BlackJackBot("Banco", "avatarBanco", true);
+		BlackJackBot franco;
+		BlackJackBot baldassarre;
+		switch(nBot) {
+			case "1":
+				giocatori.addAll(Arrays.asList(player, banco));
+				break;
+			case "2":
+				franco = new BlackJackBot("Franco", "avatarFranco", false);
+				giocatori.addAll(Arrays.asList(franco, player, banco));
+				break;
+			case "3":
+				baldassarre = new BlackJackBot("Baldassarre", "avatarBaldassare", false);
+				franco = new BlackJackBot("Franco", "avatarFranco", false);
+				giocatori.addAll(Arrays.asList(franco, player, baldassarre, banco));
+				break;
+			default: 
+				baldassarre = new BlackJackBot("Baldassarre", "avatarBaldassare", false);
+				franco = new BlackJackBot("Franco", "avatarFranco", false);
+				giocatori.addAll(Arrays.asList(franco, player, baldassarre, banco));
+				break;
+		}
 	}
 	
 	public void provaStampa() {
@@ -52,8 +73,6 @@ public class TavoloDaGioco extends Observable{
 	
 	// metodo di inizio gioco
 	public void startGame() {
-		setChanged();
-		notifyObservers(getNumeroGiocatori());
 		distribuisciCarteIniziali();
 		turnazione();
 		

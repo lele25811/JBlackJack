@@ -11,7 +11,7 @@ public class Test {
 	public static void main(String[] args) {
 		// va tolta la creazione del player da qui e gestita in altro modo
 		BlackJackPlayer bp1 = new BlackJackPlayer("Emanuele", "Male");
-		BlackJackPlayer bp2 = new BlackJackPlayer("Jhonatan", "Alien");
+		//BlackJackPlayer bp2 = new BlackJackPlayer("Jhonatan", "Alien");
 
 		//Database db = Database.getIstance();
 		//db.clearDatabase();
@@ -27,7 +27,7 @@ public class Test {
 		 * 
 		 */
 		
-		TavoloDaGioco model = new TavoloDaGioco(bp1);
+		TavoloDaGioco model = new TavoloDaGioco();
 		Frame view = new Frame();
 		new GameController(model, view);
 		
