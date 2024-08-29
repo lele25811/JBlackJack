@@ -13,6 +13,7 @@ import java.util.Random;
 public class TavoloDaGioco extends Observable{
 	
 	// punteggio per mano, [player,...,mazziere]
+	private static TavoloDaGioco tavoloDaGiocoInstance;
 	
 	// non sicuro se veramente usata.
 	private int[] punti;
@@ -20,12 +21,26 @@ public class TavoloDaGioco extends Observable{
 	private ArrayList<Player> giocatori = new ArrayList<Player>();
 	private BlackJackPlayer player;
 	
-	public TavoloDaGioco() {
-		mazzo = new MazzoDaGioco();
+	public static TavoloDaGioco getInstance() {
+		if(tavoloDaGiocoInstance == null) tavoloDaGiocoInstance = new TavoloDaGioco();
+		return tavoloDaGiocoInstance;
 	}
 	
+	private TavoloDaGioco() {
+		mazzo = new MazzoDaGioco();
+	}
+		
+	public BlackJackPlayer getPlayer() {
+		return player;
+	}
+	/*
+	public void getPlayer() {
+		System.out.println("Da tavolo di gioco il giocatore "+player.getNickname());	
+	}
+	*/
 	public void addPlayer(BlackJackPlayer player) {
 		this.player = player;
+		System.out.println("E' STATO AGGIUNTO IL PLAYER AL TAVOLO "+player.getNickname());
 	}
 	
 	private void addPunti(int size) {
@@ -106,7 +121,7 @@ public class TavoloDaGioco extends Observable{
 				System.out.println(valori[i]);
 			}
 			if(valoreAggiornato > 21) {
-				System.out.println("CAIO###HO SBALLATO CON "+valoreAggiornato+"###");
+				System.out.println("###HO SBALLATO CON "+valoreAggiornato+"###");
 				return 0;
 			}
 			// gestione uscita raddoppio
@@ -202,5 +217,8 @@ public class TavoloDaGioco extends Observable{
 		return giocatori.size();
 	}
 	
+	public void getCarte() {
+		mazzo.mazzoStampa();
+	}
 	
 }

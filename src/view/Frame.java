@@ -1,79 +1,25 @@
 package view;
 
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import model.Database;
-import model.TavoloDaGioco;
-
-@SuppressWarnings("deprecation")
-public class Frame extends JFrame implements Observer{
-	
-	private CardLayout cardLayout;
-	private JPanel mainPanel;
-	private LoginPanel loginPanel;
-	private SplashScreenPanel splashPanel;
-	private MenuPanel menuPanel;
-	private GamePanel gamePanel;
-	
-	private Database db;
-	
-	// todo:
-	private int nGiocatori = 0;
+public class Frame extends JFrame{
 	
 	public Frame() {
-		setTitle("JBlackJack");
-		setSize(1280, 720);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
-		setResizable(false);
-		
-		db = Database.getIstance();
-		// Creiamo un CardLayout per passare da un pannello all'altro
-		cardLayout = new CardLayout();
-		mainPanel = new JPanel(cardLayout);
-		// Creaiamo i pannelli
-		splashPanel = new SplashScreenPanel();
-        loginPanel = new LoginPanel(this, db);
-        menuPanel = new MenuPanel(this);
-        gamePanel = new GamePanel();
+		this.setTitle("JTrash");
         
-        // Aggiungiamo i pannelli al CardLayout
-        mainPanel.add(splashPanel, "splash");
-        mainPanel.add(loginPanel, "playerSelect");
-        mainPanel.add(menuPanel, "menuPanel");
-        mainPanel.add(gamePanel, "gamePanel");
-
-        splashPanel.addPlayButtonActionListener(e -> cardLayout.show(mainPanel, "playerSelect"));
+        // Chiude l'applicazione quando il frame viene chiuso
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        // Aggiungiamo il mainPanel al JFrame
-        add(mainPanel);
-
-        // Mostriamo lo splashPanel all'inizio
-        cardLayout.show(mainPanel, "splash");
+        // Imposta le dimensioni del frame
+        this.setSize(1280, 720);
         
-    }
-
-	public void showPanel(String panelName) {
-		cardLayout.show(mainPanel, panelName);
+        // Impedisce il ridimensionamento del frame
+        this.setResizable(false);
+        
+        // Posiziona il frame al centro dello schermo
+        this.setLocationRelativeTo(null);
+        
+        // Rende il frame visibile
+        //this.setVisible(true);
 	}
-
-	@Override
-	public void update(Observable o, Object arg) {
-		if (o instanceof TavoloDaGioco) {
-			nGiocatori = (int) arg;
-			System.out.println("Giocatori: "+arg);
-		}
-	}
-
 }

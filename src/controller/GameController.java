@@ -1,17 +1,17 @@
 package controller;
 
 import model.TavoloDaGioco;
-import view.Frame;
+import view.SplashScreenPage;
 
 public class GameController {
 	private TavoloDaGioco model;
-	private Frame view;
+	private SplashScreenPage view;
 	
 	@SuppressWarnings("deprecation")
-	public GameController(TavoloDaGioco model, Frame view) {
+	public GameController(TavoloDaGioco model, SplashScreenPage view) {
 		this.model = model;
 		this.view = view;
 		
-		model.addObserver(view);
+		//model.addObserver(view);
 	}
 }

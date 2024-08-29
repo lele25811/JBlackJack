@@ -1,7 +1,6 @@
 package view;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -9,15 +8,12 @@ import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -34,16 +30,15 @@ import model.BlackJackPlayer;
 import model.Database;
 import model.Player;
 import model.TavoloDaGioco;
-/*
- * Classe che definisce la grafica del tavolo da gioco 
- */
-public class LoginPanel extends JPanel{
+
+public class LoginPage extends JPanel implements ActionListener{
+	private Frame frame;
+	
 	private Image backgroudImage;
 	
-	private JFrame frame;
 	// Register
 	private JPanel newPlayer;
-	private JButton buttonNewPlayer;
+	private MyButton buttonNewPlayer;
 	private JLabel nicknameLabel;
 	private JTextField nicknameTextField;
 	// Avatar 
@@ -55,37 +50,39 @@ public class LoginPanel extends JPanel{
 	private JRadioButton avatar3Button;
 	private JLabel avatar4ImageLabel;
 	private JRadioButton avatar4Button;
+	private ButtonGroup group;
 	// Login
 	private JPanel loadPlayer;
-	private JButton buttonLoadPlayer;
+	private MyButton buttonLoadPlayer;
 	private JList listaGiocatori;
 	
 	private Database db;
+	private BlackJackPlayer player;
+	private TavoloDaGioco tavoloDaGioco;
 	
 	
-	
-	@SuppressWarnings("deprecation")
-	public LoginPanel(Frame frame, Database db) {
-		this.frame = frame;
+	public LoginPage() {
+		frame = new Frame();
 		setLayout(new BorderLayout());
+		
+		db = db.getIstance();
+		tavoloDaGioco = tavoloDaGioco.getInstance();
+		
 		//Carica l'immagine dal percorso specificato
 		ImageIcon icon = new ImageIcon("./src/graphics/backgroundGame.png");
 		backgroudImage = icon.getImage();
-		
-		// prende l'istance del database per aggiungere/caricare un Giocatore
-		this.db = db;
-		
+
 		newPlayer = new JPanel();
 		newPlayer.setPreferredSize(new Dimension(640, 360));
 		// set JPanel trasparent
 		newPlayer.setBackground(new Color(0, 0, 0, 0));
 		newPlayer.setOpaque(true);
-		buttonNewPlayer = new JButton("Add Player");
+		buttonNewPlayer = new MyButton("Add Player", this);
 		nicknameLabel = new JLabel("Nickname:");
 		nicknameLabel.setFont(nicknameLabel.getFont().deriveFont(18f));
 		nicknameTextField = new JTextField(30);
 		nicknameTextField.setFont(nicknameTextField.getFont().deriveFont(18f));
-		
+
 		//Avatar
 		avatar1Button = new JRadioButton("Male");
 		avatar1Button.setActionCommand("Male");
@@ -95,108 +92,93 @@ public class LoginPanel extends JPanel{
 		avatar3Button.setActionCommand("Alien");
 		avatar4Button = new JRadioButton("Dog");
 		avatar4Button.setActionCommand("Dog");
-		
-		ButtonGroup group = new ButtonGroup();
+
+		group = new ButtonGroup();
 		group.add(avatar1Button);
 		group.add(avatar2Button);
 		group.add(avatar3Button);
 		group.add(avatar4Button);
-		
+
 		ImageIcon avatar1ImageIcon = new ImageIcon("./src/graphics/avatar/Male.png"); 
 		Image image = avatar1ImageIcon.getImage();
 		avatar1ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar1ImageLabel = new JLabel(avatar1ImageIcon);
-		
+
 		ImageIcon avatar2ImageIcon = new ImageIcon("./src/graphics/avatar/Female.png"); 
 		image = avatar2ImageIcon.getImage();
 		avatar2ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar2ImageLabel = new JLabel(avatar2ImageIcon);
-		
+
 		ImageIcon avatar3ImageIcon = new ImageIcon("./src/graphics/avatar/Alien.png"); 
 		image = avatar3ImageIcon.getImage();
 		avatar3ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar3ImageLabel = new JLabel(avatar3ImageIcon);
-		
+
 		ImageIcon avatar4ImageIcon = new ImageIcon("./src/graphics/avatar/Dog.png"); 
 		image = avatar4ImageIcon.getImage();
 		avatar4ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
 		avatar4ImageLabel = new JLabel(avatar4ImageIcon);
 
 		TitledBorder border = BorderFactory.createTitledBorder("Add Player");
-        border.setTitleJustification(TitledBorder.CENTER); // Centra il titolo sul bordo
-        newPlayer.setBorder(border);
-        
-        newPlayer.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTH;
-        gbc.fill = gbc.HORIZONTAL;
-        
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0.1;
-        gbc.weighty = 0.1;
-        newPlayer.add(nicknameLabel, gbc);
+		border.setTitleJustification(TitledBorder.CENTER); // Centra il titolo sul bordo
+		newPlayer.setBorder(border);
 
-        gbc.gridx = 1; 
-        gbc.gridy = 0;
-        newPlayer.add(nicknameTextField, gbc);
-        
-        // da far scegliere gli avatar
-        gbc.gridx = 0; 
-        gbc.gridy = 1;
-        newPlayer.add(avatar1Button, gbc);
-        
-        gbc.gridx = 1; 
-        gbc.gridy = 1;
-        newPlayer.add(avatar1ImageLabel, gbc);
-        
-        gbc.gridx = 0; 
-        gbc.gridy = 2;
-        newPlayer.add(avatar2Button, gbc);
-        
-        gbc.gridx = 1; 
-        gbc.gridy = 2;
-        newPlayer.add(avatar2ImageLabel, gbc);
-        
-        gbc.gridx = 0; 
-        gbc.gridy = 3;
-        newPlayer.add(avatar3Button, gbc);
-        
-        gbc.gridx = 1; 
-        gbc.gridy = 3;
-        newPlayer.add(avatar3ImageLabel, gbc);
-        
-        gbc.gridx = 0; 
-        gbc.gridy = 4;
-        newPlayer.add(avatar4Button, gbc);
-        
-        gbc.gridx = 1; 
-        gbc.gridy = 4;
-        newPlayer.add(avatar4ImageLabel, gbc);
+		newPlayer.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.NORTH;
+		gbc.fill = gbc.HORIZONTAL;
 
-        // Button
-        gbc.anchor = GridBagConstraints.SOUTH;
-        gbc.gridx = 0; 
-        gbc.gridy = 10;
-        gbc.gridwidth = 2;
-        newPlayer.add(buttonNewPlayer, gbc);
-        
-        buttonNewPlayer.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String nickname = nicknameTextField.getText();
-				String avatar = group.getSelection().getActionCommand();
-				
-				BlackJackPlayer player = new BlackJackPlayer(nickname, avatar);
-				db.addPlayer(player);
-				db.stampaPlayers();
-				frame.showPanel("menuPanel");
-			}
-		});
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 0.1;
+		gbc.weighty = 0.1;
+		newPlayer.add(nicknameLabel, gbc);
+
+		gbc.gridx = 1; 
+		gbc.gridy = 0;
+		newPlayer.add(nicknameTextField, gbc);
+
+		// da far scegliere gli avatar
+		gbc.gridx = 0; 
+		gbc.gridy = 1;
+		newPlayer.add(avatar1Button, gbc);
+
+		gbc.gridx = 1; 
+		gbc.gridy = 1;
+		newPlayer.add(avatar1ImageLabel, gbc);
+
+		gbc.gridx = 0; 
+		gbc.gridy = 2;
+		newPlayer.add(avatar2Button, gbc);
+
+		gbc.gridx = 1; 
+		gbc.gridy = 2;
+		newPlayer.add(avatar2ImageLabel, gbc);
+
+		gbc.gridx = 0; 
+		gbc.gridy = 3;
+		newPlayer.add(avatar3Button, gbc);
+
+		gbc.gridx = 1; 
+		gbc.gridy = 3;
+		newPlayer.add(avatar3ImageLabel, gbc);
+
+		gbc.gridx = 0; 
+		gbc.gridy = 4;
+		newPlayer.add(avatar4Button, gbc);
+
+		gbc.gridx = 1; 
+		gbc.gridy = 4;
+		newPlayer.add(avatar4ImageLabel, gbc);
+
+		// Button
+		gbc.anchor = GridBagConstraints.SOUTH;
+		gbc.gridx = 0; 
+		gbc.gridy = 10;
+		gbc.gridwidth = 2;
+		newPlayer.add(buttonNewPlayer, gbc);
 		
-		
-		
+
 		//Load Player
 		loadPlayer = new JPanel();
 		loadPlayer.setPreferredSize(new Dimension(640, 360));
@@ -207,7 +189,7 @@ public class LoginPanel extends JPanel{
 		loadPlayer.setOpaque(true);
         
         
-		buttonLoadPlayer = new JButton("load Player");
+		buttonLoadPlayer = new MyButton("load Player", this);
 		loadPlayer.setLayout(new BorderLayout());
 		loadPlayer.add(buttonLoadPlayer, BorderLayout.SOUTH);
 		
@@ -235,28 +217,41 @@ public class LoginPanel extends JPanel{
 		scrollPane.getViewport().setOpaque(false);
 		loadPlayer.add(scrollPane, BorderLayout.CENTER);
 		
-		buttonLoadPlayer.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String nickname = (String)listaGiocatori.getSelectedValue();	
-				System.out.println("È stato selezionato "+nickname);
-				/*
-				 * TODO: gestisci il passaggio al model (recupera il player).
-				 */
-				frame.showPanel("menuPanel");
-			}
-		});
+        frame.setLayout(new BorderLayout());
+		this.add(newPlayer, BorderLayout.WEST);
+		this.add(loadPlayer, BorderLayout.EAST);
 		
-        setLayout(new BorderLayout());
-		add(newPlayer, BorderLayout.WEST);
-		add(loadPlayer, BorderLayout.EAST);
-		
+		// TODO bg sistemalo
+		frame.setContentPane(this);
+		frame.setVisible(true);
 	}
 	
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.drawImage(backgroudImage, 0, 0, 1280, 720, this);
+	}
+	
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == buttonNewPlayer) {
+			String nickname = nicknameTextField.getText();
+			String avatar = group.getSelection().getActionCommand();
+			player = new BlackJackPlayer(nickname, avatar);
+			db.addPlayer(player);
+			tavoloDaGioco.addPlayer(player);
+			System.out.println("Creato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
+		}else if(e.getSource() == buttonLoadPlayer) {
+			System.out.println("load Player");
+			int indexPlayer = listaGiocatori.getSelectedIndex();
+			player = db.getPlayerByIndex(indexPlayer);
+			tavoloDaGioco.addPlayer(player);
+			System.out.println("Caricato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
+		}
+		frame.dispose();
+		new MenuPage(tavoloDaGioco);
+
+		
 	}
 }

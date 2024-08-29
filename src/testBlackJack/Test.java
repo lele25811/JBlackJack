@@ -2,9 +2,8 @@ package testBlackJack;
 
 import controller.GameController;
 import model.BlackJackPlayer;
-import model.Database;
 import model.TavoloDaGioco;
-import view.Frame;
+import view.SplashScreenPage;
 
 public class Test {
 	
@@ -27,8 +26,8 @@ public class Test {
 		 * 
 		 */
 		
-		TavoloDaGioco model = new TavoloDaGioco();
-		Frame view = new Frame();
+		TavoloDaGioco model = TavoloDaGioco.getInstance();
+		SplashScreenPage view = new SplashScreenPage();
 		new GameController(model, view);
 		
 		model.startGame();

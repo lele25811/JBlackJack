@@ -32,10 +32,9 @@ public class Database {
 		savePlayer();
 	}
 	
-	//TODO
-	public BlackJackPlayer getPlayerByName(String player) {
-		
-		return null;
+	
+	public BlackJackPlayer getPlayerByIndex(int index) {
+		return bjPlayers.get(index);
 	}
 	
 	// Salva l'oggetto Player serializzato nel file
