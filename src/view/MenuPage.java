@@ -42,7 +42,6 @@ public class MenuPage extends JPanel implements ActionListener{
 	
 	private JLabel nicknameLabel;
 	private ImageIcon avatarIcon;
-	private Image avatarImage;
 	private JLabel avatarLabel;
 	private JLabel levelLabel;
 	private JLabel nGames;
@@ -75,12 +74,12 @@ public class MenuPage extends JPanel implements ActionListener{
         
         botLabel = new JLabel("Choose how many bots:");
         botLabel.setFont(labelFont);
-        oneBot = new JRadioButton("1");
-        oneBot.setActionCommand("1");
-        twoBot = new JRadioButton("2");
-        twoBot.setActionCommand("2");
-        threeBot = new JRadioButton("3");
-        threeBot.setActionCommand("3");
+        oneBot = new JRadioButton(BotNumber.ONE.getText());
+        oneBot.setActionCommand(BotNumber.ONE.getValue());
+        twoBot = new JRadioButton(BotNumber.TWO.getText());
+        twoBot.setActionCommand(BotNumber.TWO.getValue());
+        threeBot = new JRadioButton(BotNumber.THREE.getText());
+        threeBot.setActionCommand(BotNumber.THREE.getValue());
         
         group = new ButtonGroup();
         group.add(oneBot);
@@ -187,9 +186,13 @@ public class MenuPage extends JPanel implements ActionListener{
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		
+		if(e.getSource() == playButton) {
+			String nBot = group.getSelection().getActionCommand();
+			frame.dispose();
+			new GamePage(tavoloDaGioco, nBot);
+		}
 	}
+	
 	
     @Override
     protected void paintComponent(Graphics g) {
