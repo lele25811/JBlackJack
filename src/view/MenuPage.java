@@ -57,7 +57,7 @@ public class MenuPage extends JPanel implements ActionListener{
 		
 		frame = new Frame();
 		
-		player = tavoloDaGioco.getPlayer();
+		player = (BlackJackPlayer) tavoloDaGioco.getPlayer();
 		
 		backgroundImage = new ImageIcon("./src/graphics/backgroundGame.png").getImage();
 
@@ -188,8 +188,9 @@ public class MenuPage extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == playButton) {
 			String nBot = group.getSelection().getActionCommand();
+			tavoloDaGioco.addBot(nBot);
 			frame.dispose();
-			new GamePage(tavoloDaGioco, nBot);
+			new GamePage(tavoloDaGioco);
 		}
 	}
 	

@@ -7,46 +7,36 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import model.BlackJackPlayer;
-import model.Player;
+import model.BlackJackBot;
 
-/*
- * Ambiente di gioco grafico dove vengono messe le carte per il player
- */
-public class PlayersJPanel extends JPanel{
+public class BotPanel extends JPanel{
 	
 	private TitledBorder titledBorder;
-	private BlackJackPlayer player;
+	private BlackJackBot bot;
 	
-	public PlayersJPanel(String name, BlackJackPlayer player) {
-		this.player = player;
+	public BotPanel(String name, BlackJackBot bot) {
+		this.bot = bot;
 		
 		setPreferredSize(new Dimension(200, 200));
 		
 		titledBorder = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.RED),  // Bordo rosso
-                player.getNickname(),                      // Titolo con il nome del giocatore
+                BorderFactory.createLineBorder(Color.WHITE),  // Bordo rosso
+                bot.getNickname(),                      // Titolo con il nome del giocatore
                 TitledBorder.CENTER,                       // Posiziona il titolo al centro
                 TitledBorder.TOP,                          // Posiziona il titolo in alto
                 getFont(),                                 // Font del titolo
                 Color.WHITE                               // Colore del titolo (bianco)
         );
-
-        
-        setBorder(titledBorder);
-		/*
-		 * TODO titolo: nome giocatore, 
-		 * vedi come organizzare il tutto forse è meglio creare un panel per il player e uno per i bot,
-		 * vedi come gestire la parte in basso
-		 */
 		
+        setBorder(titledBorder);
+        
 		setBackground(new Color(120, 0, 0, 0));
 		setOpaque(true);
 		
 	}
 	
 	public void setPanelTitle() {
-		titledBorder.setTitle(player.getNickname());
+		titledBorder.setTitle(bot.getNickname());
 		repaint();
 	}
 }

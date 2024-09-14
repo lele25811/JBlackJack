@@ -9,12 +9,16 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import model.BlackJackBot;
+import model.BlackJackPlayer;
 import model.TavoloDaGioco;
 
 public class GamePage extends JPanel{
@@ -23,51 +27,44 @@ public class GamePage extends JPanel{
 	private Image backgroudImage;
 	
 	private TavoloDaGioco tavoloDaGioco;
-	String nBot;
 	
-	public GamePage(TavoloDaGioco tavoloDaGioco, String nBot) {
+	private BotPanel bancoPanel;
+	private BotPanel bot1Panel;
+	private PlayersJPanel playerPanel;
+	private BotPanel bot2Panel;
+	
+	private ActionPlayerPanel actionPlayerMenu;
+	
+	
+	public GamePage(TavoloDaGioco tavoloDaGioco) {
 		frame = new Frame();
 		this.tavoloDaGioco = tavoloDaGioco;
-		this.nBot = nBot;
 	
-		tavoloDaGioco.addBot(nBot);
-		System.out.println("Ci sono contro "+nBot+" Bot");
+		System.out.println("Ci sono contro "+ tavoloDaGioco.getNumeroGiocatori() +" Bot");
 		
 		ImageIcon icon = new ImageIcon("./src/graphics/backgroundGame.png");
-		backgroudImage = icon.getImage();
-
-		PlayersJPanel bancoPanel = new PlayersJPanel();
-		PlayersJPanel bot1Panel = new PlayersJPanel();
-		PlayersJPanel playerPanel = new PlayersJPanel();
-		PlayersJPanel bot2Panel = new PlayersJPanel();
+		backgroudImage = icon.getImage();		
 		
-		this.setLayout(new GridLayout(3, 3));
-
-		this.add(bancoPanel);     
-
-		this.add(bot1Panel);
-
-		this.add(playerPanel);
+		bancoPanel = new BotPanel("Banco", (BlackJackBot) tavoloDaGioco.getBanco());
+		bot1Panel = new BotPanel("Bot1", (BlackJackBot) tavoloDaGioco.getBot1());
+		playerPanel = new PlayersJPanel("Player", (BlackJackPlayer) tavoloDaGioco.getPlayer());
+		bot2Panel = new BotPanel("Bot2", (BlackJackBot) tavoloDaGioco.getBot2());
+		actionPlayerMenu = new ActionPlayerPanel();
 		
-		this.add(bot2Panel);
-
-
-		/*
 		this.setLayout(new BorderLayout());
-		
-		PlayersJPanel bancoPanel = new PlayersJPanel();
-		PlayersJPanel bot1Panel = new PlayersJPanel();
-		PlayersJPanel playerPanel = new PlayersJPanel();
-		PlayersJPanel bot2Panel = new PlayersJPanel();	
-		
-		
-		this.add(bancoPanel, BorderLayout.NORTH);
-	    this.add(bot1Panel, BorderLayout.SOUTH);
-	    this.add(playerPanel, BorderLayout.EAST);
-	    this.add(bot2Panel, BorderLayout.WEST);
 
-		*/
-		
+        JPanel gamePanel = new JPanel(new GridLayout(2, 2)); 
+        gamePanel.setBackground(new Color(120, 0, 0, 0));
+        gamePanel.setOpaque(true);
+        
+        gamePanel.add(bancoPanel);
+        gamePanel.add(bot1Panel);
+        gamePanel.add(playerPanel);
+        gamePanel.add(bot2Panel);
+
+        this.add(gamePanel, BorderLayout.CENTER);
+        this.add(actionPlayerMenu, BorderLayout.PAGE_END);
+        
 		frame.setContentPane(this);
 		frame.setVisible(true);
 	}

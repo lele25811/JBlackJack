@@ -30,14 +30,23 @@ public class TavoloDaGioco extends Observable{
 		mazzo = new MazzoDaGioco();
 	}
 		
-	public BlackJackPlayer getPlayer() {
+	public Player getPlayer() {
 		return player;
 	}
-	/*
-	public void getPlayer() {
-		System.out.println("Da tavolo di gioco il giocatore "+player.getNickname());	
+	
+	public Player getBanco() {
+		return giocatori.get(giocatori.size()-1);
 	}
-	*/
+	
+	public Player getBot1() {
+		return giocatori.get(0);
+	}
+	
+	public Player getBot2() {
+		return giocatori.get(2);
+	}
+	
+	
 	public void addPlayer(BlackJackPlayer player) {
 		this.player = player;
 		System.out.println("E' STATO AGGIUNTO IL PLAYER AL TAVOLO "+player.getNickname());
