@@ -98,7 +98,7 @@ public class TavoloDaGioco extends Observable{
 	// metodo di inizio gioco
 	public void startGame() {
 		distribuisciCarteIniziali();
-		turnazione();
+		//turnazione();
 		
 	}
 
@@ -139,7 +139,6 @@ public class TavoloDaGioco extends Observable{
 				System.out.println("Lung array "+ valori.length);
 				System.out.println(valori[0]);
 				return valori[0];
-				
 			}
 			if(valori.length > 1 && valori[1] > 21) {
 				valori = new int[]{valori[0]};
@@ -218,8 +217,11 @@ public class TavoloDaGioco extends Observable{
 		for(int i=0; i<2; i++) {
 			for(Player p: giocatori) {
 				p.addCarta(mazzo.prossimaCarta());
+				
 			}
 		}
+		setChanged();
+		notifyObservers();
 	}
 
 	public int getNumeroGiocatori() {

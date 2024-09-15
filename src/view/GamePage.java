@@ -36,6 +36,7 @@ public class GamePage extends JPanel{
 	private ActionPlayerPanel actionPlayerMenu;
 	
 	
+	@SuppressWarnings("deprecation")
 	public GamePage(TavoloDaGioco tavoloDaGioco) {
 		frame = new Frame();
 		this.tavoloDaGioco = tavoloDaGioco;
@@ -64,6 +65,12 @@ public class GamePage extends JPanel{
 
         this.add(gamePanel, BorderLayout.CENTER);
         this.add(actionPlayerMenu, BorderLayout.PAGE_END);
+        
+        tavoloDaGioco.addObserver(bancoPanel);
+        tavoloDaGioco.addObserver(bot1Panel);
+        tavoloDaGioco.addObserver(playerPanel);
+        tavoloDaGioco.addObserver(bot2Panel);
+        tavoloDaGioco.startGame();
         
 		frame.setContentPane(this);
 		frame.setVisible(true);

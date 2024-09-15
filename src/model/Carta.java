@@ -50,5 +50,9 @@ public class Carta {
 		return valore.stampaValore()+" di "+seme.stampaSeme();
 	}
 	
+	public String getPath() {
+		return valore.stampaValore()+seme.stampaSeme()+".png";
+	}
+	
 
 }

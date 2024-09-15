@@ -2,14 +2,18 @@ package view;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import model.BlackJackBot;
+import model.TavoloDaGioco;
 
-public class BotPanel extends JPanel{
+@SuppressWarnings("deprecation")
+public class BotPanel extends JPanel implements Observer{
 	
 	private TitledBorder titledBorder;
 	private BlackJackBot bot;
@@ -38,5 +42,18 @@ public class BotPanel extends JPanel{
 	public void setPanelTitle() {
 		titledBorder.setTitle(bot.getNickname());
 		repaint();
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (o instanceof TavoloDaGioco) {
+			mostraCarte();
+		}
+	}
+
+	private void mostraCarte() {
+		System.out.println("Giocatore: "+bot.getNickname());
+		System.out.println("|");
+		System.out.println("-Carte ricevute: "+bot.getMano());
 	}
 }
