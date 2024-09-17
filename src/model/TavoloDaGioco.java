@@ -3,7 +3,6 @@ package model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Observable;
-import java.util.OptionalInt;
 import java.util.Random;
 
 /*
@@ -20,6 +19,9 @@ public class TavoloDaGioco extends Observable{
 	private MazzoDaGioco mazzo;
 	private ArrayList<Player> giocatori = new ArrayList<Player>();
 	private BlackJackPlayer player;
+	private int currentPlayerIndex;
+	// Oggetto per la sincronizzazione dei turni
+	private final Object lock = new Object();
 	
 	public static TavoloDaGioco getInstance() {
 		if(tavoloDaGiocoInstance == null) tavoloDaGiocoInstance = new TavoloDaGioco();
@@ -82,6 +84,8 @@ public class TavoloDaGioco extends Observable{
 				giocatori.addAll(Arrays.asList(franco, player, baldassarre, banco));
 				break;
 		}
+		currentPlayerIndex = 0;
+		addPunti(giocatori.size());
 	}
 	
 	public void provaStampa() {
@@ -98,26 +102,63 @@ public class TavoloDaGioco extends Observable{
 	// metodo di inizio gioco
 	public void startGame() {
 		distribuisciCarteIniziali();
-		//turnazione();
-		
+		/*
+		new Thread(() -> {
+	        turnazione();  // Esegue il ciclo di gioco su un thread separato
+	    }).start();
+		*/
 	}
 
-	
 	private void turnazione() {
-		for(Player p: giocatori) {
-			System.out.println();
+		while(hasNext()) {
+			System.out.println("Giocatore attuale "+currentPlayerIndex+" su "+giocatori.size()+"-1");
+			if(currentPlayerIndex == giocatori.size()-1) {
+				break;
+			}
+			Player p = getCurrentPlayer();
 			if(p instanceof BlackJackBot) {
 				//turnoBot(p);
-				System.out.println("È un bot, "+p.getNickname());
-				provaTurnoBot(p);
+				System.out.println("MODEL.È il turno di bot, "+p.getNickname());
+				int punti = provaTurnoBot(p);
+				setPunti(currentPlayerIndex, punti);
+				nextPlayer();
 			}
 			if(p instanceof BlackJackPlayer) {
-				System.out.println("È un Player, "+p.getNickname());
-				//turnoPlayer();
+				System.out.println("MODEL.È il turno di Player, "+p.getNickname());
+				turnoPlayer();
+				waitForPlayerTurn();
+				nextPlayer();
 			}
 		}
 	}
 	
+	private void waitForPlayerTurn() {
+		synchronized (lock) {
+            try {
+            	System.out.println("Sono in attesa");
+                lock.wait();  // Attende che il turno del giocatore sia completato
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+	}
+	
+	public void playerFinishedTurn() {
+        synchronized (lock) {
+        	System.out.println("Turno finito");
+            lock.notify();  // Notifica che il turno del giocatore è finito
+        }
+    }
+
+	private void setPunti(int currentPlayerIndex, int p) {
+		System.out.println(currentPlayerIndex+ "ha totalizzato: "+ p);
+		punti[currentPlayerIndex] = p;
+	}
+	
+	public int getPunti(Player p) {
+		return punti[giocatori.indexOf(p)];
+	}
+
 	private int provaTurnoBot(Player p) {
 		boolean isBanco = ((BlackJackBot) p).getIsBanco();
 		boolean isRaddoppio = false;
@@ -136,7 +177,6 @@ public class TavoloDaGioco extends Observable{
 			// gestione uscita raddoppio
 			if(isRaddoppio) {
 				System.out.println("Il raddoppio mi ha lasciato:");
-				System.out.println("Lung array "+ valori.length);
 				System.out.println(valori[0]);
 				return valori[0];
 			}
@@ -206,30 +246,91 @@ public class TavoloDaGioco extends Observable{
 	private void raddoppio(int valori, Player p) {
 		p.addCarta(mazzo.prossimaCarta());
 		System.out.println("Mano attuale "+p.getMano());
+		setChanged();
+		notifyObservers("ChiediCarta");
 	}
 
 	private void carta(int valori, Player p) {
 		p.addCarta(mazzo.prossimaCarta());
 		System.out.println("Mano attuale "+p.getMano());
-	}
-
-	private void distribuisciCarteIniziali() {
-		for(int i=0; i<2; i++) {
-			for(Player p: giocatori) {
-				p.addCarta(mazzo.prossimaCarta());
-				
-			}
-		}
 		setChanged();
-		notifyObservers();
+		notifyObservers("ChiediCarta");
 	}
 
+	private void distribuisciCarteIniziali() { 
+		new Thread(() -> {
+			try {
+				for (int i = 0; i < 2; i++) {  // Due carte per ciascun giocatore
+					for (Player p : giocatori) {
+						Thread.sleep(1000);  // Attesa di 1 secondi tra una carta e l'altra
+						p.addCarta(mazzo.prossimaCarta());
+						setChanged();
+						notifyObservers("DistribuisciCarteIniziali");  // Notifica la distribuzione della carta
+					}
+				}
+				System.out.println("Distribuzione della carte completata, La partita può iniziare");
+				setChanged();
+				notifyObservers("DistribuzioneTerminata");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}).start();
+	}
+	
 	public int getNumeroGiocatori() {
 		return giocatori.size();
 	}
 	
+	public static boolean lastIsAsso(Player p) {
+		boolean isAsso = p.getMano().stream().skip(p.getMano().size() -1).anyMatch(carta -> "Asso".equals(carta.getStringValore()));
+		return isAsso;
+	}
+	
 	public void getCarte() {
 		mazzo.mazzoStampa();
+	}
+	
+	public void turnoPlayer() {
+		setChanged();
+		notifyObservers("turnoPlayer");
+	}
+	
+	/*
+	 * Gestione della turnazione
+	 */
+
+	// Ritorna il giocatore corrente
+	public Player getCurrentPlayer() {
+		return giocatori.get(currentPlayerIndex);
+	}
+	
+	public void nextPlayer() {
+		if (currentPlayerIndex < giocatori.size() - 1) {
+            currentPlayerIndex++;
+        } else {
+            // Tutti i giocatori hanno giocato
+            currentPlayerIndex = 0; // Reset currentPlayer 
+        }
+	}
+	
+	public boolean hasNext() {
+		return currentPlayerIndex >=0;
+	}
+	
+	/*
+	 * TODO: GESTIONE DELLE MOSSE DEL PLAYER E DI CONSEGUENZA DEI BOT
+	 */
+	
+	public void getCard(Player p) {
+		p.addCarta(mazzo.prossimaCarta());
+		setChanged();
+		notifyObservers("NuovaCarta");
+	}
+	
+	public void stay() {
+		nextPlayer();
+		// corretto? credo di no
+		//turnazione();
 	}
 	
 }

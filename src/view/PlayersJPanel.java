@@ -12,8 +12,10 @@ import java.util.Observer;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import model.BlackJackPlayer;
@@ -32,11 +34,12 @@ public class PlayersJPanel extends JPanel implements Observer{
 	private ArrayList<Carta> mano;
 	private ArrayList<Image> carteImages;
 	private JLabel punti;
+	private Integer puntiAttuali = 0;
 	
 	public PlayersJPanel(String name, BlackJackPlayer player) {
 		this.player = player;
 		carteImages = new ArrayList<>();
-		punti = new JLabel("0", SwingConstants.CENTER);
+		punti = new JLabel("", SwingConstants.CENTER);
 		
 		setPreferredSize(new Dimension(200, 200));
 		
@@ -55,7 +58,6 @@ public class PlayersJPanel extends JPanel implements Observer{
 		setLayout(new BorderLayout());
 		
 		add(punti, BorderLayout.NORTH);
-		
 	}
 	
 	public void setPanelTitle() {
@@ -65,15 +67,26 @@ public class PlayersJPanel extends JPanel implements Observer{
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (o instanceof TavoloDaGioco) {
-			mostraCarte();
+		if (o instanceof TavoloDaGioco && arg instanceof String) {
+			String action = (String)arg;
+			if(action.equals("DistribuisciCarteIniziali")) {
+				drawCarteIniziali();
+			}else if(action.equals("DistribuzioneTerminata")) {
+				calcolaPunteggio();
+			}else if(action.equals("NuovaCarta")) {
+				drawCard();
+				if(TavoloDaGioco.lastIsAsso(player)) {
+					calcolaPunteggio();
+				}
+			}
 		}
 	}
 	
-	public void mostraCarte() {
-		System.out.println("Giocatore: "+player.getNickname());
-		System.out.println("|_");
-		System.out.println("Carte ricevute: "+player.getMano());
+	private void drawCarteIniziali() {
+		drawCard();
+	}
+
+	public void drawCard() {
 		carteImages.clear();
 		mano = player.getMano();
 		for (Carta carta : mano) {
@@ -82,17 +95,51 @@ public class PlayersJPanel extends JPanel implements Observer{
 		    ImageIcon cartaIcon = new ImageIcon("./src/graphics/"+imagePath);
 		    Image img = cartaIcon.getImage(); // Ottieni l'oggetto Image dall'ImageIcon
 	        Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
-	       
-	        carteImages.add(imgScaled);
 	        
-	        //ImageIcon scaledIcon = new ImageIcon(imgScaled);
-		    //JLabel cartaLabel = new JLabel(scaledIcon);
-	        //add(cartaLabel, BorderLayout.SOUTH);
-	        punti.setText("Valore mano da definire");
+	        carteImages.add(imgScaled);
 		}
-		revalidate();  // Aggiorna il layout del pannello
-		repaint();     // Ridisegna il pannello
-		
+		revalidate();
+		repaint();
+	}
+	
+	public void calcolaPunteggio() {
+		SwingUtilities.invokeLater(() -> {
+			int[] punteggi = player.getPuntiMano();
+			if (TavoloDaGioco.lastIsAsso(player) || puntiAttuali == 0) {
+				puntiAttuali = scegliPunteggioAsso(punteggi);
+			}else {
+				puntiAttuali = punteggi[0];
+			}
+			punti.setText("Punti attuali: " + puntiAttuali);
+		});
+	}
+	
+	public int scegliPunteggioAsso(int[] punteggi) {
+	    if (punteggi.length == 2) { // Se ci sono due opzioni di punteggio (con Asso)
+	        // Crea il messaggio e le opzioni per il popup
+	        String message = "Vuoi contare l'Asso come 1 ("+punteggi[0]+") o 11 ("+punteggi[1]+")?";
+	        String[] options = {"Asso = 1 ("+punteggi[0]+")", "Asso = 11 ("+punteggi[1]+")"};
+	        
+	        // Mostra il menu popup con le opzioni
+	        int scelta = JOptionPane.showOptionDialog(
+	            null, //componente padre della finestra 
+	            message, // testo da visualizzare nella finestra
+	            "Scegli il valore dell'Asso", // titolo finestra
+	            JOptionPane.DEFAULT_OPTION, // tipo di operazioni che verranno mostrate
+	            JOptionPane.QUESTION_MESSAGE, // tipo di messaggio che viene mostrato
+	            null, // icona
+	            options, // risposta 1
+	            options[0] //risposta 2
+	        );
+	        
+	        // Gestisci la scelta del giocatore
+	        if (scelta == 0) { // Asso = 1
+	            return punteggi[0];
+	        } else if (scelta == 1) { // Asso = 11
+	            return punteggi[1];
+	        }
+	    }
+	    return punteggi[0];
 	}
 	
 	@Override
@@ -105,8 +152,9 @@ public class PlayersJPanel extends JPanel implements Observer{
 
 	    for (Image carta : carteImages) {
 	    	g.drawImage(carta, xOffset, yOffset, this);
-	        xOffset += 50;  // Sposta la prossima carta di 50px a destra
+	        xOffset += 40;  // Sposta la prossima carta di 50px a destra
 	    }
 	}
-}
+	
 
+}

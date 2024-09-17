@@ -50,7 +50,7 @@ public class GamePage extends JPanel{
 		bot1Panel = new BotPanel("Bot1", (BlackJackBot) tavoloDaGioco.getBot1());
 		playerPanel = new PlayersJPanel("Player", (BlackJackPlayer) tavoloDaGioco.getPlayer());
 		bot2Panel = new BotPanel("Bot2", (BlackJackBot) tavoloDaGioco.getBot2());
-		actionPlayerMenu = new ActionPlayerPanel();
+		actionPlayerMenu = new ActionPlayerPanel(tavoloDaGioco);
 		
 		this.setLayout(new BorderLayout());
 
@@ -70,6 +70,7 @@ public class GamePage extends JPanel{
         tavoloDaGioco.addObserver(bot1Panel);
         tavoloDaGioco.addObserver(playerPanel);
         tavoloDaGioco.addObserver(bot2Panel);
+        tavoloDaGioco.addObserver(actionPlayerMenu);
         tavoloDaGioco.startGame();
         
 		frame.setContentPane(this);

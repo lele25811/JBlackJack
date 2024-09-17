@@ -60,6 +60,16 @@ public class Player implements Serializable{
 		return mano;
 	}
 	
+	/*
+	 * Ritorna l'array dei valori possibili della mano, in modo che i bot possono scegliere in autonomia e il player sceglie tramite menu popup
+	 */
+	public int[] getPuntiMano() {
+		int valore = mano.stream().mapToInt(carta -> carta.getValore()).sum();
+		boolean isAsso = mano.stream().anyMatch(carta -> "Asso".equals(carta.getStringValore()));
+		if(isAsso) return new int[] {valore, valore+10};
+		else return new int[] {valore};
+	}
+	
 	public int[] getValoreManoIniziale() {
 		int valore = mano.stream().mapToInt(carta -> carta.getValore()).sum();
 		boolean isAsso = mano.stream().anyMatch(carta -> "Asso".equals(carta.getStringValore()));
@@ -79,4 +89,12 @@ public class Player implements Serializable{
 		if (isAsso) return new int[] {valoreUltimaCarta+valoreAttuale, valoreUltimaCarta+valoreAttuale+10};
 		else return new int[] {valoreUltimaCarta+valoreAttuale};
 	}
+	
+	public Carta getLastCard() {
+		if (mano.size() > 0) {
+			return mano.get(mano.size()-1);
+		}
+		return null;
+	}
+	
 }
