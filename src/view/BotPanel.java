@@ -69,15 +69,26 @@ public class BotPanel extends JPanel implements Observer{
 				drawCarteIniziali();
 			}else if(action.equals("DistribuzioneTerminata")) {
 				calcolaPunteggio();
-			}else if(action.equals("ChiediCarta")) {
+				updatePunti();
+			}else if(action.equals("NuovaCarta")) {				
 				drawCards();
+				puntiAttuali = bot.updatePunti();
+				updatePunti();
 			}
 		}
 	}
 
+	private void updatePunti() {
+		punti.setText("Punti attuali: "+puntiAttuali);
+		punti.revalidate();
+		punti.repaint();
+	}
+
 	private void calcolaPunteggio() {
 		int[] punteggiDisponibili = bot.getValoreManoIniziale();
-		punti.setText("Punti Attuali: "+String.valueOf(bot.getSceltaPunteggio(punteggiDisponibili)));
+		//puntiAttuali = bot.getSceltaPunteggio(punteggiDisponibili);
+		puntiAttuali = bot.getSceltaPunti(punteggiDisponibili);
+		updatePunti();
 	}
 
 	private void drawCarteIniziali() {
@@ -98,7 +109,6 @@ public class BotPanel extends JPanel implements Observer{
 		}
 		revalidate();
 		repaint();
-		
 	}
 	
 	

@@ -22,6 +22,7 @@ public class TavoloDaGioco extends Observable{
 	private int currentPlayerIndex;
 	// Oggetto per la sincronizzazione dei turni
 	private final Object lock = new Object();
+	private Random random = new Random();
 	
 	public static TavoloDaGioco getInstance() {
 		if(tavoloDaGiocoInstance == null) tavoloDaGiocoInstance = new TavoloDaGioco();
@@ -101,6 +102,7 @@ public class TavoloDaGioco extends Observable{
 	
 	// metodo di inizio gioco
 	public void startGame() {
+		System.out.println("n giocatori "+giocatori.size());
 		distribuisciCarteIniziali();
 		/*
 		new Thread(() -> {
@@ -112,30 +114,28 @@ public class TavoloDaGioco extends Observable{
 	private void turnazione() {
 		while(hasNext()) {
 			System.out.println("Giocatore attuale "+currentPlayerIndex+" su "+giocatori.size()+"-1");
-			if(currentPlayerIndex == giocatori.size()-1) {
+			if(currentPlayerIndex == giocatori.size()) {
 				break;
 			}
 			Player p = getCurrentPlayer();
 			if(p instanceof BlackJackBot) {
-				//turnoBot(p);
 				System.out.println("MODEL.È il turno di bot, "+p.getNickname());
-				int punti = provaTurnoBot(p);
-				setPunti(currentPlayerIndex, punti);
-				nextPlayer();
+				turnoBot((BlackJackBot) p);
+				//int punti = provaTurnoBot(p);
+				//setPunti(currentPlayerIndex, punti);
 			}
 			if(p instanceof BlackJackPlayer) {
 				System.out.println("MODEL.È il turno di Player, "+p.getNickname());
 				turnoPlayer();
 				waitForPlayerTurn();
-				nextPlayer();
 			}
+			nextPlayer();
 		}
 	}
 	
 	private void waitForPlayerTurn() {
 		synchronized (lock) {
             try {
-            	System.out.println("Sono in attesa");
                 lock.wait();  // Attende che il turno del giocatore sia completato
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -159,102 +159,37 @@ public class TavoloDaGioco extends Observable{
 		return punti[giocatori.indexOf(p)];
 	}
 
-	private int provaTurnoBot(Player p) {
-		boolean isBanco = ((BlackJackBot) p).getIsBanco();
-		boolean isRaddoppio = false;
-		Random random = new Random();
-		int valoreAggiornato = 0;
-		int[] valori = p.getValoreManoIniziale();
+	// Entry point per il turno del bot
+	private int turnoBot(BlackJackBot bot) {
+		boolean raddoppio = false;
+		int punti = bot.getPunti();
 		while(true) {
-			
-			for(int i=0; i<valori.length; i++) {
-				System.out.println(valori[i]);
-			}
-			if(valoreAggiornato > 21) {
-				System.out.println("###HO SBALLATO CON "+valoreAggiornato+"###");
+			//System.out.println("punti Attuali: "+punti);
+			if(isSballato(punti)) {
+				System.out.println("Ho sballato con "+punti);
 				return 0;
-			}
-			// gestione uscita raddoppio
-			if(isRaddoppio) {
-				System.out.println("Il raddoppio mi ha lasciato:");
-				System.out.println(valori[0]);
-				return valori[0];
-			}
-			if(valori.length > 1 && valori[1] > 21) {
-				valori = new int[]{valori[0]};
-			}
-			if(valori.length > 1) {
-				if(valori[1] >= 18) {
-					System.out.println("###STO CON "+valori[1] +"###");
-					return valori[1];
-				}else {
-					int sceltaCarta = random.nextInt(2); // scelta valore[0] o [1]
-					int sceltaMossa = random.nextInt(2); // scelta mossa (carta o raddoppio)
-					if(isBanco) {
-						sceltaMossa = 0;
-					}
-					switch(sceltaMossa) {
-						case 0:
-							valoreAggiornato = valori[sceltaCarta];
-							System.out.println("###CARTA CON "+valori[sceltaCarta] +"###");
-							carta(valori[sceltaCarta], p);
+			}else if(punti >= 18 || raddoppio) {
+				System.out.println("Sto con "+punti);
+				return punti;
+			}else if(punti < 18) {
+				int scelta = 0;
+				if(!bot.getIsBanco()) {
+					scelta = random.nextInt(2);
+				}
+				switch(scelta) {
+					case 0: getCard(bot);
 							break;
-						case 1:
-							valoreAggiornato = valori[sceltaCarta];
-							System.out.println("###RADDOPPIO CON "+valori[sceltaCarta] +"###");
-							isRaddoppio = true;
-							raddoppio(valori[sceltaCarta], p);
-							break;
-						default: carta(valori[0], p);
-					}
-				}
-			//Controllo valori singoli
-			}else if(valori.length == 1) {
-				if(valori[0] > 21) {
-					System.out.println("###HO SBALLATO CON"+valori[0]+"###");
-					return 0;
-				}
-				if(valori[0] >= 18) {
-					System.out.println("###STO CON "+valori[0] +"###");
-					return valori[0];
-				}else {
-					int sceltaMossa = random.nextInt(2);
-					if(isBanco) {
-						sceltaMossa = 0;
-					}
-					switch(sceltaMossa) {
-					case 0:
-						valoreAggiornato = valori[0];
-						carta(valori[0], p);
-						System.out.println("###CARTA CON "+valori[0] +"###");
+					case 1: {
+						getCard(bot);
+						System.out.println("Raddoppio");
+						raddoppio = true;
 						break;
-					case 1:
-						valoreAggiornato = valori[0];
-						// TODO: definisci operazioni
-						isRaddoppio = true;
-						raddoppio(valori[0], p);
-						System.out.println("###RADDOPPIO CON "+valori[0] +"###");
-						break;
-					default: carta(valori[0], p);
 					}
 				}
 			}
-			valori = p.getValoreMano(valoreAggiornato);
+			punti = punti + bot.updatePunti();
+			bot.setPunti(punti);
 		}
-	}
-
-	private void raddoppio(int valori, Player p) {
-		p.addCarta(mazzo.prossimaCarta());
-		System.out.println("Mano attuale "+p.getMano());
-		setChanged();
-		notifyObservers("ChiediCarta");
-	}
-
-	private void carta(int valori, Player p) {
-		p.addCarta(mazzo.prossimaCarta());
-		System.out.println("Mano attuale "+p.getMano());
-		setChanged();
-		notifyObservers("ChiediCarta");
 	}
 
 	private void distribuisciCarteIniziali() { 
@@ -271,6 +206,7 @@ public class TavoloDaGioco extends Observable{
 				System.out.println("Distribuzione della carte completata, La partita può iniziare");
 				setChanged();
 				notifyObservers("DistribuzioneTerminata");
+				turnazione();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -305,16 +241,17 @@ public class TavoloDaGioco extends Observable{
 	}
 	
 	public void nextPlayer() {
-		if (currentPlayerIndex < giocatori.size() - 1) {
+		if (currentPlayerIndex <= giocatori.size()) {
             currentPlayerIndex++;
         } else {
             // Tutti i giocatori hanno giocato
             currentPlayerIndex = 0; // Reset currentPlayer 
         }
+		System.out.println("Prossimo player: "+currentPlayerIndex);
 	}
 	
 	public boolean hasNext() {
-		return currentPlayerIndex >=0;
+		return currentPlayerIndex < giocatori.size();
 	}
 	
 	/*
@@ -322,15 +259,19 @@ public class TavoloDaGioco extends Observable{
 	 */
 	
 	public void getCard(Player p) {
+		System.out.println("Chiedo carta");
 		p.addCarta(mazzo.prossimaCarta());
+		System.out.println(p.getMano());
 		setChanged();
 		notifyObservers("NuovaCarta");
 	}
 	
 	public void stay() {
 		nextPlayer();
-		// corretto? credo di no
-		//turnazione();
+	}
+	
+	public boolean isSballato(int punto) {
+		return punto > 21;
 	}
 	
 }

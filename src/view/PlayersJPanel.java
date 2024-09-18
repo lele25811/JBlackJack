@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
+import model.BlackJackBot;
 import model.BlackJackPlayer;
 import model.Carta;
 import model.Player;
@@ -68,7 +69,7 @@ public class PlayersJPanel extends JPanel implements Observer{
 	@Override
 	public void update(Observable o, Object arg) {
 		if (o instanceof TavoloDaGioco && arg instanceof String) {
-			String action = (String)arg;
+			String action = (String) arg;
 			if(action.equals("DistribuisciCarteIniziali")) {
 				drawCarteIniziali();
 			}else if(action.equals("DistribuzioneTerminata")) {
@@ -77,9 +78,18 @@ public class PlayersJPanel extends JPanel implements Observer{
 				drawCard();
 				if(TavoloDaGioco.lastIsAsso(player)) {
 					calcolaPunteggio();
+				}else {
+					puntiAttuali = puntiAttuali + player.getLastCard().getValore();
 				}
+				updatePunteggio();
 			}
 		}
+	}
+	
+	private void updatePunteggio() {
+		punti.setText("Punti attuali: " + puntiAttuali);
+		punti.revalidate();
+		punti.repaint();
 	}
 	
 	private void drawCarteIniziali() {
@@ -110,7 +120,6 @@ public class PlayersJPanel extends JPanel implements Observer{
 			}else {
 				puntiAttuali = punteggi[0];
 			}
-			punti.setText("Punti attuali: " + puntiAttuali);
 		});
 	}
 	

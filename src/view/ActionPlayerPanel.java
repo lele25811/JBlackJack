@@ -61,7 +61,6 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 			raddoppiaButton.setEnabled(false);
 			dividiButton.setEnabled(false);
 			tavoloDaGioco.playerFinishedTurn();
-			System.out.println("Sto bene cosi");
 		}
 		if(e.getSource() == raddoppiaButton) {
 			System.out.println("Raddoppio");
