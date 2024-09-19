@@ -50,14 +50,16 @@ public class BotPanel extends JPanel implements Observer{
         setBorder(titledBorder);
         
 		setBackground(new Color(120, 0, 0, 0));
-		setOpaque(true);
+		setOpaque(false);
 		
+		setLayout(new BorderLayout());
 		add(punti, BorderLayout.NORTH);
 		
 	}
 	
 	public void setPanelTitle() {
 		titledBorder.setTitle(bot.getNickname());
+		revalidate();
 		repaint();
 	}
 
@@ -65,23 +67,30 @@ public class BotPanel extends JPanel implements Observer{
 	public void update(Observable o, Object arg) {
 		if (o instanceof TavoloDaGioco && arg instanceof String) {
 			String action = (String) arg;
+			
 			if(action.equals("DistribuisciCarteIniziali")) {
 				drawCarteIniziali();
+				calcolaPunteggio();
+				updatePunti();
 			}else if(action.equals("DistribuzioneTerminata")) {
 				calcolaPunteggio();
 				updatePunti();
-			}else if(action.equals("NuovaCarta")) {				
+			}else if(action.equals("NuovaCartaBot")) {
 				drawCards();
-				puntiAttuali = bot.updatePunti();
+				updatePunti();
+			}else if(action.equals("FineTurno")) {
 				updatePunti();
 			}
+			revalidate();
+			repaint();
 		}
 	}
 
 	private void updatePunti() {
+		puntiAttuali = bot.getPunti();
 		punti.setText("Punti attuali: "+puntiAttuali);
-		punti.revalidate();
-		punti.repaint();
+		revalidate();
+		repaint();
 	}
 
 	private void calcolaPunteggio() {
@@ -125,5 +134,4 @@ public class BotPanel extends JPanel implements Observer{
 	        xOffset += 40;  // Sposta la prossima carta di 50px a destra
 	    }
 	}
-	
 }

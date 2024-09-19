@@ -50,13 +50,13 @@ public class GamePage extends JPanel{
 		bot1Panel = new BotPanel("Bot1", (BlackJackBot) tavoloDaGioco.getBot1());
 		playerPanel = new PlayersJPanel("Player", (BlackJackPlayer) tavoloDaGioco.getPlayer());
 		bot2Panel = new BotPanel("Bot2", (BlackJackBot) tavoloDaGioco.getBot2());
-		actionPlayerMenu = new ActionPlayerPanel(tavoloDaGioco);
+		actionPlayerMenu = new ActionPlayerPanel(tavoloDaGioco, playerPanel);
 		
 		this.setLayout(new BorderLayout());
 
         JPanel gamePanel = new JPanel(new GridLayout(2, 2)); 
         gamePanel.setBackground(new Color(120, 0, 0, 0));
-        gamePanel.setOpaque(true);
+        gamePanel.setOpaque(false);
         
         gamePanel.add(bancoPanel);
         gamePanel.add(bot1Panel);

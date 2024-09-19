@@ -21,9 +21,11 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 	private MyButton raddoppiaButton;
 	private MyButton dividiButton;
 	private TavoloDaGioco tavoloDaGioco;
+	private PlayersJPanel playerPanel;
 	
-	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco) {
+	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco, PlayersJPanel playerPanel) {
 		this.tavoloDaGioco = tavoloDaGioco;
+		this.playerPanel = playerPanel;
 		
 		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.RED, 2), "Azioni di gioco");
 	    border.setTitleColor(Color.RED);
@@ -60,6 +62,7 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 			staiButton.setEnabled(false);
 			raddoppiaButton.setEnabled(false);
 			dividiButton.setEnabled(false);
+			playerPanel.endPlayerTurn();
 			tavoloDaGioco.playerFinishedTurn();
 		}
 		if(e.getSource() == raddoppiaButton) {
@@ -75,7 +78,7 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 	public void update(Observable o, Object arg) {
 		if (arg instanceof String) {
 			String action = (String) arg;
-			if (action.equals("turnoPlayer")) {
+			if (action.equals("TurnoPlayer")) {
 				cartaButton.setEnabled(true);
 				staiButton.setEnabled(true);
 				raddoppiaButton.setEnabled(true);

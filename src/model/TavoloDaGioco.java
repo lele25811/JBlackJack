@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Observable;
 import java.util.Random;
 
+import javax.swing.SwingUtilities;
+
 /*
  * Classe che modella le regole di gioco, le mani, i punti e la logica
  */
@@ -121,6 +123,8 @@ public class TavoloDaGioco extends Observable{
 			if(p instanceof BlackJackBot) {
 				System.out.println("MODEL.È il turno di bot, "+p.getNickname());
 				turnoBot((BlackJackBot) p);
+				setChanged();
+				notifyObservers("FineTurno");
 				//int punti = provaTurnoBot(p);
 				//setPunti(currentPlayerIndex, punti);
 			}
@@ -167,9 +171,11 @@ public class TavoloDaGioco extends Observable{
 			//System.out.println("punti Attuali: "+punti);
 			if(isSballato(punti)) {
 				System.out.println("Ho sballato con "+punti);
+				bot.setPunti(punti);
 				return 0;
 			}else if(punti >= 18 || raddoppio) {
 				System.out.println("Sto con "+punti);
+				bot.setPunti(punti);
 				return punti;
 			}else if(punti < 18) {
 				int scelta = 0;
@@ -177,10 +183,10 @@ public class TavoloDaGioco extends Observable{
 					scelta = random.nextInt(2);
 				}
 				switch(scelta) {
-					case 0: getCard(bot);
+					case 0: getCardBot(bot);
 							break;
 					case 1: {
-						getCard(bot);
+						getCardBot(bot);
 						System.out.println("Raddoppio");
 						raddoppio = true;
 						break;
@@ -189,6 +195,7 @@ public class TavoloDaGioco extends Observable{
 			}
 			punti = punti + bot.updatePunti();
 			bot.setPunti(punti);
+			punti = bot.getPunti();
 		}
 	}
 
@@ -217,18 +224,13 @@ public class TavoloDaGioco extends Observable{
 		return giocatori.size();
 	}
 	
-	public static boolean lastIsAsso(Player p) {
-		boolean isAsso = p.getMano().stream().skip(p.getMano().size() -1).anyMatch(carta -> "Asso".equals(carta.getStringValore()));
-		return isAsso;
-	}
-	
 	public void getCarte() {
 		mazzo.mazzoStampa();
 	}
 	
 	public void turnoPlayer() {
 		setChanged();
-		notifyObservers("turnoPlayer");
+		notifyObservers("TurnoPlayer");
 	}
 	
 	/*
@@ -264,6 +266,19 @@ public class TavoloDaGioco extends Observable{
 		System.out.println(p.getMano());
 		setChanged();
 		notifyObservers("NuovaCarta");
+	}
+	
+	public void getCardBot(Player p) {
+		System.out.println("Chiedo carta");
+		p.addCarta(mazzo.prossimaCarta());
+		System.out.println(p.getMano());
+		try {
+			Thread.sleep(2000);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		setChanged();
+        notifyObservers("NuovaCartaBot");
 	}
 	
 	public void stay() {

@@ -76,7 +76,7 @@ public class LoginPage extends JPanel implements ActionListener{
 		newPlayer.setPreferredSize(new Dimension(640, 360));
 		// set JPanel trasparent
 		newPlayer.setBackground(new Color(0, 0, 0, 0));
-		newPlayer.setOpaque(true);
+		newPlayer.setOpaque(false);
 		buttonNewPlayer = new MyButton("Add Player", this);
 		nicknameLabel = new JLabel("Nickname:");
 		nicknameLabel.setFont(nicknameLabel.getFont().deriveFont(18f));
@@ -186,7 +186,7 @@ public class LoginPage extends JPanel implements ActionListener{
         borderLoadPlayer.setTitleJustification(TitledBorder.CENTER); // Centra il titolo sul bordo
         loadPlayer.setBorder(borderLoadPlayer);
         loadPlayer.setBackground(new Color(120, 0, 0, 0));
-		loadPlayer.setOpaque(true);
+		loadPlayer.setOpaque(false);
         
         
 		buttonLoadPlayer = new MyButton("load Player", this);
@@ -202,8 +202,8 @@ public class LoginPage extends JPanel implements ActionListener{
 	    }
 	    
 		listaGiocatori = new JList<String>(playersNameAvatar);
-		listaGiocatori.setBackground(new Color(0, 0, 0, 0));
-		listaGiocatori.setOpaque(true);
+		listaGiocatori.setBackground(new Color(120, 0, 0, 0));
+		listaGiocatori.setOpaque(false);
 		Font font = listaGiocatori.getFont();
 	    Font newFont = font.deriveFont(font.getSize() + 10f); // Aumenta la dimensione di 10 punti
 	    listaGiocatori.setFont(newFont);

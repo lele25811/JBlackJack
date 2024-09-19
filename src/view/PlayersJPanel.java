@@ -18,10 +18,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
-import model.BlackJackBot;
 import model.BlackJackPlayer;
 import model.Carta;
-import model.Player;
 import model.TavoloDaGioco;
 
 /*
@@ -36,6 +34,8 @@ public class PlayersJPanel extends JPanel implements Observer{
 	private ArrayList<Image> carteImages;
 	private JLabel punti;
 	private Integer puntiAttuali = 0;
+	private boolean isTurnoPlayer = false;
+	private boolean isDistribuzioneFinita = false;
 	
 	public PlayersJPanel(String name, BlackJackPlayer player) {
 		this.player = player;
@@ -55,7 +55,7 @@ public class PlayersJPanel extends JPanel implements Observer{
 
         setBorder(titledBorder);
 		setBackground(new Color(120, 0, 0, 0));
-		setOpaque(true);
+		setOpaque(false);
 		setLayout(new BorderLayout());
 		
 		add(punti, BorderLayout.NORTH);
@@ -70,19 +70,22 @@ public class PlayersJPanel extends JPanel implements Observer{
 	public void update(Observable o, Object arg) {
 		if (o instanceof TavoloDaGioco && arg instanceof String) {
 			String action = (String) arg;
+			
 			if(action.equals("DistribuisciCarteIniziali")) {
-				drawCarteIniziali();
+				drawCard();
+				calcolaPunteggio();
 			}else if(action.equals("DistribuzioneTerminata")) {
 				calcolaPunteggio();
+				isDistribuzioneFinita = true;
+			}else if(action.equals("TurnoPlayer")) {
+				isTurnoPlayer = true;
+				calcolaPunteggio();
 			}else if(action.equals("NuovaCarta")) {
+				isDistribuzioneFinita = false;
 				drawCard();
-				if(TavoloDaGioco.lastIsAsso(player)) {
-					calcolaPunteggio();
-				}else {
-					puntiAttuali = puntiAttuali + player.getLastCard().getValore();
-				}
-				updatePunteggio();
+				calcolaPunteggio();
 			}
+			updatePunteggio();
 		}
 	}
 	
@@ -90,10 +93,6 @@ public class PlayersJPanel extends JPanel implements Observer{
 		punti.setText("Punti attuali: " + puntiAttuali);
 		punti.revalidate();
 		punti.repaint();
-	}
-	
-	private void drawCarteIniziali() {
-		drawCard();
 	}
 
 	public void drawCard() {
@@ -115,11 +114,22 @@ public class PlayersJPanel extends JPanel implements Observer{
 	public void calcolaPunteggio() {
 		SwingUtilities.invokeLater(() -> {
 			int[] punteggi = player.getPuntiMano();
-			if (TavoloDaGioco.lastIsAsso(player) || puntiAttuali == 0) {
-				puntiAttuali = scegliPunteggioAsso(punteggi);
-			}else {
+			if(!isTurnoPlayer) {
 				puntiAttuali = punteggi[0];
 			}
+		    if (isTurnoPlayer) {  // Solo durante il turno del giocatore
+				if (isDistribuzioneFinita && player.haveAsso()) {
+	                // Se il punteggio è 0 e c'è un Asso in mano, mostra il popup per scegliere il valore dell'Asso
+	                puntiAttuali = scegliPunteggioAsso(punteggi);
+	            } else if (player.lastIsAsso() && puntiAttuali > 0) {
+	                // Se l'ultima carta pescata è un Asso e il punteggio è già > 0, mostra di nuovo il popup
+	                puntiAttuali = scegliPunteggioAsso(punteggi);
+	            } else {
+	                // Se non ci sono Assi, o il punteggio attuale è già impostato, prendi il punteggio regolare
+	                puntiAttuali = punteggi[0];
+	            }
+	        }
+			updatePunteggio();
 		});
 	}
 	
@@ -163,6 +173,10 @@ public class PlayersJPanel extends JPanel implements Observer{
 	    	g.drawImage(carta, xOffset, yOffset, this);
 	        xOffset += 40;  // Sposta la prossima carta di 50px a destra
 	    }
+	}
+
+	public void endPlayerTurn() {
+		isTurnoPlayer = false;
 	}
 	
 

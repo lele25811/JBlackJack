@@ -97,4 +97,22 @@ public class Player implements Serializable{
 		return null;
 	}
 	
+	public boolean haveAsso() {
+		if(getMano().size() > 1) {
+			boolean isAsso = getMano().stream().anyMatch(carta -> "Asso".equals(carta.getStringValore()));
+			return isAsso;
+		}else {
+			return false;
+		}
+	}
+	
+	public boolean lastIsAsso() {
+		if(getMano().size() > 1) {
+			boolean isAsso = getMano().stream().skip(getMano().size()-1).anyMatch(carta -> "Asso".equals(carta.getStringValore()));
+			return isAsso;
+		}else {
+			return false;
+		}
+	}
+	
 }
