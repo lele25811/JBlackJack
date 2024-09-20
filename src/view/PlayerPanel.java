@@ -26,7 +26,7 @@ import model.TavoloDaGioco;
  * Ambiente di gioco grafico dove vengono messe le carte per il player
  */
 @SuppressWarnings("deprecation")
-public class PlayersJPanel extends JPanel implements Observer{
+public class PlayerPanel extends JPanel implements Observer{
 	
 	private TitledBorder titledBorder;
 	private BlackJackPlayer player;
@@ -35,9 +35,10 @@ public class PlayersJPanel extends JPanel implements Observer{
 	private JLabel punti;
 	private Integer puntiAttuali = 0;
 	private boolean isTurnoPlayer = false;
-	private boolean isDistribuzioneFinita = false;
+	private boolean isPrimeDueCarte = true;
+	private ActionPlayerPanel actionPlayerPanel;
 	
-	public PlayersJPanel(String name, BlackJackPlayer player) {
+	public PlayerPanel(String name, BlackJackPlayer player) {
 		this.player = player;
 		carteImages = new ArrayList<>();
 		punti = new JLabel("", SwingConstants.CENTER);
@@ -73,20 +74,20 @@ public class PlayersJPanel extends JPanel implements Observer{
 			
 			if(action.equals("DistribuisciCarteIniziali")) {
 				drawCard();
-				calcolaPunteggio();
 			}else if(action.equals("DistribuzioneTerminata")) {
-				calcolaPunteggio();
-				isDistribuzioneFinita = true;
+				calcolaPunteggioIniziale();
 			}else if(action.equals("TurnoPlayer")) {
 				isTurnoPlayer = true;
-				calcolaPunteggio();
 			}else if(action.equals("NuovaCarta")) {
-				isDistribuzioneFinita = false;
 				drawCard();
-				calcolaPunteggio();
+				calcolaPunteggioNuovaCarta();
 			}
 			updatePunteggio();
 		}
+	}
+	
+	public void addActionPlayer(ActionPlayerPanel actionPlayerPanel) {
+		this.actionPlayerPanel = actionPlayerPanel;
 	}
 	
 	private void updatePunteggio() {
@@ -111,32 +112,50 @@ public class PlayersJPanel extends JPanel implements Observer{
 		repaint();
 	}
 	
-	public void calcolaPunteggio() {
+	public void calcolaPunteggioIniziale() {
 		SwingUtilities.invokeLater(() -> {
 			int[] punteggi = player.getPuntiMano();
-			if(!isTurnoPlayer) {
-				puntiAttuali = punteggi[0];
+			if (isPrimeDueCarte) {
+				// Se sono le prime due carte, calcola il punteggio iniziale
+				if (player.haveAsso() && punteggi.length == 2) {
+					// Se c'è un asso, chiedi se contarlo come 1 o 11
+					puntiAttuali = scegliPunteggioAsso(punteggi);
+				} else {
+					// Altrimenti prendi il punteggio normale
+					puntiAttuali = punteggi[0];
+				}
+				isPrimeDueCarte = false; // Da ora in poi, considera le nuove carte separatamente
 			}
-		    if (isTurnoPlayer) {  // Solo durante il turno del giocatore
-				if (isDistribuzioneFinita && player.haveAsso()) {
-	                // Se il punteggio è 0 e c'è un Asso in mano, mostra il popup per scegliere il valore dell'Asso
-	                puntiAttuali = scegliPunteggioAsso(punteggi);
-	            } else if (player.lastIsAsso() && puntiAttuali > 0) {
-	                // Se l'ultima carta pescata è un Asso e il punteggio è già > 0, mostra di nuovo il popup
-	                puntiAttuali = scegliPunteggioAsso(punteggi);
-	            } else {
-	                // Se non ci sono Assi, o il punteggio attuale è già impostato, prendi il punteggio regolare
-	                puntiAttuali = punteggi[0];
-	            }
-	        }
 			updatePunteggio();
 		});
 	}
-	
+
+	public void calcolaPunteggioNuovaCarta() {
+		SwingUtilities.invokeLater(() -> {
+			// Per ogni nuova carta, aggiungi il suo valore al punteggio attuale
+			Carta ultimaCarta = mano.get(mano.size() - 1);
+			int valoreCarta = ultimaCarta.getValore();
+
+			if ("Asso".equals(ultimaCarta.getStringValore())) {
+				// Se l'ultima carta è un asso, chiedi se contarlo come 1 o 11
+				int[] punteggi = player.getPuntiMano();
+				valoreCarta = scegliPunteggioAsso(new int[]{valoreCarta, valoreCarta + 10});
+			}
+			// Aggiungi il valore della nuova carta al punteggio attuale
+			puntiAttuali += valoreCarta;
+			
+			updatePunteggio();
+			
+			if(puntiAttuali > 21) {
+				passaTurno(true);
+			}
+		});
+	}
+
 	public int scegliPunteggioAsso(int[] punteggi) {
 	    if (punteggi.length == 2) { // Se ci sono due opzioni di punteggio (con Asso)
 	        // Crea il messaggio e le opzioni per il popup
-	        String message = "Vuoi contare l'Asso come 1 ("+punteggi[0]+") o 11 ("+punteggi[1]+")?";
+	        String message = "Vuoi contare l'Asso come 1 ("+puntiAttuali+punteggi[0]+") o 11 ("+puntiAttuali+punteggi[1]+")?";
 	        String[] options = {"Asso = 1 ("+punteggi[0]+")", "Asso = 11 ("+punteggi[1]+")"};
 	        
 	        // Mostra il menu popup con le opzioni
@@ -175,9 +194,15 @@ public class PlayersJPanel extends JPanel implements Observer{
 	    }
 	}
 
-	public void endPlayerTurn() {
-		isTurnoPlayer = false;
+	public void passaTurno(boolean sballato) {
+		if(sballato) {
+			MyPopup myPopup = new MyPopup("Sballato!", "Hai sballato con "+puntiAttuali);
+			myPopup.showMessage();
+		}else {
+			MyPopup myPopup = new MyPopup("Passa turno!", "Hai passato il turno con "+puntiAttuali);
+			myPopup.showMessage();
+		}
+		actionPlayerPanel.passaTurno();
 	}
-	
 
 }

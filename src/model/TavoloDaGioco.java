@@ -104,13 +104,7 @@ public class TavoloDaGioco extends Observable{
 	
 	// metodo di inizio gioco
 	public void startGame() {
-		System.out.println("n giocatori "+giocatori.size());
 		distribuisciCarteIniziali();
-		/*
-		new Thread(() -> {
-	        turnazione();  // Esegue il ciclo di gioco su un thread separato
-	    }).start();
-		*/
 	}
 
 	private void turnazione() {
@@ -135,6 +129,7 @@ public class TavoloDaGioco extends Observable{
 			}
 			nextPlayer();
 		}
+		System.out.println("Turnazione Terminata");
 	}
 	
 	private void waitForPlayerTurn() {

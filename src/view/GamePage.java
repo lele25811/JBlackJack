@@ -30,27 +30,31 @@ public class GamePage extends JPanel{
 	
 	private BotPanel bancoPanel;
 	private BotPanel bot1Panel;
-	private PlayersJPanel playerPanel;
+	private PlayerPanel playerPanel;
 	private BotPanel bot2Panel;
 	
 	private ActionPlayerPanel actionPlayerMenu;
 	
 	
 	@SuppressWarnings("deprecation")
-	public GamePage(TavoloDaGioco tavoloDaGioco) {
+	public GamePage(TavoloDaGioco tDG) {
 		frame = new Frame();
-		this.tavoloDaGioco = tavoloDaGioco;
+		this.tavoloDaGioco = tDG;
 	
 		System.out.println("Ci sono contro "+ tavoloDaGioco.getNumeroGiocatori() +" Bot");
 		
 		ImageIcon icon = new ImageIcon("./src/graphics/backgroundGame.png");
-		backgroudImage = icon.getImage();		
+		backgroudImage = icon.getImage();
 		
 		bancoPanel = new BotPanel("Banco", (BlackJackBot) tavoloDaGioco.getBanco());
 		bot1Panel = new BotPanel("Bot1", (BlackJackBot) tavoloDaGioco.getBot1());
-		playerPanel = new PlayersJPanel("Player", (BlackJackPlayer) tavoloDaGioco.getPlayer());
+		playerPanel = new PlayerPanel("Player", (BlackJackPlayer) tavoloDaGioco.getPlayer());
 		bot2Panel = new BotPanel("Bot2", (BlackJackBot) tavoloDaGioco.getBot2());
+		
 		actionPlayerMenu = new ActionPlayerPanel(tavoloDaGioco, playerPanel);
+		
+		playerPanel.addActionPlayer(actionPlayerMenu);
+
 		
 		this.setLayout(new BorderLayout());
 

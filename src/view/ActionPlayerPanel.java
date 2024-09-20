@@ -21,9 +21,10 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 	private MyButton raddoppiaButton;
 	private MyButton dividiButton;
 	private TavoloDaGioco tavoloDaGioco;
-	private PlayersJPanel playerPanel;
+	private PlayerPanel playerPanel;
+	private MyPopup myPopup;
 	
-	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco, PlayersJPanel playerPanel) {
+	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco, PlayerPanel playerPanel) {
 		this.tavoloDaGioco = tavoloDaGioco;
 		this.playerPanel = playerPanel;
 		
@@ -58,12 +59,7 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 			System.out.println("Chiedo carta");
 		}
 		if(e.getSource() == staiButton) {
-			cartaButton.setEnabled(false);
-			staiButton.setEnabled(false);
-			raddoppiaButton.setEnabled(false);
-			dividiButton.setEnabled(false);
-			playerPanel.endPlayerTurn();
-			tavoloDaGioco.playerFinishedTurn();
+			playerPanel.passaTurno(false);
 		}
 		if(e.getSource() == raddoppiaButton) {
 			System.out.println("Raddoppio");
@@ -88,4 +84,11 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 
 	}
 	
+	public void passaTurno() {
+		cartaButton.setEnabled(false);
+		staiButton.setEnabled(false);
+		raddoppiaButton.setEnabled(false);
+		dividiButton.setEnabled(false);
+		tavoloDaGioco.playerFinishedTurn();
+	}
 }

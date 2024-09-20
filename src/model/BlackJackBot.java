@@ -47,8 +47,11 @@ public class BlackJackBot extends Player{
 			}
 			switch(scelta) {
 			case 0: punti = puntiDisponibili[0];
+					break;
 			case 1: punti = puntiDisponibili[1];
+					break;
 			default: punti = puntiDisponibili[1];
+					break;
 			}
 		}
 	}

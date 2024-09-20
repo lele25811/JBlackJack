@@ -69,7 +69,7 @@ public class BotPanel extends JPanel implements Observer{
 			String action = (String) arg;
 			
 			if(action.equals("DistribuisciCarteIniziali")) {
-				drawCarteIniziali();
+				drawCards();
 				calcolaPunteggio();
 				updatePunti();
 			}else if(action.equals("DistribuzioneTerminata")) {
@@ -77,6 +77,7 @@ public class BotPanel extends JPanel implements Observer{
 				updatePunti();
 			}else if(action.equals("NuovaCartaBot")) {
 				drawCards();
+				calcolaPunteggio();
 				updatePunti();
 			}else if(action.equals("FineTurno")) {
 				updatePunti();
@@ -89,8 +90,8 @@ public class BotPanel extends JPanel implements Observer{
 	private void updatePunti() {
 		puntiAttuali = bot.getPunti();
 		punti.setText("Punti attuali: "+puntiAttuali);
-		revalidate();
-		repaint();
+		punti.revalidate();
+		punti.repaint();
 	}
 
 	private void calcolaPunteggio() {
@@ -98,10 +99,6 @@ public class BotPanel extends JPanel implements Observer{
 		//puntiAttuali = bot.getSceltaPunteggio(punteggiDisponibili);
 		puntiAttuali = bot.getSceltaPunti(punteggiDisponibili);
 		updatePunti();
-	}
-
-	private void drawCarteIniziali() {
-		drawCards();
 	}
 	
 	public void drawCards() {
