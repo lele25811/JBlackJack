@@ -7,6 +7,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
@@ -23,8 +24,10 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 	private TavoloDaGioco tavoloDaGioco;
 	private PlayerPanel playerPanel;
 	private MyPopup myPopup;
+	private Frame frame;
 	
-	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco, PlayerPanel playerPanel) {
+	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco, PlayerPanel playerPanel, Frame frame) {
+		this.frame = frame;
 		this.tavoloDaGioco = tavoloDaGioco;
 		this.playerPanel = playerPanel;
 		
@@ -84,11 +87,33 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 
 	}
 	
-	public void passaTurno() {
+	public void passaTurno(int punteggio) {
 		cartaButton.setEnabled(false);
 		staiButton.setEnabled(false);
 		raddoppiaButton.setEnabled(false);
 		dividiButton.setEnabled(false);
+		tavoloDaGioco.setPuntiTavolo(punteggio);
 		tavoloDaGioco.playerFinishedTurn();
 	}
+
+	public void chiediNuovaPartita() {
+		int risposta = JOptionPane.showConfirmDialog(
+				null, 
+				"Vuoi giocare di nuovo?", 
+				"Nuova partita", 
+				JOptionPane.YES_NO_OPTION, 
+				JOptionPane.QUESTION_MESSAGE);
+
+		if (risposta == JOptionPane.YES_OPTION) {
+			// Reset del gioco e inizio nuova partita
+			System.out.println("Nuova Partita");
+			tavoloDaGioco.resetPartita();
+			playerPanel.resetPartita();
+			frame.dispose();
+			new MenuPage(tavoloDaGioco);
+		} else if (risposta == JOptionPane.NO_OPTION) {
+			System.exit(0);
+		}
+	}
+
 }

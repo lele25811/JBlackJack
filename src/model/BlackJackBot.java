@@ -18,23 +18,6 @@ public class BlackJackBot extends Player{
 		return isBanco;
 	}
 	
-	// definisci le possibili mosse di un bot, scelta randomica ecc
-	/*
-	public int getSceltaPunteggio(int[] puntiDisponibili) {
-		if(puntiDisponibili.length < 2) {
-			return puntiDisponibili[0];
-		}else {
-			int scelta = random.nextInt(2); // Sceglie tra 0 o 1
-			switch(scelta) {
-			case 0: return puntiDisponibili[0];
-			case 1: return puntiDisponibili[1];
-			}
-		}
-		return 0;
-	}
-	*/
-	
-	
 	private void SceltaPunteggio(int[] puntiDisponibili) {
 		if(puntiDisponibili.length < 2) {
 			punti = puntiDisponibili[0];

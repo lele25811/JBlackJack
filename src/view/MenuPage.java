@@ -46,12 +46,11 @@ public class MenuPage extends JPanel implements ActionListener{
 	private JLabel levelLabel;
 	private JLabel nGames;
 	private JLabel nGamesWin;
-	private JLabel nGamesDraw;
 	private JLabel nGamesLost;
 	
 	private TavoloDaGioco tavoloDaGioco;
 	private BlackJackPlayer player;
-	
+
 	public MenuPage(TavoloDaGioco tavoloDaGioco) {
 		this.tavoloDaGioco = tavoloDaGioco;
 		
@@ -136,8 +135,6 @@ public class MenuPage extends JPanel implements ActionListener{
         nGames.setFont(labelFont);
         nGamesWin = new JLabel("Win Games: "+player.getNumeroVittorie());
         nGamesWin.setFont(labelFont);
-        nGamesDraw = new JLabel("Draw Games: "+player.getNumeroPareggi());
-        nGamesDraw.setFont(labelFont);
         nGamesLost = new JLabel("Lost Games: "+player.getNumeroSconfitte());
         nGamesLost.setFont(labelFont);
 
@@ -166,10 +163,6 @@ public class MenuPage extends JPanel implements ActionListener{
         
         gbc.gridx = 0;
         gbc.gridy = 5;
-        rightMenuPanel.add(nGamesDraw, gbc);
-        
-        gbc.gridx = 0;
-        gbc.gridy = 6;
         rightMenuPanel.add(nGamesLost, gbc);
         
 
@@ -182,8 +175,7 @@ public class MenuPage extends JPanel implements ActionListener{
 		frame.setVisible(true);
 	}
 	
-	
-	
+		
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == playButton) {
@@ -201,5 +193,4 @@ public class MenuPage extends JPanel implements ActionListener{
         g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
     }
 
-	
 }

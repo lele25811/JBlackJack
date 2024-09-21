@@ -115,4 +115,8 @@ public class Player implements Serializable{
 		}
 	}
 	
+	public void resetMano() {
+		mano.clear();
+	}
+	
 }

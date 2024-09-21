@@ -17,12 +17,6 @@ public class BlackJackPlayer extends Player{
 	 */
 	private int numeroVittorie;
 	
-	/*
-	 *  numeroSconfitte definisce il numero di sconfitte di un giocatore
-	 */
-	private int numeroSconfitte;
-	
-	
 	 /*
 	  * livello definisce il livello di un giocatore 
 	  */
@@ -57,14 +51,7 @@ public class BlackJackPlayer extends Player{
 	 * Metodo che ritorna il numero delle sconfitte di un giocatore
 	 */
 	public int getNumeroSconfitte() {
-		return numeroSconfitte;
-	}
-	
-	/*
-	 * Metodo che ritorna il numero dei pareggi di un giocatore
-	 */
-	public int getNumeroPareggi() {
-		return numeroPartite - (numeroVittorie + numeroSconfitte);
+		return numeroPartite - numeroVittorie;
 	}
 	
 	/*
@@ -98,7 +85,7 @@ public class BlackJackPlayer extends Player{
 
 	@Override
 	public String toString() {
-		return super.toString() + " BlackJackPlayer [numeroPartite=" + numeroPartite + ", numeroVittorie=" + numeroVittorie + ", numeroPareggi=" +this.getNumeroPareggi() + ", livello="
+		return super.toString() + " BlackJackPlayer [numeroPartite=" + numeroPartite + ", numeroVittorie=" + numeroVittorie + ", numeroSconfitte=" + this.getNumeroSconfitte() + ", livello="
 				+ livello + "]";
 	}
 	

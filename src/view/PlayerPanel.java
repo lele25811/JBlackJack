@@ -83,6 +83,11 @@ public class PlayerPanel extends JPanel implements Observer{
 				calcolaPunteggioNuovaCarta();
 			}
 			updatePunteggio();
+			if(action.equals("Vittoria")) {
+				popUpRisultato(action, "vinto");
+			}else if(action.equals("Sconfitta")) {
+				popUpRisultato(action, "perso");
+			}
 		}
 	}
 	
@@ -155,8 +160,10 @@ public class PlayerPanel extends JPanel implements Observer{
 	public int scegliPunteggioAsso(int[] punteggi) {
 	    if (punteggi.length == 2) { // Se ci sono due opzioni di punteggio (con Asso)
 	        // Crea il messaggio e le opzioni per il popup
-	        String message = "Vuoi contare l'Asso come 1 ("+puntiAttuali+punteggi[0]+") o 11 ("+puntiAttuali+punteggi[1]+")?";
-	        String[] options = {"Asso = 1 ("+punteggi[0]+")", "Asso = 11 ("+punteggi[1]+")"};
+	    	int puntiAggiornatiUno = puntiAttuali+punteggi[0];
+	    	int puntiAggiornatiUndici = puntiAttuali+punteggi[1];
+	        String message = "Vuoi contare l'Asso come 1 ("+puntiAggiornatiUno+") o 11 ("+puntiAggiornatiUndici+")?";
+	        String[] options = {"Asso = 1 ("+puntiAggiornatiUno+")", "Asso = 11 ("+puntiAggiornatiUndici+")"};
 	        
 	        // Mostra il menu popup con le opzioni
 	        int scelta = JOptionPane.showOptionDialog(
@@ -202,7 +209,20 @@ public class PlayerPanel extends JPanel implements Observer{
 			MyPopup myPopup = new MyPopup("Passa turno!", "Hai passato il turno con "+puntiAttuali);
 			myPopup.showMessage();
 		}
-		actionPlayerPanel.passaTurno();
+		actionPlayerPanel.passaTurno(puntiAttuali);
 	}
+	
+	private void popUpRisultato(String title , String parola) {
+		System.out.println("Arrivato messaggio popUp");
+		String testo = player.getNickname()+" ha "+parola+"!!"; 
+		MyPopup myPopup = new MyPopup(title, testo);
+		myPopup.showMessage();
+		actionPlayerPanel.chiediNuovaPartita();
+	}
+
+	public void resetPartita() {
+		puntiAttuali = 0;
+	}
+	
 
 }

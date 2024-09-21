@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.Random;
 
 import javax.swing.SwingUtilities;
@@ -16,7 +17,6 @@ public class TavoloDaGioco extends Observable{
 	// punteggio per mano, [player,...,mazziere]
 	private static TavoloDaGioco tavoloDaGiocoInstance;
 	
-	// non sicuro se veramente usata.
 	private int[] punti;
 	private MazzoDaGioco mazzo;
 	private ArrayList<Player> giocatori = new ArrayList<Player>();
@@ -25,6 +25,7 @@ public class TavoloDaGioco extends Observable{
 	// Oggetto per la sincronizzazione dei turni
 	private final Object lock = new Object();
 	private Random random = new Random();
+	private Thread threadGame;
 	
 	public static TavoloDaGioco getInstance() {
 		if(tavoloDaGiocoInstance == null) tavoloDaGiocoInstance = new TavoloDaGioco();
@@ -57,7 +58,7 @@ public class TavoloDaGioco extends Observable{
 		System.out.println("E' STATO AGGIUNTO IL PLAYER AL TAVOLO "+player.getNickname());
 	}
 	
-	private void addPunti(int size) {
+	private void inizializzaPunti(int size) {
 		punti = new int[size];
 		for(int i = 0; i<size; i++) {
 			punti[0] = 0;
@@ -88,7 +89,7 @@ public class TavoloDaGioco extends Observable{
 				break;
 		}
 		currentPlayerIndex = 0;
-		addPunti(giocatori.size());
+		inizializzaPunti(giocatori.size());
 	}
 	
 	public void provaStampa() {
@@ -123,6 +124,7 @@ public class TavoloDaGioco extends Observable{
 				//setPunti(currentPlayerIndex, punti);
 			}
 			if(p instanceof BlackJackPlayer) {
+				((BlackJackPlayer) p).addPartita();
 				System.out.println("MODEL.È il turno di Player, "+p.getNickname());
 				turnoPlayer();
 				waitForPlayerTurn();
@@ -130,6 +132,7 @@ public class TavoloDaGioco extends Observable{
 			nextPlayer();
 		}
 		System.out.println("Turnazione Terminata");
+		finePartita();
 	}
 	
 	private void waitForPlayerTurn() {
@@ -149,9 +152,9 @@ public class TavoloDaGioco extends Observable{
         }
     }
 
-	private void setPunti(int currentPlayerIndex, int p) {
-		System.out.println(currentPlayerIndex+ "ha totalizzato: "+ p);
-		punti[currentPlayerIndex] = p;
+	// Da modificare per l assegnazione punti
+	public void setPuntiTavolo(int punteggioFinale) {
+		punti[currentPlayerIndex] = punteggioFinale;
 	}
 	
 	public int getPunti(Player p) {
@@ -167,10 +170,12 @@ public class TavoloDaGioco extends Observable{
 			if(isSballato(punti)) {
 				System.out.println("Ho sballato con "+punti);
 				bot.setPunti(punti);
-				return 0;
+				setPuntiTavolo(punti);
+				return punti;
 			}else if(punti >= 18 || raddoppio) {
 				System.out.println("Sto con "+punti);
 				bot.setPunti(punti);
+				setPuntiTavolo(punti);
 				return punti;
 			}else if(punti < 18) {
 				int scelta = 0;
@@ -283,5 +288,67 @@ public class TavoloDaGioco extends Observable{
 	public boolean isSballato(int punto) {
 		return punto > 21;
 	}
+	
+	/*
+	 *  Gestione fine della partita
+	 *  punti tiene i punteggi (manca player) in sequenza fai confronti vari
+	 */
+	public void finePartita() {
+		boolean vittoriaPlayer = false;
+		int puntiBanco = 0;
+		ArrayList<Player> giocatoriVincitori = new ArrayList<>();
+		if(punti == null) {
+			inizializzaPunti(giocatori.size());
+		}
+		puntiBanco = punti[giocatori.size()-1];
+		System.out.println("Il banco ha totalizzato: "+puntiBanco);
+		
+		if(puntiBanco > 21) {
+			System.out.println("Il banco ha sballato");
+			for(int i=0; i<giocatori.size()-1; i++) {
+				if(punti[i] <= 21) {
+					giocatoriVincitori.add(giocatori.get(i));
+				}
+			}
+		}else {
+			System.out.println("Il banco non ha sballato");
+			for(int i=0; i<giocatori.size()-1; i++) {
+				if(punti[i] <= 21 && punti[i] > puntiBanco) {
+					giocatoriVincitori.add(giocatori.get(i));
+				}
+			}
+		}
+		if (!giocatoriVincitori.isEmpty()) {
+	        System.out.println("Giocatori che hanno vinto: ");
+	        for(Player p: giocatoriVincitori) {
+	        	System.out.println(p.getNickname());
+	        	if(p instanceof BlackJackPlayer) {
+	        		((BlackJackPlayer) p).addVittoria();
+	        		vittoriaPlayer = true;
+	        	}
+	        }
+	    }else {
+	        System.out.println("Il banco ha vinto.");
+	    }
+		if(vittoriaPlayer) {
+			System.out.println("Partito messaggio poppUp");
+			setChanged();
+			notifyObservers("Vittoria");
+		}else {
+			System.out.println("Partito messaggio poppUp");
+			setChanged();
+			notifyObservers("Sconfitta");
+		}
+	}
+
+	public void resetPartita() {
+		for(Player player: giocatori) {
+			player.resetMano();
+		}
+		currentPlayerIndex = 0;
+		giocatori.clear();
+		System.out.println("Giocatori dopo il reset "+giocatori);
+	}
+
 	
 }
