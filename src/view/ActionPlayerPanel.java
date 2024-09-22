@@ -13,6 +13,7 @@ import javax.swing.border.TitledBorder;
 
 import model.Player;
 import model.TavoloDaGioco;
+import model.UpdateEvent;
 
 @SuppressWarnings("deprecation")
 public class ActionPlayerPanel extends JPanel implements ActionListener, Observer{
@@ -75,16 +76,19 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (arg instanceof String) {
-			String action = (String) arg;
+		if (o instanceof TavoloDaGioco && arg instanceof UpdateEvent) {
+			UpdateEvent event = (UpdateEvent) arg;
+
+			String action = event.getAction();
+			Object data = event.getData();
+
 			if (action.equals("TurnoPlayer")) {
 				cartaButton.setEnabled(true);
 				staiButton.setEnabled(true);
 				raddoppiaButton.setEnabled(true);
 				dividiButton.setEnabled(true);
 			}
-		}
-
+		}		        
 	}
 	
 	public void passaTurno(int punteggio) {

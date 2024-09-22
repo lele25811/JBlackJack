@@ -121,9 +121,8 @@ public class TavoloDaGioco extends Observable{
 				System.out.println("MODEL.È il turno di bot, "+p.getNickname());
 				turnoBot((BlackJackBot) p);
 				setChanged();
-				notifyObservers("FineTurno");
-				//int punti = provaTurnoBot(p);
-				//setPunti(currentPlayerIndex, punti);
+				//notifyObservers("FineTurno");
+				notifyObservers(new UpdateEvent("FineTurno", p));
 			}
 			if(p instanceof BlackJackPlayer) {
 				((BlackJackPlayer) p).addPartita();
@@ -209,12 +208,14 @@ public class TavoloDaGioco extends Observable{
 						Thread.sleep(1000);  // Attesa di 1 secondi tra una carta e l'altra
 						p.addCarta(mazzo.prossimaCarta());
 						setChanged();
-						notifyObservers("DistribuisciCarteIniziali");  // Notifica la distribuzione della carta
+						//notifyObservers("DistribuisciCarteIniziali");  // Notifica la distribuzione della carta
+						notifyObservers(new UpdateEvent("DistribuisciCarteIniziali", p));
 					}
 				}
 				System.out.println("Distribuzione della carte completata, La partita può iniziare");
 				setChanged();
-				notifyObservers("DistribuzioneTerminata");
+				//notifyObservers("DistribuzioneTerminata");
+				notifyObservers(new UpdateEvent("DistribuzioneTerminata", player));
 				turnazione();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -233,7 +234,8 @@ public class TavoloDaGioco extends Observable{
 	
 	public void turnoPlayer() {
 		setChanged();
-		notifyObservers("TurnoPlayer");
+		//notifyObservers("TurnoPlayer");
+		notifyObservers(new UpdateEvent("TurnoPlayer", player));
 	}
 	
 	/*
@@ -268,7 +270,8 @@ public class TavoloDaGioco extends Observable{
 		p.addCarta(mazzo.prossimaCarta());
 		System.out.println(p.getMano());
 		setChanged();
-		notifyObservers("NuovaCarta");
+		//notifyObservers("NuovaCarta");
+		notifyObservers(new UpdateEvent("NuovaCarta", p));
 	}
 	
 	public void getCardBot(Player p) {
@@ -281,7 +284,8 @@ public class TavoloDaGioco extends Observable{
 			e.printStackTrace();
 		}
 		setChanged();
-        notifyObservers("NuovaCartaBot");
+        //notifyObservers("NuovaCartaBot");
+        notifyObservers(new UpdateEvent("NuovaCartaBot", p));
 	}
 	
 	public void stay() {
@@ -336,12 +340,14 @@ public class TavoloDaGioco extends Observable{
 		if(vittoriaPlayer) {
 			System.out.println("Partito Vittoria messaggio poppUp");
 			setChanged();
-			notifyObservers("Vittoria");
+			//notifyObservers("Vittoria");
+			notifyObservers(new UpdateEvent("Vittoria", player));
 			
 		}else if(!vittoriaPlayer){
 			System.out.println("Partito Sconfitta messaggio poppUp");
 			setChanged();
-			notifyObservers("Sconfitta");
+			//notifyObservers("Sconfitta");
+			notifyObservers(new UpdateEvent("Sconfitta", player));
 		}
 		System.out.println("Aggiornamento db...");
 		db.updatePlayer(player);

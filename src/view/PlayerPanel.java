@@ -21,6 +21,7 @@ import javax.swing.border.TitledBorder;
 import model.BlackJackPlayer;
 import model.Carta;
 import model.TavoloDaGioco;
+import model.UpdateEvent;
 
 /*
  * Ambiente di gioco grafico dove vengono messe le carte per il player
@@ -70,25 +71,31 @@ public class PlayerPanel extends JPanel implements Observer{
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (o instanceof TavoloDaGioco && arg instanceof String) {
-			String action = (String) arg;
-			
-			if(action.equals("DistribuisciCarteIniziali")) {
-				drawCard();
-			}else if(action.equals("DistribuzioneTerminata")) {
-				calcolaPunteggioIniziale();
-			}else if(action.equals("TurnoPlayer")) {
-				isTurnoPlayer = true;
-			}else if(action.equals("NuovaCarta")) {
-				drawCard();
-				calcolaPunteggioNuovaCarta();
-			}
-			updatePunteggio();
-			if(!isFinita) {
-				if(action.equals("Vittoria")) {
-					popUpRisultato(action, "vinto");
-				}else if(action.equals("Sconfitta")) {
-					popUpRisultato(action, "perso");
+		if (o instanceof TavoloDaGioco && arg instanceof UpdateEvent) {
+			UpdateEvent event = (UpdateEvent) arg;
+
+			String action = event.getAction();
+			Object data = event.getData();
+
+			// Controlla il tipo di evento
+			if (data instanceof BlackJackPlayer) {
+				if(action.equals("DistribuisciCarteIniziali")) {
+					drawCard();
+				}else if(action.equals("DistribuzioneTerminata")) {
+					calcolaPunteggioIniziale();
+				}else if(action.equals("TurnoPlayer")) {
+					isTurnoPlayer = true;
+				}else if(action.equals("NuovaCarta")) {
+					drawCard();
+					calcolaPunteggioNuovaCarta();
+				}
+				updatePunteggio();
+				if(!isFinita) {
+					if(action.equals("Vittoria")) {
+						popUpRisultato(action, "vinto");
+					}else if(action.equals("Sconfitta")) {
+						popUpRisultato(action, "perso");
+					}
 				}
 			}
 		}

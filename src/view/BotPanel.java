@@ -20,6 +20,7 @@ import javax.swing.border.TitledBorder;
 import model.BlackJackBot;
 import model.Carta;
 import model.TavoloDaGioco;
+import model.UpdateEvent;
 
 @SuppressWarnings("deprecation")
 public class BotPanel extends JPanel implements Observer{
@@ -65,25 +66,29 @@ public class BotPanel extends JPanel implements Observer{
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (o instanceof TavoloDaGioco && arg instanceof String) {
-			String action = (String) arg;
-			
-			if(action.equals("DistribuisciCarteIniziali")) {
-				drawCards();
-				calcolaPunteggio();
-				updatePunti();
-			}else if(action.equals("DistribuzioneTerminata")) {
-				calcolaPunteggio();
-				updatePunti();
-			}else if(action.equals("NuovaCartaBot")) {
-				drawCards();
-				calcolaPunteggio();
-				updatePunti();
-			}else if(action.equals("FineTurno")) {
-				updatePunti();
+		if (o instanceof TavoloDaGioco && arg instanceof UpdateEvent) {
+			UpdateEvent event = (UpdateEvent) arg;
+
+			String action = event.getAction();
+			Object data = event.getData();
+			// Controlla il tipo di evento
+			if (data instanceof BlackJackBot && bot.equals((BlackJackBot) data)) {
+				System.out.println("BOT = BOT");
+				if(action.equals("DistribuisciCarteIniziali")) {
+					drawCards();
+					calcolaPunteggio();
+					updatePunti();
+				}else if(action.equals("NuovaCartaBot")) {
+					System.out.println("BOT CHIEDE CARTA");
+					drawCards();
+					calcolaPunteggio();
+					updatePunti();
+				}else if(action.equals("FineTurno")) {
+					updatePunti();
+				}
+				revalidate();
+				repaint();
 			}
-			revalidate();
-			repaint();
 		}
 	}
 
@@ -102,6 +107,7 @@ public class BotPanel extends JPanel implements Observer{
 	}
 	
 	public void drawCards() {
+		System.out.println("Eccoci siamo a lavoro per voi");
 		carteImages.clear();
 		mano = bot.getMano();
 		for (Carta carta : mano) {
