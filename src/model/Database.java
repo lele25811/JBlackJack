@@ -32,6 +32,20 @@ public class Database {
 		savePlayer();
 	}
 	
+	public void updatePlayer(Player updatePlayer) {
+		bjPlayers = loadPlayer();
+		for(int i=0; i<bjPlayers.size(); i++) {
+			BlackJackPlayer currentPlayer = bjPlayers.get(i);
+			
+			if (currentPlayer.getNickname().equals(updatePlayer.getNickname()) &&
+		            currentPlayer.getAvatar().equals(updatePlayer.getAvatar())) {
+				System.out.println("Aggiornato "+updatePlayer.getNickname()+" avatar: "+updatePlayer.getAvatar());
+				bjPlayers.set(i, (BlackJackPlayer) updatePlayer);
+				break;
+			}
+		}
+		savePlayer();
+	}
 	
 	public BlackJackPlayer getPlayerByIndex(int index) {
 		return bjPlayers.get(index);

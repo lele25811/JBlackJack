@@ -242,16 +242,24 @@ public class LoginPage extends JPanel implements ActionListener{
 			db.addPlayer(player);
 			tavoloDaGioco.addPlayer(player);
 			System.out.println("Creato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
+			caricaMenu();
 		}else if(e.getSource() == buttonLoadPlayer) {
 			System.out.println("load Player");
 			int indexPlayer = listaGiocatori.getSelectedIndex();
-			player = db.getPlayerByIndex(indexPlayer);
-			tavoloDaGioco.addPlayer(player);
-			System.out.println("Caricato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
+			if(indexPlayer == -1) {
+				MyPopup myPopup = new MyPopup("Errore", "Nessun Profilo selezionato");
+				myPopup.showMessage();
+			}else {
+				player = db.getPlayerByIndex(indexPlayer);
+				tavoloDaGioco.addPlayer(player);
+				System.out.println("Caricato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
+				caricaMenu();
+			}
 		}
+	}
+	
+	private void caricaMenu() {
 		frame.dispose();
 		new MenuPage(tavoloDaGioco);
-
-		
 	}
 }

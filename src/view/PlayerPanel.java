@@ -37,6 +37,7 @@ public class PlayerPanel extends JPanel implements Observer{
 	private boolean isTurnoPlayer = false;
 	private boolean isPrimeDueCarte = true;
 	private ActionPlayerPanel actionPlayerPanel;
+	private boolean isFinita = false;
 	
 	public PlayerPanel(String name, BlackJackPlayer player) {
 		this.player = player;
@@ -83,10 +84,12 @@ public class PlayerPanel extends JPanel implements Observer{
 				calcolaPunteggioNuovaCarta();
 			}
 			updatePunteggio();
-			if(action.equals("Vittoria")) {
-				popUpRisultato(action, "vinto");
-			}else if(action.equals("Sconfitta")) {
-				popUpRisultato(action, "perso");
+			if(!isFinita) {
+				if(action.equals("Vittoria")) {
+					popUpRisultato(action, "vinto");
+				}else if(action.equals("Sconfitta")) {
+					popUpRisultato(action, "perso");
+				}
 			}
 		}
 	}
@@ -213,7 +216,8 @@ public class PlayerPanel extends JPanel implements Observer{
 	}
 	
 	private void popUpRisultato(String title , String parola) {
-		System.out.println("Arrivato messaggio popUp");
+		isFinita = true;
+		System.out.println("Arrivato messaggio popUp "+parola);
 		String testo = player.getNickname()+" ha "+parola+"!!"; 
 		MyPopup myPopup = new MyPopup(title, testo);
 		myPopup.showMessage();

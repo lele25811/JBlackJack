@@ -25,7 +25,8 @@ public class TavoloDaGioco extends Observable{
 	// Oggetto per la sincronizzazione dei turni
 	private final Object lock = new Object();
 	private Random random = new Random();
-	private Thread threadGame;
+	private Thread provaT;
+	private Database db;
 	
 	public static TavoloDaGioco getInstance() {
 		if(tavoloDaGiocoInstance == null) tavoloDaGiocoInstance = new TavoloDaGioco();
@@ -34,6 +35,7 @@ public class TavoloDaGioco extends Observable{
 	
 	private TavoloDaGioco() {
 		mazzo = new MazzoDaGioco();
+		db = db.getIstance();
 	}
 		
 	public Player getPlayer() {
@@ -200,7 +202,7 @@ public class TavoloDaGioco extends Observable{
 	}
 
 	private void distribuisciCarteIniziali() { 
-		new Thread(() -> {
+		 provaT = new Thread(() -> {
 			try {
 				for (int i = 0; i < 2; i++) {  // Due carte per ciascun giocatore
 					for (Player p : giocatori) {
@@ -217,7 +219,8 @@ public class TavoloDaGioco extends Observable{
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}).start();
+		});
+		provaT.start();
 	}
 	
 	public int getNumeroGiocatori() {
@@ -331,14 +334,17 @@ public class TavoloDaGioco extends Observable{
 	        System.out.println("Il banco ha vinto.");
 	    }
 		if(vittoriaPlayer) {
-			System.out.println("Partito messaggio poppUp");
+			System.out.println("Partito Vittoria messaggio poppUp");
 			setChanged();
 			notifyObservers("Vittoria");
-		}else {
-			System.out.println("Partito messaggio poppUp");
+			
+		}else if(!vittoriaPlayer){
+			System.out.println("Partito Sconfitta messaggio poppUp");
 			setChanged();
 			notifyObservers("Sconfitta");
 		}
+		System.out.println("Aggiornamento db...");
+		db.updatePlayer(player);
 	}
 
 	public void resetPartita() {
