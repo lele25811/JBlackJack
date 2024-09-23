@@ -260,7 +260,6 @@ public class TavoloDaGioco extends Observable{
             // Tutti i giocatori hanno giocato
             currentPlayerIndex = 0; // Reset currentPlayer 
         }
-		System.out.println("Prossimo player: "+currentPlayerIndex);
 	}
 	
 	public boolean hasNext() {
@@ -352,12 +351,10 @@ public class TavoloDaGioco extends Observable{
 	        System.out.println("Il banco ha vinto.");
 	    }
 		if(vittoriaPlayer) {
-			System.out.println("Partito Vittoria messaggio poppUp");
 			setChanged();
 			notifyObservers(new UpdateEvent("Vittoria", player));
 			
 		}else if(!vittoriaPlayer){
-			System.out.println("Partito Sconfitta messaggio poppUp");
 			setChanged();
 			notifyObservers(new UpdateEvent("Sconfitta", player));
 		}

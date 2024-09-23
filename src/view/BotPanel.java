@@ -77,7 +77,6 @@ public class BotPanel extends JPanel implements Observer{
 				if(action.equals("DistribuisciCarteIniziali")) {
 					if(bot.getIsBanco()) {
 						drawCardsInizialiBanco();
-						//calcolaPunteggio();
 					}else {
 						drawCards();
 						calcolaPunteggio();
@@ -109,7 +108,6 @@ public class BotPanel extends JPanel implements Observer{
 
 	private void calcolaPunteggio() {
 		int[] punteggiDisponibili = bot.getValoreManoIniziale();
-		//puntiAttuali = bot.getSceltaPunteggio(punteggiDisponibili);
 		puntiAttuali = bot.getSceltaPunti(punteggiDisponibili);
 	}
 	
@@ -129,7 +127,6 @@ public class BotPanel extends JPanel implements Observer{
 		repaint();
 	}
 	
-	// Cambiano entrambe le carte causa la stessa variabile "Shallowcopy"???
 	public void drawCardsInizialiBanco() {
 		carteImages.clear();
 		mano = bot.getMano();
@@ -141,8 +138,7 @@ public class BotPanel extends JPanel implements Observer{
 			Image primaCartaImage = primaCartaIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
 			carteImages.add(primaCartaImage);
 		}
-
-		// Aggiungi la carta coperta se ci sono almeno 2 carte
+		
 		if (mano.size() > 1) {
 			ImageIcon cartaCopertaIcon = new ImageIcon("./src/graphics/" + cartaCopertaPath);
 			Image cartaCopertaImage = cartaCopertaIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
