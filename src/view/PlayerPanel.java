@@ -35,10 +35,8 @@ public class PlayerPanel extends JPanel implements Observer{
 	private ArrayList<Image> carteImages;
 	private JLabel punti;
 	private Integer puntiAttuali = 0;
-	private boolean isTurnoPlayer = false;
 	private boolean isPrimeDueCarte = true;
 	private ActionPlayerPanel actionPlayerPanel;
-	private boolean isFinita = false;
 	
 	public PlayerPanel(String name, BlackJackPlayer player) {
 		this.player = player;
@@ -76,35 +74,33 @@ public class PlayerPanel extends JPanel implements Observer{
 
 			String action = event.getAction();
 			Object data = event.getData();
-
 			// Controlla il tipo di evento
 			if (data instanceof BlackJackPlayer) {
 				if(action.equals("DistribuisciCarteIniziali")) {
 					drawCard();
 				}else if(action.equals("DistribuzioneTerminata")) {
 					calcolaPunteggioIniziale();
-				}else if(action.equals("TurnoPlayer")) {
-					isTurnoPlayer = true;
 				}else if(action.equals("NuovaCarta")) {
 					drawCard();
-					calcolaPunteggioNuovaCarta();
+					calcolaPunteggioNuovaCarta(false);
+				}else if(action.equals("Raddoppio")) {
+					drawCard();
+					calcolaPunteggioNuovaCarta(true);
 				}
 				updatePunteggio();
-				if(!isFinita) {
-					if(action.equals("Vittoria")) {
-						popUpRisultato(action, "vinto");
-					}else if(action.equals("Sconfitta")) {
-						popUpRisultato(action, "perso");
-					}
+				if(action.equals("Vittoria")) {
+					popUpRisultato(action, "vinto");
+				}else if(action.equals("Sconfitta")) {
+					popUpRisultato(action, "perso");
 				}
 			}
 		}
 	}
-	
+
 	public void addActionPlayer(ActionPlayerPanel actionPlayerPanel) {
 		this.actionPlayerPanel = actionPlayerPanel;
 	}
-	
+
 	private void updatePunteggio() {
 		punti.setText("Punti attuali: " + puntiAttuali);
 		punti.revalidate();
@@ -145,7 +141,7 @@ public class PlayerPanel extends JPanel implements Observer{
 		});
 	}
 
-	public void calcolaPunteggioNuovaCarta() {
+	public void calcolaPunteggioNuovaCarta(boolean raddoppio) {
 		SwingUtilities.invokeLater(() -> {
 			// Per ogni nuova carta, aggiungi il suo valore al punteggio attuale
 			Carta ultimaCarta = mano.get(mano.size() - 1);
@@ -163,6 +159,8 @@ public class PlayerPanel extends JPanel implements Observer{
 			
 			if(puntiAttuali > 21) {
 				passaTurno(true);
+			}else if(raddoppio) {
+				passaTurno(false);
 			}
 		});
 	}
@@ -223,8 +221,6 @@ public class PlayerPanel extends JPanel implements Observer{
 	}
 	
 	private void popUpRisultato(String title , String parola) {
-		isFinita = true;
-		System.out.println("Arrivato messaggio popUp "+parola);
 		String testo = player.getNickname()+" ha "+parola+"!!"; 
 		MyPopup myPopup = new MyPopup(title, testo);
 		myPopup.showMessage();

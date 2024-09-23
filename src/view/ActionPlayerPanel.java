@@ -24,13 +24,14 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 	private MyButton dividiButton;
 	private TavoloDaGioco tavoloDaGioco;
 	private PlayerPanel playerPanel;
-	private MyPopup myPopup;
 	private Frame frame;
+	private GamePage gamePage;
 	
-	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco, PlayerPanel playerPanel, Frame frame) {
+	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco, PlayerPanel playerPanel, Frame frame, GamePage gamePage) {
 		this.frame = frame;
 		this.tavoloDaGioco = tavoloDaGioco;
 		this.playerPanel = playerPanel;
+		this.gamePage = gamePage;
 		
 		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.RED, 2), "Azioni di gioco");
 	    border.setTitleColor(Color.RED);
@@ -64,9 +65,12 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 		}
 		if(e.getSource() == staiButton) {
 			playerPanel.passaTurno(false);
+			System.out.println("Passo turno");
 		}
 		if(e.getSource() == raddoppiaButton) {
+			tavoloDaGioco.getDouble(tavoloDaGioco.getPlayer());
 			System.out.println("Raddoppio");
+			
 		}
 		if(e.getSource() == dividiButton) {
 			System.out.println("Divido");
@@ -105,7 +109,7 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 				null, 
 				"Vuoi giocare di nuovo?", 
 				"Nuova partita", 
-				JOptionPane.YES_NO_OPTION, 
+				JOptionPane.YES_NO_OPTION,
 				JOptionPane.QUESTION_MESSAGE);
 
 		if (risposta == JOptionPane.YES_OPTION) {
@@ -113,6 +117,7 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 			System.out.println("Nuova Partita");
 			tavoloDaGioco.resetPartita();
 			playerPanel.resetPartita();
+			gamePage.resetGame();
 			frame.dispose();
 			new MenuPage(tavoloDaGioco);
 		} else if (risposta == JOptionPane.NO_OPTION) {

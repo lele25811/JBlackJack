@@ -25,7 +25,7 @@ public class TavoloDaGioco extends Observable{
 	// Oggetto per la sincronizzazione dei turni
 	private final Object lock = new Object();
 	private Random random = new Random();
-	private Thread provaT;
+	private Thread threadGioco;
 	private Database db;
 	
 	public static TavoloDaGioco getInstance() {
@@ -118,10 +118,19 @@ public class TavoloDaGioco extends Observable{
 			}
 			Player p = getCurrentPlayer();
 			if(p instanceof BlackJackBot) {
+				try {
+					Thread.sleep(1500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(((BlackJackBot)p).getIsBanco()) {
+					setChanged();
+					notifyObservers(new UpdateEvent("TurnoBanco", p));
+				}
 				System.out.println("MODEL.È il turno di bot, "+p.getNickname());
 				turnoBot((BlackJackBot) p);
 				setChanged();
-				//notifyObservers("FineTurno");
 				notifyObservers(new UpdateEvent("FineTurno", p));
 			}
 			if(p instanceof BlackJackPlayer) {
@@ -167,7 +176,6 @@ public class TavoloDaGioco extends Observable{
 		boolean raddoppio = false;
 		int punti = bot.getPunti();
 		while(true) {
-			//System.out.println("punti Attuali: "+punti);
 			if(isSballato(punti)) {
 				System.out.println("Ho sballato con "+punti);
 				bot.setPunti(punti);
@@ -200,28 +208,27 @@ public class TavoloDaGioco extends Observable{
 		}
 	}
 
-	private void distribuisciCarteIniziali() { 
-		 provaT = new Thread(() -> {
+	private void distribuisciCarteIniziali() {
+		threadGioco = new Thread(() -> {
 			try {
 				for (int i = 0; i < 2; i++) {  // Due carte per ciascun giocatore
 					for (Player p : giocatori) {
-						Thread.sleep(1000);  // Attesa di 1 secondi tra una carta e l'altra
+						Thread.sleep(1500);  // Attesa di 1 secondi tra una carta e l'altra
 						p.addCarta(mazzo.prossimaCarta());
 						setChanged();
-						//notifyObservers("DistribuisciCarteIniziali");  // Notifica la distribuzione della carta
 						notifyObservers(new UpdateEvent("DistribuisciCarteIniziali", p));
 					}
 				}
 				System.out.println("Distribuzione della carte completata, La partita può iniziare");
 				setChanged();
-				//notifyObservers("DistribuzioneTerminata");
 				notifyObservers(new UpdateEvent("DistribuzioneTerminata", player));
 				turnazione();
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 				e.printStackTrace();
 			}
 		});
-		provaT.start();
+		threadGioco.start();
 	}
 	
 	public int getNumeroGiocatori() {
@@ -234,7 +241,6 @@ public class TavoloDaGioco extends Observable{
 	
 	public void turnoPlayer() {
 		setChanged();
-		//notifyObservers("TurnoPlayer");
 		notifyObservers(new UpdateEvent("TurnoPlayer", player));
 	}
 	
@@ -270,7 +276,6 @@ public class TavoloDaGioco extends Observable{
 		p.addCarta(mazzo.prossimaCarta());
 		System.out.println(p.getMano());
 		setChanged();
-		//notifyObservers("NuovaCarta");
 		notifyObservers(new UpdateEvent("NuovaCarta", p));
 	}
 	
@@ -284,13 +289,22 @@ public class TavoloDaGioco extends Observable{
 			e.printStackTrace();
 		}
 		setChanged();
-        //notifyObservers("NuovaCartaBot");
         notifyObservers(new UpdateEvent("NuovaCartaBot", p));
 	}
 	
 	public void stay() {
 		nextPlayer();
 	}
+	
+	public void getDouble(Player p) {
+		System.out.println("Chiedo raddoppio");
+		p.addCarta(mazzo.prossimaCarta());
+		System.out.println(p.getMano());
+		setChanged();
+		notifyObservers(new UpdateEvent("Raddoppio", p));
+
+	}
+	
 	
 	public boolean isSballato(int punto) {
 		return punto > 21;
@@ -340,13 +354,11 @@ public class TavoloDaGioco extends Observable{
 		if(vittoriaPlayer) {
 			System.out.println("Partito Vittoria messaggio poppUp");
 			setChanged();
-			//notifyObservers("Vittoria");
 			notifyObservers(new UpdateEvent("Vittoria", player));
 			
 		}else if(!vittoriaPlayer){
 			System.out.println("Partito Sconfitta messaggio poppUp");
 			setChanged();
-			//notifyObservers("Sconfitta");
 			notifyObservers(new UpdateEvent("Sconfitta", player));
 		}
 		System.out.println("Aggiornamento db...");

@@ -31,6 +31,7 @@ public class BotPanel extends JPanel implements Observer{
 	private ArrayList<Image> carteImages;
 	private JLabel punti;
 	private Integer puntiAttuali = 0;
+	private String cartaCopertaPath = "CartaRetro.png";
 	
 	public BotPanel(String name, BlackJackBot bot) {
 		this.bot = bot;
@@ -73,13 +74,20 @@ public class BotPanel extends JPanel implements Observer{
 			Object data = event.getData();
 			// Controlla il tipo di evento
 			if (data instanceof BlackJackBot && bot.equals((BlackJackBot) data)) {
-				System.out.println("BOT = BOT");
 				if(action.equals("DistribuisciCarteIniziali")) {
+					if(bot.getIsBanco()) {
+						drawCardsInizialiBanco();
+						//calcolaPunteggio();
+					}else {
+						drawCards();
+						calcolaPunteggio();
+						updatePunti();
+					}
+				}else if(action.equals("TurnoBanco")) {
 					drawCards();
 					calcolaPunteggio();
 					updatePunti();
 				}else if(action.equals("NuovaCartaBot")) {
-					System.out.println("BOT CHIEDE CARTA");
 					drawCards();
 					calcolaPunteggio();
 					updatePunti();
@@ -103,11 +111,9 @@ public class BotPanel extends JPanel implements Observer{
 		int[] punteggiDisponibili = bot.getValoreManoIniziale();
 		//puntiAttuali = bot.getSceltaPunteggio(punteggiDisponibili);
 		puntiAttuali = bot.getSceltaPunti(punteggiDisponibili);
-		updatePunti();
 	}
 	
 	public void drawCards() {
-		System.out.println("Eccoci siamo a lavoro per voi");
 		carteImages.clear();
 		mano = bot.getMano();
 		for (Carta carta : mano) {
@@ -123,6 +129,28 @@ public class BotPanel extends JPanel implements Observer{
 		repaint();
 	}
 	
+	// Cambiano entrambe le carte causa la stessa variabile "Shallowcopy"???
+	public void drawCardsInizialiBanco() {
+		carteImages.clear();
+		mano = bot.getMano();
+		if (mano.size() > 0) {
+			// Prima carta visibile
+			Carta primaCarta = mano.get(0);
+			String primaCartaPath = primaCarta.getPath(); // Ottieni il percorso dell'immagine della prima carta
+			ImageIcon primaCartaIcon = new ImageIcon("./src/graphics/" + primaCartaPath);
+			Image primaCartaImage = primaCartaIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+			carteImages.add(primaCartaImage);
+		}
+
+		// Aggiungi la carta coperta se ci sono almeno 2 carte
+		if (mano.size() > 1) {
+			ImageIcon cartaCopertaIcon = new ImageIcon("./src/graphics/" + cartaCopertaPath);
+			Image cartaCopertaImage = cartaCopertaIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+			carteImages.add(cartaCopertaImage);
+		}
+		revalidate();
+		repaint();
+	}
 	
 	@Override
 	protected void paintComponent(Graphics g) {

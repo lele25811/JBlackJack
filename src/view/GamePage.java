@@ -52,7 +52,7 @@ public class GamePage extends JPanel{
 		playerPanel = new PlayerPanel("Player", (BlackJackPlayer) tavoloDaGioco.getPlayer());
 		bot2Panel = new BotPanel("Bot2", (BlackJackBot) tavoloDaGioco.getBot2());
 		
-		actionPlayerMenu = new ActionPlayerPanel(tavoloDaGioco, playerPanel, frame);
+		actionPlayerMenu = new ActionPlayerPanel(tavoloDaGioco, playerPanel, frame, this);
 		
 		playerPanel.addActionPlayer(actionPlayerMenu);
 
@@ -80,6 +80,15 @@ public class GamePage extends JPanel{
         
 		frame.setContentPane(this);
 		frame.setVisible(true);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void resetGame() {
+	    tavoloDaGioco.deleteObserver(bancoPanel);
+	    tavoloDaGioco.deleteObserver(bot1Panel);
+	    tavoloDaGioco.deleteObserver(playerPanel);
+	    tavoloDaGioco.deleteObserver(bot2Panel);
+	    tavoloDaGioco.deleteObserver(actionPlayerMenu);  
 	}
 	
 	@Override
