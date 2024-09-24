@@ -1,5 +1,4 @@
-/controller/
-/graphics/
-/model/
-/testBlackJack/
 /view/
+/model/
+/controller/
+/testBlackJack/

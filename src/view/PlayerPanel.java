@@ -37,6 +37,7 @@ public class PlayerPanel extends JPanel implements Observer{
 	private Integer puntiAttuali = 0;
 	private boolean isPrimeDueCarte = true;
 	private ActionPlayerPanel actionPlayerPanel;
+	private boolean isSplit = false;
 	
 	public PlayerPanel(String name, BlackJackPlayer player) {
 		this.player = player;
@@ -74,7 +75,6 @@ public class PlayerPanel extends JPanel implements Observer{
 
 			String action = event.getAction();
 			Object data = event.getData();
-			// Controlla il tipo di evento
 			if (data instanceof BlackJackPlayer) {
 				if(action.equals("DistribuisciCarteIniziali")) {
 					drawCard();
@@ -86,6 +86,9 @@ public class PlayerPanel extends JPanel implements Observer{
 				}else if(action.equals("Raddoppio")) {
 					drawCard();
 					calcolaPunteggioNuovaCarta(true);
+				}else if(action.equals("Dividi")) {
+					isSplit = true;
+					drawCard();
 				}
 				updatePunteggio();
 				if(action.equals("Vittoria")) {
@@ -184,8 +187,6 @@ public class PlayerPanel extends JPanel implements Observer{
 	            options, // risposta 1
 	            options[0] //risposta 2
 	        );
-	        
-	        // Gestisci la scelta del giocatore
 	        if (scelta == 0) { // Asso = 1
 	            return punteggi[0];
 	        } else if (scelta == 1) { // Asso = 11
@@ -195,6 +196,7 @@ public class PlayerPanel extends JPanel implements Observer{
 	    return punteggi[0];
 	}
 	
+	/*
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -208,6 +210,35 @@ public class PlayerPanel extends JPanel implements Observer{
 	        xOffset += 40;  // Sposta la prossima carta di 50px a destra
 	    }
 	}
+	*/
+	
+	@Override
+	protected void paintComponent(Graphics g) {
+	    super.paintComponent(g);
+
+	    int xOffset = 10; // Offset iniziale
+	    int yOffset = getHeight() - 210; // Posiziona le carte alla base del pannello
+
+	    if (isSplit && carteImages.size() >= 2) {
+	        // Disegna le prime due carte con una separazione di almeno 200px
+	        g.drawImage(carteImages.get(0), xOffset, yOffset, this);
+	        xOffset += 210; // Lascia uno spazio di 200px per la seconda carta
+	        g.drawImage(carteImages.get(1), xOffset, yOffset, this);
+
+	        // Disegna eventuali carte aggiuntive (se presenti) dopo le prime due
+	        for (int i = 2; i < carteImages.size(); i++) {
+	            xOffset += 40; // Sposta la prossima carta di 40px a destra
+	            g.drawImage(carteImages.get(i), xOffset, yOffset, this);
+	        }
+	    } else {
+	        // Disegna le carte normalmente sovrapponendole orizzontalmente
+	        for (Image carta : carteImages) {
+	            g.drawImage(carta, xOffset, yOffset, this);
+	            xOffset += 40; // Sposta la prossima carta di 40px a destra
+	        }
+	    }
+	}
+
 
 	public void passaTurno(boolean sballato) {
 		if(sballato) {
@@ -230,6 +261,4 @@ public class PlayerPanel extends JPanel implements Observer{
 	public void resetPartita() {
 		puntiAttuali = 0;
 	}
-	
-
 }

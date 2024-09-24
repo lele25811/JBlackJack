@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import model.BlackJackPlayer;
 import model.Player;
 import model.TavoloDaGioco;
 import model.UpdateEvent;
@@ -73,6 +74,7 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 			
 		}
 		if(e.getSource() == dividiButton) {
+			tavoloDaGioco.getSplit(tavoloDaGioco.getPlayer());
 			System.out.println("Divido");
 		}
 		
@@ -90,7 +92,9 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 				cartaButton.setEnabled(true);
 				staiButton.setEnabled(true);
 				raddoppiaButton.setEnabled(true);
-				dividiButton.setEnabled(true);
+				if(tavoloDaGioco.carteUguali((BlackJackPlayer)data)) {
+					dividiButton.setEnabled(true);
+				}
 			}
 		}		        
 	}

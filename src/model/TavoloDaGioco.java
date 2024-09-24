@@ -27,6 +27,7 @@ public class TavoloDaGioco extends Observable{
 	private Random random = new Random();
 	private Thread threadGioco;
 	private Database db;
+	private boolean isSplit = false;
 	
 	public static TavoloDaGioco getInstance() {
 		if(tavoloDaGiocoInstance == null) tavoloDaGiocoInstance = new TavoloDaGioco();
@@ -214,7 +215,16 @@ public class TavoloDaGioco extends Observable{
 				for (int i = 0; i < 2; i++) {  // Due carte per ciascun giocatore
 					for (Player p : giocatori) {
 						Thread.sleep(1500);  // Attesa di 1 secondi tra una carta e l'altra
-						p.addCarta(mazzo.prossimaCarta());
+						/*
+						 * Distribuizione controllata per il player DA TOGLIERE#####################################################################################################################
+						 */
+						if(p instanceof BlackJackPlayer) {
+							Carta carta = new Carta(Valore.CINQUE, Seme.FIORI);
+							p.addCarta(carta);
+						}else {
+							p.addCarta(mazzo.prossimaCarta());
+						}
+						//p.addCarta(mazzo.prossimaCarta());
 						setChanged();
 						notifyObservers(new UpdateEvent("DistribuisciCarteIniziali", p));
 					}
@@ -301,7 +311,13 @@ public class TavoloDaGioco extends Observable{
 		System.out.println(p.getMano());
 		setChanged();
 		notifyObservers(new UpdateEvent("Raddoppio", p));
-
+	}
+	
+	public void getSplit(Player p) {
+		System.out.println("Chiedo split");
+		isSplit = true;
+		setChanged();
+		notifyObservers(new UpdateEvent("Dividi", p));
 	}
 	
 	
@@ -371,5 +387,10 @@ public class TavoloDaGioco extends Observable{
 		System.out.println("Giocatori dopo il reset "+giocatori);
 	}
 
-	
+	public boolean carteUguali(Player p) {
+		if(p.getMano().size() == 2) {
+			return p.getMano().get(0).getValore() == p.getMano().get(1).getValore();
+		}
+		return false;
+	}
 }

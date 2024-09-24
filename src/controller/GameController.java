@@ -15,8 +15,6 @@ public class GameController {
 
 	public void startGame() {
 		model.startGame();
+		view.setVisible(true);
 	}
-	
-	
-	
 }

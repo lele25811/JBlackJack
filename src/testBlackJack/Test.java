@@ -23,6 +23,5 @@ public class Test {
 		GameController controller = new GameController(model, view);
 		
 		controller.startGame();
-		view.setVisible(true);
 	}
 }
