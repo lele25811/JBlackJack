@@ -17,6 +17,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import controller.GameController;
 import model.BlackJackBot;
 import model.BlackJackPlayer;
 import model.TavoloDaGioco;
@@ -25,34 +26,34 @@ public class GamePage extends JPanel{
 	
 	private Frame frame;
 	private Image backgroudImage;
-	
-	private TavoloDaGioco tavoloDaGioco;
-	
+		
 	private BotPanel bancoPanel;
 	private BotPanel bot1Panel;
 	private PlayerPanel playerPanel;
 	private BotPanel bot2Panel;
+	//private ActionPlayerPanel actionPlayerMenu;
 	private ActionPlayerPanel actionPlayerMenu;
+	private GameController controller;
 	
 	@SuppressWarnings("deprecation")
-	public GamePage(TavoloDaGioco tDG) {
+	public GamePage() {
+		controller = GameController.getIstance();
+		
 		revalidate();
 		repaint();
 		
 		frame = new Frame();
-		this.tavoloDaGioco = tDG;
-		
-		System.out.println("Ci sono contro "+ tavoloDaGioco.getNumeroGiocatori() +" Bot");
-		
+				
 		ImageIcon icon = new ImageIcon("./src/graphics/backgroundGame.png");
 		backgroudImage = icon.getImage();
 		
-		bancoPanel = new BotPanel("Banco", (BlackJackBot) tavoloDaGioco.getBanco());
-		bot1Panel = new BotPanel("Bot1", (BlackJackBot) tavoloDaGioco.getBot1());
-		playerPanel = new PlayerPanel("Player", (BlackJackPlayer) tavoloDaGioco.getPlayer());
-		bot2Panel = new BotPanel("Bot2", (BlackJackBot) tavoloDaGioco.getBot2());
+		bancoPanel = new BotPanel("Banco", (BlackJackBot) controller.getBanco());
+		bot1Panel = new BotPanel("Bot1", (BlackJackBot) controller.getBot1());
+		playerPanel = new PlayerPanel("Player", (BlackJackPlayer) controller.getPlayer());
+		bot2Panel = new BotPanel("Bot2", (BlackJackBot) controller.getBot2());
 		
-		actionPlayerMenu = new ActionPlayerPanel(tavoloDaGioco, playerPanel, frame, this);
+		//actionPlayerMenu = new ActionPlayerPanel(tavoloDaGioco, playerPanel, frame, this);
+		actionPlayerMenu = new ActionPlayerPanel(frame);
 		
 		playerPanel.addActionPlayer(actionPlayerMenu);
 
@@ -70,13 +71,18 @@ public class GamePage extends JPanel{
         this.add(gamePanel, BorderLayout.CENTER);
         this.add(actionPlayerMenu, BorderLayout.PAGE_END);
         
+        // ###
+        controller = GameController.getIstance();
+        controller.addActionPlayerMenu(actionPlayerMenu);
+        controller.addPlayerPanel(playerPanel);
 
-        tavoloDaGioco.addObserver(bancoPanel);
-        tavoloDaGioco.addObserver(bot1Panel);
-        tavoloDaGioco.addObserver(playerPanel);
-        tavoloDaGioco.addObserver(bot2Panel);
-        tavoloDaGioco.addObserver(actionPlayerMenu);
-        tavoloDaGioco.startGame();
+        controller.addObserver(bancoPanel);
+        controller.addObserver(bot1Panel);
+        controller.addObserver(playerPanel);
+        controller.addObserver(bot2Panel);
+        controller.addObserver(actionPlayerMenu);
+        
+        controller.startGame();
         
 		frame.setContentPane(this);
 		frame.setVisible(true);
@@ -84,11 +90,11 @@ public class GamePage extends JPanel{
 	
 	@SuppressWarnings("deprecation")
 	public void resetGame() {
-	    tavoloDaGioco.deleteObserver(bancoPanel);
-	    tavoloDaGioco.deleteObserver(bot1Panel);
-	    tavoloDaGioco.deleteObserver(playerPanel);
-	    tavoloDaGioco.deleteObserver(bot2Panel);
-	    tavoloDaGioco.deleteObserver(actionPlayerMenu);  
+	    controller.deleteObserver(bancoPanel);
+	    controller.deleteObserver(bot1Panel);
+	    controller.deleteObserver(playerPanel);
+	    controller.deleteObserver(bot2Panel);
+	    controller.deleteObserver(actionPlayerMenu);  
 	}
 	
 	@Override
@@ -96,5 +102,4 @@ public class GamePage extends JPanel{
 		super.paintComponent(g);
 		g.drawImage(backgroudImage, 0, 0, 1280, 720, this);
 	}
-
 }

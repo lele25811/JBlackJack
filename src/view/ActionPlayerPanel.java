@@ -7,32 +7,29 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import controller.GameController;
 import model.BlackJackPlayer;
-import model.Player;
 import model.TavoloDaGioco;
 import model.UpdateEvent;
 
 @SuppressWarnings("deprecation")
-public class ActionPlayerPanel extends JPanel implements ActionListener, Observer{
+public class ActionPlayerPanel extends JPanel implements Observer{
 
-	private MyButton cartaButton;
-	private MyButton staiButton;
-	private MyButton raddoppiaButton;
-	private MyButton dividiButton;
-	private TavoloDaGioco tavoloDaGioco;
-	private PlayerPanel playerPanel;
+	private JButton cartaButton;
+	private JButton staiButton;
+	private JButton raddoppiaButton;
+	private JButton dividiButton;
 	private Frame frame;
-	private GamePage gamePage;
+	private GameController controller;
 	
-	public ActionPlayerPanel(TavoloDaGioco tavoloDaGioco, PlayerPanel playerPanel, Frame frame, GamePage gamePage) {
+	public ActionPlayerPanel(Frame frame) {
 		this.frame = frame;
-		this.tavoloDaGioco = tavoloDaGioco;
-		this.playerPanel = playerPanel;
-		this.gamePage = gamePage;
+		controller = GameController.getIstance();
 		
 		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.RED, 2), "Azioni di gioco");
 	    border.setTitleColor(Color.RED);
@@ -41,10 +38,10 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 	    setBackground(new Color(120, 0, 0, 0));
 		setOpaque(false);
 		
-		cartaButton = new MyButton("Card", this);
-		staiButton = new MyButton("Stay", this);
-		raddoppiaButton = new MyButton("Double", this);
-		dividiButton = new MyButton("Split", this);
+		cartaButton = new JButton("Card");
+		staiButton = new JButton("Stay");
+		raddoppiaButton = new JButton("Double");
+		dividiButton = new JButton("Split");
 		
 		cartaButton.setEnabled(false);
 		staiButton.setEnabled(false);
@@ -57,27 +54,23 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 		add(dividiButton);
 		
 	}
+	
+	public JButton getCartaButton() {
+		return cartaButton;
+	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == cartaButton) {
-			tavoloDaGioco.getCard(tavoloDaGioco.getPlayer());
-			System.out.println("Chiedo carta");
-		}
-		if(e.getSource() == staiButton) {
-			playerPanel.passaTurno(false);
-			System.out.println("Passo turno");
-		}
-		if(e.getSource() == raddoppiaButton) {
-			tavoloDaGioco.getDouble(tavoloDaGioco.getPlayer());
-			System.out.println("Raddoppio");
-			
-		}
-		if(e.getSource() == dividiButton) {
-			tavoloDaGioco.getSplit(tavoloDaGioco.getPlayer());
-			System.out.println("Divido");
-		}
-		
+	public JButton getStaiButton() {
+		return staiButton;
+	}
+
+
+	public JButton getRaddoppiaButton() {
+		return raddoppiaButton;
+	}
+
+
+	public JButton getDividiButton() {
+		return dividiButton;
 	}
 
 	@Override
@@ -92,20 +85,20 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 				cartaButton.setEnabled(true);
 				staiButton.setEnabled(true);
 				raddoppiaButton.setEnabled(true);
-				if(tavoloDaGioco.carteUguali((BlackJackPlayer)data)) {
+				//if(tavoloDaGioco.carteUguali((BlackJackPlayer)data)) {
+				if(controller.isCarteUguali((BlackJackPlayer) data)) {
 					dividiButton.setEnabled(true);
 				}
 			}
-		}		        
-	}
+		}
+	}		        
 	
 	public void passaTurno(int punteggio) {
 		cartaButton.setEnabled(false);
 		staiButton.setEnabled(false);
 		raddoppiaButton.setEnabled(false);
 		dividiButton.setEnabled(false);
-		tavoloDaGioco.setPuntiTavolo(punteggio);
-		tavoloDaGioco.playerFinishedTurn();
+		controller.passaTurno(punteggio);
 	}
 
 	public void chiediNuovaPartita() {
@@ -119,14 +112,16 @@ public class ActionPlayerPanel extends JPanel implements ActionListener, Observe
 		if (risposta == JOptionPane.YES_OPTION) {
 			// Reset del gioco e inizio nuova partita
 			System.out.println("Nuova Partita");
-			tavoloDaGioco.resetPartita();
-			playerPanel.resetPartita();
-			gamePage.resetGame();
+			//tavoloDaGioco.resetPartita();
+			//playerPanel.resetPartita();
+			//gamePage.resetGame();
+			controller.nuovaPartita();
 			frame.dispose();
-			new MenuPage(tavoloDaGioco);
+			new MenuPage();
 		} else if (risposta == JOptionPane.NO_OPTION) {
 			System.exit(0);
 		}
 	}
 
 }
+

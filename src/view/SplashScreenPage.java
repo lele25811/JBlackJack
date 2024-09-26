@@ -51,7 +51,6 @@ public class SplashScreenPage extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 	    // Verifica se l'evento è stato generato dal pulsante di invio
 		if(e.getSource()== playButton) {
-			System.out.println("CAmbio in login");
 			// Chiude il frame corrente
 			frame.dispose();
 		    // Avvia l'interfaccia grafica del gioco con il nuovo giocatore

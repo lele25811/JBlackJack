@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
 
+import controller.GameController;
 import model.BlackJackPlayer;
 import model.TavoloDaGioco;
 
@@ -48,15 +49,14 @@ public class MenuPage extends JPanel implements ActionListener{
 	private JLabel nGamesWin;
 	private JLabel nGamesLost;
 	
-	private TavoloDaGioco tavoloDaGioco;
+	private GameController controller;
 	private BlackJackPlayer player;
 
-	public MenuPage(TavoloDaGioco tavoloDaGioco) {
-		this.tavoloDaGioco = tavoloDaGioco;
-		
+	public MenuPage() {
 		frame = new Frame();
+		controller = GameController.getIstance();
 		
-		player = (BlackJackPlayer) tavoloDaGioco.getPlayer();
+		player = GameController.getIstance().getPlayer();
 		
 		backgroundImage = new ImageIcon("./src/graphics/backgroundGame.png").getImage();
 
@@ -89,7 +89,7 @@ public class MenuPage extends JPanel implements ActionListener{
         leftMenuPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.fill = gbc.CENTER;
+        gbc.fill = GridBagConstraints.CENTER;
         gbc.insets = new Insets(10, 10, 10, 10);
         
         gbc.gridx = 1;
@@ -180,9 +180,10 @@ public class MenuPage extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == playButton) {
 			String nBot = group.getSelection().getActionCommand();
-			tavoloDaGioco.addBot(nBot);
+			controller.addBot(nBot);
 			frame.dispose();
-			new GamePage(tavoloDaGioco);
+			GamePage gamePage = new GamePage();
+			GameController.getIstance().addGamePage(gamePage);
 		}
 	}
 	

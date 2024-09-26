@@ -100,8 +100,8 @@ public class PlayerPanel extends JPanel implements Observer{
 		}
 	}
 
-	public void addActionPlayer(ActionPlayerPanel actionPlayerPanel) {
-		this.actionPlayerPanel = actionPlayerPanel;
+	public void addActionPlayer(ActionPlayerPanel actionPlayerMenu) {
+		this.actionPlayerPanel = actionPlayerMenu;
 	}
 
 	private void updatePunteggio() {

@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 
+import controller.GameController;
 import model.BlackJackPlayer;
 import model.Database;
 import model.Player;
@@ -54,20 +55,17 @@ public class LoginPage extends JPanel implements ActionListener{
 	// Login
 	private JPanel loadPlayer;
 	private MyButton buttonLoadPlayer;
-	private JList listaGiocatori;
+	private JList<String> listaGiocatori;
 	
-	private Database db;
 	private BlackJackPlayer player;
-	private TavoloDaGioco tavoloDaGioco;
+	private GameController controller;
 	
 	
 	public LoginPage() {
 		frame = new Frame();
+		controller = GameController.getIstance();
 		setLayout(new BorderLayout());
-		
-		db = db.getIstance();
-		tavoloDaGioco = tavoloDaGioco.getInstance();
-		
+			
 		//Carica l'immagine dal percorso specificato
 		ImageIcon icon = new ImageIcon("./src/graphics/backgroundGame.png");
 		backgroudImage = icon.getImage();
@@ -126,7 +124,7 @@ public class LoginPage extends JPanel implements ActionListener{
 		newPlayer.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTH;
-		gbc.fill = gbc.HORIZONTAL;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -193,7 +191,7 @@ public class LoginPage extends JPanel implements ActionListener{
 		loadPlayer.setLayout(new BorderLayout());
 		loadPlayer.add(buttonLoadPlayer, BorderLayout.SOUTH);
 		
-		List<BlackJackPlayer> giocatori = db.getPlayers();
+		List<BlackJackPlayer> giocatori = controller.getDbPlayers();
 	    String[] playersName = giocatori.stream().map(Player::getNickname).toArray(String[]::new);
 	    String[] avatarName = giocatori.stream().map(Player::getAvatar).toArray(String[]::new);
 	    String[] playersNameAvatar = new String[playersName.length];
@@ -239,8 +237,8 @@ public class LoginPage extends JPanel implements ActionListener{
 			String nickname = nicknameTextField.getText();
 			String avatar = group.getSelection().getActionCommand();
 			player = new BlackJackPlayer(nickname, avatar);
-			db.addPlayer(player);
-			tavoloDaGioco.addPlayer(player);
+			controller.addDbPlayer(player);
+			controller.addPlayer(player);
 			System.out.println("Creato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
 			caricaMenu();
 		}else if(e.getSource() == buttonLoadPlayer) {
@@ -250,8 +248,8 @@ public class LoginPage extends JPanel implements ActionListener{
 				MyPopup myPopup = new MyPopup("Errore", "Nessun Profilo selezionato");
 				myPopup.showMessage();
 			}else {
-				player = db.getPlayerByIndex(indexPlayer);
-				tavoloDaGioco.addPlayer(player);
+				player = controller.getDbPlayerByIndex(indexPlayer);
+				controller.addPlayer(player);
 				System.out.println("Caricato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
 				caricaMenu();
 			}
@@ -260,6 +258,6 @@ public class LoginPage extends JPanel implements ActionListener{
 	
 	private void caricaMenu() {
 		frame.dispose();
-		new MenuPage(tavoloDaGioco);
+		new MenuPage();
 	}
 }

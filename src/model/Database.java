@@ -15,7 +15,7 @@ public class Database {
 	
 	private static Database databaseInstance;
 	private List<BlackJackPlayer> bjPlayers;
-	private String fileName = "DatabasePlayer.txt";
+	private final String FILENAME = "DatabasePlayer.txt";
 	
 	public static Database getIstance() {
 		if (databaseInstance == null) databaseInstance = new Database();
@@ -54,7 +54,7 @@ public class Database {
 	// Salva l'oggetto Player serializzato nel file
 	private void savePlayer() {
 		try {
-			FileOutputStream file = new FileOutputStream(fileName);
+			FileOutputStream file = new FileOutputStream(FILENAME);
 			ObjectOutputStream out = new ObjectOutputStream(file);
 			out.writeObject(bjPlayers);
 			out.close();
@@ -67,7 +67,7 @@ public class Database {
 	// Carica l'oggetto player deserializzandolo dal file
 	public List<BlackJackPlayer> loadPlayer() {
 		try {
-			FileInputStream file = new FileInputStream(fileName);
+			FileInputStream file = new FileInputStream(FILENAME);
 			ObjectInputStream in = new ObjectInputStream(file);
 			bjPlayers.clear();
 			bjPlayers.addAll((ArrayList<BlackJackPlayer>) in.readObject());
@@ -82,7 +82,7 @@ public class Database {
 	
 	 // Metodo per pulire il file
 	 public void clearDatabase() {
-	        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
+	        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILENAME))) {
 	            bjPlayers.clear();
 	            out.writeObject(bjPlayers);
 	        } catch (IOException i) {
@@ -104,7 +104,6 @@ public class Database {
 
 	public List<BlackJackPlayer> getPlayers() {
 		return loadPlayer();
-		
 	}
 	
 }
