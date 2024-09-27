@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.lang.ModuleLayer.Controller;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -18,6 +19,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
+import controller.GameController;
 import model.BlackJackPlayer;
 import model.Carta;
 import model.TavoloDaGioco;
@@ -35,12 +37,18 @@ public class PlayerPanel extends JPanel implements Observer{
 	private ArrayList<Image> carteImages;
 	private JLabel punti;
 	private Integer puntiAttuali = 0;
+	private Integer puntiMano1 = 0;
+	private Integer puntiMano2 = 0;
+	private Integer indexMano = 0;
 	private boolean isPrimeDueCarte = true;
 	private ActionPlayerPanel actionPlayerPanel;
 	private boolean isSplit = false;
+	private GameController controller;
 	
 	public PlayerPanel(String name, BlackJackPlayer player) {
 		this.player = player;
+		controller = GameController.getIstance();
+		
 		carteImages = new ArrayList<>();
 		punti = new JLabel("", SwingConstants.CENTER);
 		
@@ -81,13 +89,36 @@ public class PlayerPanel extends JPanel implements Observer{
 				}else if(action.equals("DistribuzioneTerminata")) {
 					calcolaPunteggioIniziale();
 				}else if(action.equals("NuovaCarta")) {
-					drawCard();
-					calcolaPunteggioNuovaCarta(false);
+					player.StampaManiSplit();
+					if(!isSplit) {
+						drawCard();
+						calcolaPunteggioNuovaCarta(false);
+					}else {
+						// chiedo carta mentre sono nello split
+						if (indexMano == 0) {
+				            // Prima mano
+				            drawCard();  // Disegna la carta nella prima mano
+				            calcolaPunteggioNuovaCarta(false);
+				        } else if (indexMano == 1) {
+				            // Seconda mano
+				            drawCard();  // Disegna la carta nella seconda mano
+				            calcolaPunteggioNuovaCarta(false);
+				        }
+					}
 				}else if(action.equals("Raddoppio")) {
-					drawCard();
-					calcolaPunteggioNuovaCarta(true);
+					if(!isSplit) {
+						drawCard();
+						calcolaPunteggioNuovaCarta(true);
+					}else {
+						// chiedo raddoppio mentre sono nello split
+						
+					}
 				}else if(action.equals("Dividi")) {
 					isSplit = true;
+					calcolaPunteggioIniziale();
+					puntiMano1 = puntiAttuali /2;
+					puntiMano2 = puntiAttuali /2;
+					puntiAttuali = puntiAttuali /2;
 					drawCard();
 				}
 				updatePunteggio();
@@ -105,25 +136,53 @@ public class PlayerPanel extends JPanel implements Observer{
 	}
 
 	private void updatePunteggio() {
-		punti.setText("Punti attuali: " + puntiAttuali);
+		if(!isSplit) {
+			punti.setText("Punti attuali: " + puntiAttuali);
+		}else {
+			punti.setText("Punti attuali: " + puntiMano1 +" / "+puntiMano2);
+		}
 		punti.revalidate();
 		punti.repaint();
 	}
-
+	
 	public void drawCard() {
-		carteImages.clear();
-		mano = player.getMano();
-		for (Carta carta : mano) {
-			// Crea l'icona della carta usando il percorso dell'immagine ottenuto da carta.getNome()
-		    String imagePath = carta.getPath(); // getNome() restituisce il path dell'immagine della carta
-		    ImageIcon cartaIcon = new ImageIcon("./src/graphics/"+imagePath);
-		    Image img = cartaIcon.getImage(); // Ottieni l'oggetto Image dall'ImageIcon
-	        Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
+	    carteImages.clear(); // Pulisce la lista delle immagini precedenti
+	    if (isSplit) {
+	        // Gestione dello split: due mani
+	        ArrayList<Carta> mano1 = player.getMano1();
+	        ArrayList<Carta> mano2 = player.getMano2();
 	        
-	        carteImages.add(imgScaled);
-		}
-		revalidate();
-		repaint();
+	        // Aggiungi le carte della mano1
+	        for (Carta carta : mano1) {
+	            String imagePath = carta.getPath(); // Ottieni il percorso dell'immagine
+	            ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
+	            Image img = cartaIcon.getImage(); 
+	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
+	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
+	        }
+	        
+	        // Aggiungi le carte della mano2
+	        for (Carta carta : mano2) {
+	            String imagePath = carta.getPath(); // Ottieni il percorso dell'immagine
+	            ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
+	            Image img = cartaIcon.getImage();
+	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
+	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
+	        }
+	    } else {
+	        // Gestione normale: una sola mano
+	        mano = player.getMano(); // Ottieni la mano del giocatore
+	        for (Carta carta : mano) {
+	            String imagePath = carta.getPath(); // Ottieni il percorso dell'immagine
+	            ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
+	            Image img = cartaIcon.getImage(); 
+	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
+	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
+	        }
+	    }
+	    
+	    revalidate(); // Forza la rilettura del layout
+	    repaint(); // Ridisegna il pannello
 	}
 	
 	public void calcolaPunteggioIniziale() {
@@ -146,25 +205,54 @@ public class PlayerPanel extends JPanel implements Observer{
 
 	public void calcolaPunteggioNuovaCarta(boolean raddoppio) {
 		SwingUtilities.invokeLater(() -> {
-			// Per ogni nuova carta, aggiungi il suo valore al punteggio attuale
-			Carta ultimaCarta = mano.get(mano.size() - 1);
-			int valoreCarta = ultimaCarta.getValore();
+			if(!isSplit) {
+				// Per ogni nuova carta, aggiungi il suo valore al punteggio attuale
+				Carta ultimaCarta = mano.get(mano.size() - 1);
+				int valoreCarta = ultimaCarta.getValore();
 
-			if ("Asso".equals(ultimaCarta.getStringValore())) {
-				// Se l'ultima carta è un asso, chiedi se contarlo come 1 o 11
-				int[] punteggi = player.getPuntiMano();
-				valoreCarta = scegliPunteggioAsso(new int[]{valoreCarta, valoreCarta + 10});
+				if ("Asso".equals(ultimaCarta.getStringValore())) {
+					// Se l'ultima carta è un asso, chiedi se contarlo come 1 o 11
+					valoreCarta = scegliPunteggioAsso(new int[]{valoreCarta, valoreCarta + 10});
+				}
+				// Aggiungi il valore della nuova carta al punteggio attuale
+				puntiAttuali += valoreCarta;
+			}else {
+				if(indexMano == 0) {
+					System.out.println(player.getLastCartSplit(indexMano));
+					puntiMano1 += player.getLastCartSplit(indexMano);
+					puntiAttuali = puntiMano1;
+				}else {
+					System.out.println(player.getLastCartSplit(indexMano));
+					puntiMano2 += player.getLastCartSplit(indexMano);
+					puntiAttuali = puntiMano2;
+				}
 			}
-			// Aggiungi il valore della nuova carta al punteggio attuale
-			puntiAttuali += valoreCarta;
-			
 			updatePunteggio();
-			
-			if(puntiAttuali > 21) {
-				passaTurno(true);
-			}else if(raddoppio) {
-				passaTurno(false);
+			if (!isSplit) {
+				if (puntiAttuali > 21) {
+					passaTurno(true);
+				} else if (raddoppio) {
+					passaTurno(false);
+				}
+			} else if (isSplit) {
+				System.out.println("indexMano "+indexMano);
+				if (puntiAttuali > 21) {
+					System.out.println("HAI SBALLATO");
+					if(indexMano >= 1) {
+						passaTurno(true);
+					}else {
+						indexMano +=1;
+						controller.updateIndexMano();
+					}
+				} else if (raddoppio) {
+					if(indexMano == 2) {
+						passaTurno(true);
+					}else {
+						indexMano +=1;
+					}
+				}
 			}
+			System.out.println("indexMano dopo il controllo "+indexMano);
 		});
 	}
 
@@ -196,50 +284,40 @@ public class PlayerPanel extends JPanel implements Observer{
 	    return punteggi[0];
 	}
 	
-	/*
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-	    // Disegna ogni carta, sovrapponendole orizzontalmente
-	    int xOffset = 10;  // Offset iniziale
-	    int yOffset = getHeight() - 210;  // Posiziona le carte alla base del pannello
-
-	    for (Image carta : carteImages) {
-	    	g.drawImage(carta, xOffset, yOffset, this);
-	        xOffset += 40;  // Sposta la prossima carta di 50px a destra
-	    }
-	}
-	*/
-	
 	@Override
 	protected void paintComponent(Graphics g) {
 	    super.paintComponent(g);
 
-	    int xOffset = 10; // Offset iniziale
+	    int xOffset = 10; // Offset iniziale per la prima mano
 	    int yOffset = getHeight() - 210; // Posiziona le carte alla base del pannello
 
-	    if (isSplit && carteImages.size() >= 2) {
-	        // Disegna le prime due carte con una separazione di almeno 200px
-	        g.drawImage(carteImages.get(0), xOffset, yOffset, this);
-	        xOffset += 210; // Lascia uno spazio di 200px per la seconda carta
-	        g.drawImage(carteImages.get(1), xOffset, yOffset, this);
-
-	        // Disegna eventuali carte aggiuntive (se presenti) dopo le prime due
-	        for (int i = 2; i < carteImages.size(); i++) {
-	            xOffset += 40; // Sposta la prossima carta di 40px a destra
-	            g.drawImage(carteImages.get(i), xOffset, yOffset, this);
+	    if (isSplit) {
+	        // Disegna le carte della prima mano (mano 1)
+	        for (int i = 0; i < player.getMano1().size(); i++) {
+	            Image img = carteImages.get(i); // Ottieni l'immagine della carta dalla lista
+	            g.drawImage(img, xOffset, yOffset, this); // Disegna la carta
+	            xOffset += 35; // Sposta per la prossima carta nella prima mano
+	        }
+	        
+	        // Offset per disegnare la seconda mano
+	        int xOffsetSecondHand = 210; // Larghezza separazione tra le due mani
+	        int xOffeset = 1;
+	        for (int i = 0; i < player.getMano2().size(); i++) {
+	        	xOffeset = 30 * player.getMano1().size(); 
+	            Image img = carteImages.get(player.getMano1().size() + i); // Le carte della seconda mano sono dopo quelle della prima
+	            g.drawImage(img, xOffsetSecondHand+xOffeset, yOffset, this); // Disegna la carta
+	            xOffsetSecondHand += 35; // Sposta per la prossima carta nella seconda mano
 	        }
 	    } else {
-	        // Disegna le carte normalmente sovrapponendole orizzontalmente
+	        // Disegna le carte normalmente (senza split)
 	        for (Image carta : carteImages) {
-	            g.drawImage(carta, xOffset, yOffset, this);
+	            g.drawImage(carta, xOffset, yOffset, this); // Disegna la carta
 	            xOffset += 40; // Sposta la prossima carta di 40px a destra
 	        }
 	    }
 	}
-
-
+	
+	
 	public void passaTurno(boolean sballato) {
 		if(sballato) {
 			MyPopup myPopup = new MyPopup("Sballato!", "Hai sballato con "+puntiAttuali);

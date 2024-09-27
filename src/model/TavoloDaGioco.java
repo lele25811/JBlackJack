@@ -2,6 +2,8 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -93,17 +95,6 @@ public class TavoloDaGioco extends Observable{
 		}
 		currentPlayerIndex = 0;
 		inizializzaPunti(giocatori.size());
-	}
-	
-	public void provaStampa() {
-		for(Player p: giocatori) {
-			System.out.println(p.toString());
-			System.out.println(p.getMano());
-			int[] puntiMano = p.getValoreManoIniziale();
-			for(int i=0; i<puntiMano.length; i++) {
-				System.out.println(puntiMano[i]);
-			}
-		}
 	}
 	
 	// metodo di inizio gioco
@@ -276,10 +267,6 @@ public class TavoloDaGioco extends Observable{
 		return currentPlayerIndex < giocatori.size();
 	}
 	
-	/*
-	 * TODO: GESTIONE DELLE MOSSE DEL PLAYER E DI CONSEGUENZA DEI BOT
-	 */
-	
 	public void getCard(Player p) {
 		System.out.println("Chiedo carta");
 		p.addCarta(mazzo.prossimaCarta());
@@ -316,6 +303,8 @@ public class TavoloDaGioco extends Observable{
 	public void getSplit(Player p) {
 		System.out.println("Chiedo split");
 		isSplit = true;
+		// Divide le mani di gioco (Map<Integer,ArrayList<Carta>>)
+		p.maniSplit();
 		setChanged();
 		notifyObservers(new UpdateEvent("Dividi", p));
 	}
@@ -392,5 +381,9 @@ public class TavoloDaGioco extends Observable{
 			return p.getMano().get(0).getValore() == p.getMano().get(1).getValore();
 		}
 		return false;
+	}
+
+	public void updateIndexMano() {
+		getPlayer().updateIndexMano();
 	}
 }

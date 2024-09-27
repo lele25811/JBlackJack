@@ -170,4 +170,8 @@ public class GameController {
 		model.startGame();
 	}
 
+	public void updateIndexMano() {
+		model.updateIndexMano();
+	}
+
 }
