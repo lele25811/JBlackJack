@@ -89,7 +89,6 @@ public class PlayerPanel extends JPanel implements Observer{
 				}else if(action.equals("DistribuzioneTerminata")) {
 					calcolaPunteggioIniziale();
 				}else if(action.equals("NuovaCarta")) {
-					player.StampaManiSplit();
 					if(!isSplit) {
 						drawCard();
 						calcolaPunteggioNuovaCarta(false);
@@ -111,7 +110,15 @@ public class PlayerPanel extends JPanel implements Observer{
 						calcolaPunteggioNuovaCarta(true);
 					}else {
 						// chiedo raddoppio mentre sono nello split
-						
+						if (indexMano == 0) {
+				            // Prima mano
+				            drawCard();  // Disegna la carta nella prima mano
+				            calcolaPunteggioNuovaCarta(true);
+				        } else if (indexMano == 1) {
+				            // Seconda mano
+				            drawCard();  // Disegna la carta nella seconda mano
+				            calcolaPunteggioNuovaCarta(true);
+				        }
 					}
 				}else if(action.equals("Dividi")) {
 					isSplit = true;
@@ -148,6 +155,8 @@ public class PlayerPanel extends JPanel implements Observer{
 	public void drawCard() {
 	    carteImages.clear(); // Pulisce la lista delle immagini precedenti
 	    if (isSplit) {
+			player.StampaManiSplit();
+
 	        // Gestione dello split: due mani
 	        ArrayList<Carta> mano1 = player.getMano1();
 	        ArrayList<Carta> mano2 = player.getMano2();
@@ -203,7 +212,7 @@ public class PlayerPanel extends JPanel implements Observer{
 		});
 	}
 
-	public void calcolaPunteggioNuovaCarta(boolean raddoppio) {
+	public void calcolaPunteggioNuovaCarta(boolean raddoppio) {		
 		SwingUtilities.invokeLater(() -> {
 			if(!isSplit) {
 				// Per ogni nuova carta, aggiungi il suo valore al punteggio attuale
@@ -217,14 +226,27 @@ public class PlayerPanel extends JPanel implements Observer{
 				// Aggiungi il valore della nuova carta al punteggio attuale
 				puntiAttuali += valoreCarta;
 			}else {
-				if(indexMano == 0) {
-					System.out.println(player.getLastCartSplit(indexMano));
-					puntiMano1 += player.getLastCartSplit(indexMano);
-					puntiAttuali = puntiMano1;
+				
+				if ("Asso".equals(player.getLastCartaSplit(indexMano))) {
+					if(indexMano == 0) {
+						int valoreMano = player.getLastCartaValoreSplit(indexMano);
+						System.out.println("Ho trovato un asso puntiAttuali: "+puntiMano1);
+						System.out.println("sommando l'asso "+valoreMano+" / "+valoreMano+10);
+						puntiMano1 += scegliPunteggioAsso(new int[]{valoreMano, valoreMano + 10});
+					}else if(indexMano == 1) {
+						int valoreMano = player.getLastCartaValoreSplit(indexMano);
+						System.out.println("Ho trovato un asso puntiAttuali: "+puntiMano2);
+						System.out.println("sommando l'asso "+valoreMano+" / "+valoreMano+10);
+						puntiMano2 += scegliPunteggioAsso(new int[]{valoreMano, valoreMano + 10});
+					}
 				}else {
-					System.out.println(player.getLastCartSplit(indexMano));
-					puntiMano2 += player.getLastCartSplit(indexMano);
-					puntiAttuali = puntiMano2;
+					if(indexMano == 0) {
+						puntiMano1 += player.getLastCartaValoreSplit(indexMano);
+						puntiAttuali = puntiMano1;
+					}else {
+						puntiMano2 += player.getLastCartaValoreSplit(indexMano);
+						puntiAttuali = puntiMano2;
+					}
 				}
 			}
 			updatePunteggio();
@@ -235,32 +257,43 @@ public class PlayerPanel extends JPanel implements Observer{
 					passaTurno(false);
 				}
 			} else if (isSplit) {
-				System.out.println("indexMano "+indexMano);
 				if (puntiAttuali > 21) {
-					System.out.println("HAI SBALLATO");
 					if(indexMano >= 1) {
 						passaTurno(true);
 					}else {
 						indexMano +=1;
 						controller.updateIndexMano();
+						passaMano();
 					}
 				} else if (raddoppio) {
-					if(indexMano == 2) {
-						passaTurno(true);
+					if(indexMano >= 1) {
+						if(puntiAttuali > 21) {
+							passaTurno(true);
+						}else {
+							passaTurno(false);
+						}
 					}else {
+						controller.updateIndexMano();
+						passaTurno(false);
 						indexMano +=1;
 					}
 				}
 			}
-			System.out.println("indexMano dopo il controllo "+indexMano);
 		});
+	}
+
+	private void passaMano() {
+		MyPopup myPopup = new MyPopup("Passa turno!", "Hai passato la "+ indexMano +" mano con "+puntiAttuali);
+		myPopup.showMessage();
 	}
 
 	public int scegliPunteggioAsso(int[] punteggi) {
 	    if (punteggi.length == 2) { // Se ci sono due opzioni di punteggio (con Asso)
+	    	System.out.println("Da dentro punteggi asso "+punteggi[0]+ " / "+punteggi[1]);
 	        // Crea il messaggio e le opzioni per il popup
 	    	int puntiAggiornatiUno = puntiAttuali+punteggi[0];
 	    	int puntiAggiornatiUndici = puntiAttuali+punteggi[1];
+	    	System.out.println("1: "+puntiAggiornatiUno + " 11: " + puntiAggiornatiUndici);
 	        String message = "Vuoi contare l'Asso come 1 ("+puntiAggiornatiUno+") o 11 ("+puntiAggiornatiUndici+")?";
 	        String[] options = {"Asso = 1 ("+puntiAggiornatiUno+")", "Asso = 11 ("+puntiAggiornatiUndici+")"};
 	        
@@ -319,14 +352,29 @@ public class PlayerPanel extends JPanel implements Observer{
 	
 	
 	public void passaTurno(boolean sballato) {
-		if(sballato) {
-			MyPopup myPopup = new MyPopup("Sballato!", "Hai sballato con "+puntiAttuali);
-			myPopup.showMessage();
+		System.out.println("VADO DI POPUP: sballato???" +sballato);
+		if(!isSplit) {
+			if(sballato) {
+				MyPopup myPopup = new MyPopup("Sballato!", "Hai sballato con "+puntiAttuali);
+				myPopup.showMessage();
+			}else {
+				MyPopup myPopup = new MyPopup("Passa turno!", "Hai passato il turno con "+puntiAttuali);
+				myPopup.showMessage();
+			}
+			actionPlayerPanel.passaTurno(puntiAttuali);
 		}else {
-			MyPopup myPopup = new MyPopup("Passa turno!", "Hai passato il turno con "+puntiAttuali);
-			myPopup.showMessage();
+			System.out.println("Siamo nello split");
+			int numeroMano = indexMano +1;
+			if(sballato) {
+				MyPopup myPopup = new MyPopup("Sballato!", "Hai sballato la "+ numeroMano +" mano con "+puntiAttuali);
+				myPopup.showMessage();
+			}else {
+				MyPopup myPopup = new MyPopup("Passa turno!", "Hai passato la "+ numeroMano +" mano con "+puntiAttuali);
+				myPopup.showMessage();
+			}if(indexMano >= 1) {
+				actionPlayerPanel.passaTurno(puntiAttuali);
+			}
 		}
-		actionPlayerPanel.passaTurno(puntiAttuali);
 	}
 	
 	private void popUpRisultato(String title , String parola) {

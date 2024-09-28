@@ -1,6 +1,7 @@
 package testBlackJack;
 
 import controller.GameController;
+import model.Database;
 import model.TavoloDaGioco;
 import view.SplashScreenPage;
 
@@ -25,6 +26,8 @@ public class Test {
 	*/
 	
 	public static void main(String[] args) {
+		//Database db = Database.getIstance();
+		//db.clearDatabase();
 		TavoloDaGioco model = TavoloDaGioco.getInstance();
 		SplashScreenPage view = new SplashScreenPage();
 		GameController controller = GameController.getIstance();

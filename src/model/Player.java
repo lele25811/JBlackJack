@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /*
  * Classe che definisce il giocatore (superclasse)
@@ -27,7 +28,7 @@ public class Player implements Serializable{
 	 */
 	private String avatar;
 
-	
+
 	/*
 	 * Costruttore della classe Player
 	 */
@@ -171,15 +172,29 @@ public class Player implements Serializable{
 		return manoSplit.get(1);
 	}
 	
-	public int getLastCartSplit(Integer indexMano) {
+	public int getLastCartaValoreSplit(Integer indexMano) {
 		return manoSplit.getOrDefault(indexMano, new ArrayList<>()).stream()
 			    .reduce((prima, seconda) -> seconda)  // Ottiene l'ultima carta
-			    .map(Carta::getValore)                // Ottiene il valore della carta
+			    .map(Carta::getValore)               // Ottiene il valore della carta
 			    .orElseThrow(() -> new IllegalStateException("La lista è vuota o la chiave non esiste"));
+	}
+	
+	public String getLastCartaSplit(Integer indexMano) {
+        return manoSplit.getOrDefault(indexMano, new ArrayList<>()).stream()
+	    .reduce((prima, seconda) -> seconda)  // Ottiene l'ultima carta
+	    .map(Carta::getStringValore)
+	    .orElseThrow(() -> new IllegalStateException("La lista è vuota o la chiave non esiste"));
 	}
 
 	public void updateIndexMano() {
 		indexMano +=1;
+	}
+	
+	// non lo utilizzo controlla se serve
+	public void resetPartita() {
+		mano.clear();
+		manoSplit.clear();
+		indexMano = null;
 	}
 	
 }
