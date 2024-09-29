@@ -32,9 +32,11 @@ public class BotPanel extends JPanel implements Observer{
 	private JLabel punti;
 	private Integer puntiAttuali = 0;
 	private String cartaCopertaPath = "CartaRetro.png";
+	private AudioManager audioManager;
 	
 	public BotPanel(String name, BlackJackBot bot) {
 		this.bot = bot;
+		audioManager = AudioManager.getInstance();
 		carteImages = new ArrayList<>();
 		punti = new JLabel("", SwingConstants.CENTER);
 		
@@ -120,7 +122,7 @@ public class BotPanel extends JPanel implements Observer{
 		    ImageIcon cartaIcon = new ImageIcon("./src/graphics/"+imagePath);
 		    Image img = cartaIcon.getImage(); // Ottieni l'oggetto Image dall'ImageIcon
 	        Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
-	        
+	        audioManager.play("./src/sounds/card.wav");
 	        carteImages.add(imgScaled);
 		}
 		revalidate();
@@ -136,12 +138,14 @@ public class BotPanel extends JPanel implements Observer{
 			String primaCartaPath = primaCarta.getPath(); // Ottieni il percorso dell'immagine della prima carta
 			ImageIcon primaCartaIcon = new ImageIcon("./src/graphics/" + primaCartaPath);
 			Image primaCartaImage = primaCartaIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+			audioManager.play("./src/sounds/card.wav");
 			carteImages.add(primaCartaImage);
 		}
 		
 		if (mano.size() > 1) {
 			ImageIcon cartaCopertaIcon = new ImageIcon("./src/graphics/" + cartaCopertaPath);
 			Image cartaCopertaImage = cartaCopertaIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+			audioManager.play("./src/sounds/card.wav");
 			carteImages.add(cartaCopertaImage);
 		}
 		revalidate();

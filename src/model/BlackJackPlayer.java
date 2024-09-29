@@ -86,4 +86,5 @@ public class BlackJackPlayer extends Player{
 		return super.toString() + " BlackJackPlayer [numeroPartite=" + numeroPartite + ", numeroVittorie=" + numeroVittorie + ", numeroSconfitte=" + this.getNumeroSconfitte() + ", livello="
 				+ livello + "]";
 	}
+
 }

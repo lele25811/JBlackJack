@@ -17,6 +17,8 @@ public class Player implements Serializable{
 	private Map<Integer, ArrayList<Carta>> manoSplit;
 	private boolean isSplit = false;
 	private Integer indexMano;
+	private int puntiMano1;
+	private int puntiMano2;
 
 	/*
 	 * nickname definisce il nome del giocatore
@@ -196,6 +198,18 @@ public class Player implements Serializable{
 	
 	public Integer getIndexMano() {
 		return indexMano;
+	}
+	
+	public void setPuntiPlayerSplit(Integer puntiMano1, Integer puntiMano2) {
+		this.puntiMano1 = puntiMano1;
+		this.puntiMano2 = puntiMano2;
+		System.out.println("Aggiornamento punti...");
+		System.out.println("PuntiMano1 "+puntiMano1+" PuntiMano2 "+puntiMano2);
+	}
+	
+	public boolean getRisultatoSplit(int puntiBanco) {
+		System.out.println("Controllo punteggio dal player...con puntiBanco "+puntiBanco);
+		return (puntiBanco < puntiMano1 && puntiMano1 < 22) || (puntiBanco < puntiMano2 && puntiMano2 < 22);
 	}
 	
 	public void resetPartita() {

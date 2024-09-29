@@ -206,16 +206,7 @@ public class TavoloDaGioco extends Observable{
 				for (int i = 0; i < 2; i++) {  // Due carte per ciascun giocatore
 					for (Player p : giocatori) {
 						Thread.sleep(1500);  // Attesa di 1 secondi tra una carta e l'altra
-						/*
-						 * Distribuizione controllata per il player DA TOGLIERE#####################################################################################################################
-						 */
-						if(p instanceof BlackJackPlayer) {
-							Carta carta = new Carta(Valore.CINQUE, Seme.FIORI);
-							p.addCarta(carta);
-						}else {
-							p.addCarta(mazzo.prossimaCarta());
-						}
-						//p.addCarta(mazzo.prossimaCarta());
+						p.addCarta(mazzo.prossimaCarta());
 						setChanged();
 						notifyObservers(new UpdateEvent("DistribuisciCarteIniziali", p));
 					}
@@ -338,15 +329,22 @@ public class TavoloDaGioco extends Observable{
 		}else {
 			System.out.println("Il banco non ha sballato");
 			for(int i=0; i<giocatori.size()-1; i++) {
-				if(punti[i] <= 21 && punti[i] > puntiBanco) {
-					giocatoriVincitori.add(giocatori.get(i));
+				if(giocatori.get(i) instanceof BlackJackPlayer && isSplit) {
+					System.out.println("Giocatore "+giocatori.get(i).getNickname()+" e isSplit "+isSplit);
+					if(player.getRisultatoSplit(puntiBanco)) {
+						System.out.println("Abbiamo vinto? yes");
+						giocatoriVincitori.add(player);
+					}
+				}else if(!isSplit){
+					System.out.println("Ciao no");
+					if(punti[i] <= 21 && punti[i] > puntiBanco) {
+						giocatoriVincitori.add(giocatori.get(i));
+					}
 				}
 			}
 		}
 		if (!giocatoriVincitori.isEmpty()) {
-	        System.out.println("Giocatori che hanno vinto: ");
 	        for(Player p: giocatoriVincitori) {
-	        	System.out.println(p.getNickname());
 	        	if(p instanceof BlackJackPlayer) {
 	        		((BlackJackPlayer) p).addVittoria();
 	        		vittoriaPlayer = true;

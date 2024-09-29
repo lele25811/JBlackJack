@@ -123,9 +123,9 @@ public class PlayerPanel extends JPanel implements Observer{
 				}else if(action.equals("Dividi")) {
 					isSplit = true;
 					calcolaPunteggioIniziale();
-					puntiMano1 = puntiAttuali /2;
-					puntiMano2 = puntiAttuali /2;
-					puntiAttuali = puntiAttuali /2;
+					puntiMano1 = controller.getPlayer().getLastCard().getValore();
+					puntiMano2 = controller.getPlayer().getLastCard().getValore();
+					puntiAttuali = puntiMano1;
 					drawCard();
 				}
 				updatePunteggio();
@@ -169,7 +169,6 @@ public class PlayerPanel extends JPanel implements Observer{
 	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
 	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
 	        }
-	        
 	        // Aggiungi le carte della mano2
 	        for (Carta carta : mano2) {
 	            String imagePath = carta.getPath(); // Ottieni il percorso dell'immagine
@@ -188,8 +187,7 @@ public class PlayerPanel extends JPanel implements Observer{
 	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
 	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
 	        }
-	    }
-	    
+	    } 
 	    revalidate(); // Forza la rilettura del layout
 	    repaint(); // Ridisegna il pannello
 	}
@@ -382,6 +380,7 @@ public class PlayerPanel extends JPanel implements Observer{
 				actionPlayerPanel.passaTurno(puntiAttuali);
 			}
 		}
+		controller.setPuntiPlayerSplit(puntiMano1, puntiMano2);
 	}
 	
 	private void popUpRisultato(String title , String parola) {

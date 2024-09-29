@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -233,29 +234,37 @@ public class LoginPage extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == buttonNewPlayer) {
-			String nickname = nicknameTextField.getText();
-			String avatar = group.getSelection().getActionCommand();
-			player = new BlackJackPlayer(nickname, avatar);
-			controller.addDbPlayer(player);
-			controller.addPlayer(player);
-			System.out.println("Creato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
-			caricaMenu();
-		}else if(e.getSource() == buttonLoadPlayer) {
-			System.out.println("load Player");
-			int indexPlayer = listaGiocatori.getSelectedIndex();
-			if(indexPlayer == -1) {
-				MyPopup myPopup = new MyPopup("Errore", "Nessun Profilo selezionato");
-				myPopup.showMessage();
-			}else {
-				player = controller.getDbPlayerByIndex(indexPlayer);
+		try {
+			if(e.getSource() == buttonNewPlayer) {
+				String nickname = nicknameTextField.getText();
+				ButtonModel selectedModel = group.getSelection();
+				if(nickname.isEmpty() || selectedModel == null) {
+					throw new LoginException("Registrazione non completa");
+				}
+				String avatar = selectedModel.getActionCommand();
+				player = new BlackJackPlayer(nickname, avatar);
+				controller.addDbPlayer(player);
 				controller.addPlayer(player);
-				System.out.println("Caricato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
+				System.out.println("Creato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
 				caricaMenu();
+			}else if(e.getSource() == buttonLoadPlayer) {
+				System.out.println("load Player");
+				int indexPlayer = listaGiocatori.getSelectedIndex();
+				if(indexPlayer == -1) {
+					throw new LoginException("Nessuno profilo selezionato");
+				}else {
+					player = controller.getDbPlayerByIndex(indexPlayer);
+					controller.addPlayer(player);
+					System.out.println("Caricato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
+					caricaMenu();
+				}
 			}
+		}catch (LoginException ex) {
+			MyPopup myPopup = new MyPopup("Errore", ex.getMessage());
+			myPopup.showMessage();
 		}
 	}
-	
+
 	private void caricaMenu() {
 		frame.dispose();
 		new MenuPage();

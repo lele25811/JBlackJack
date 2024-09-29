@@ -191,8 +191,16 @@ public class GameController {
 	}
 	
 	public void cambioTastiSplit() {
-		System.out.println("Cambio tasti (controller)");
 		actionPlayerPanel.cambioButtonSplit();
+	}
+
+	public void setPuntiPlayerSplit(Integer puntiMano1, Integer puntiMano2) {
+		System.out.println("Set punti (Controller)");
+		model.getPlayer().setPuntiPlayerSplit(puntiMano1, puntiMano2);
+	}
+
+	public Integer getNumeroGiocatori() {
+		return model.getNumeroGiocatori(); 
 	}
 	
 }
