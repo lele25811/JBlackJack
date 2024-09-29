@@ -14,6 +14,7 @@ import javax.swing.border.TitledBorder;
 
 import controller.GameController;
 import model.BlackJackPlayer;
+import model.Player;
 import model.TavoloDaGioco;
 import model.UpdateEvent;
 
@@ -24,6 +25,7 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 	private JButton staiButton;
 	private JButton raddoppiaButton;
 	private JButton dividiButton;
+	private JButton passaManoButton;
 	private Frame frame;
 	private GameController controller;
 	
@@ -40,19 +42,23 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 		
 		cartaButton = new JButton("Card");
 		staiButton = new JButton("Stay");
+		passaManoButton = new JButton("Next Hand");
 		raddoppiaButton = new JButton("Double");
 		dividiButton = new JButton("Split");
 		
 		cartaButton.setEnabled(false);
 		staiButton.setEnabled(false);
+		passaManoButton.setEnabled(false);
 		raddoppiaButton.setEnabled(false);
 		dividiButton.setEnabled(false);
 		
 		add(cartaButton);
 		add(staiButton);
+		add(passaManoButton);
 		add(raddoppiaButton);
 		add(dividiButton);
 		
+		passaManoButton.setVisible(false);
 	}
 	
 	public JButton getCartaButton() {
@@ -72,6 +78,11 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 	public JButton getDividiButton() {
 		return dividiButton;
 	}
+	
+	// TODO
+	public JButton getPassaManoButton() {
+		return passaManoButton;
+	}
 
 	@Override
 	public void update(Observable o, Object arg) {
@@ -85,13 +96,23 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 				cartaButton.setEnabled(true);
 				staiButton.setEnabled(true);
 				raddoppiaButton.setEnabled(true);
-				//if(tavoloDaGioco.carteUguali((BlackJackPlayer)data)) {
 				if(controller.isCarteUguali((BlackJackPlayer) data)) {
 					dividiButton.setEnabled(true);
 				}
+			}else if (action.equals("Dividi")) {
+				Player player = (Player) data;
+				if (player.isSplit() && player.getIndexMano() == 0) {
+					staiButton.setVisible(false); // Nascondi passaTurno
+					passaManoButton.setVisible(true); // Mostra passaMano
+					passaManoButton.setEnabled(true);
+				} else {
+					staiButton.setVisible(true); // Mostra passaTurno
+					staiButton.setEnabled(true);
+					passaManoButton.setVisible(false); // Nascondi passaMano
+				}
 			}
 		}
-	}		        
+	}
 	
 	public void passaTurno(int punteggio) {
 		cartaButton.setEnabled(false);
@@ -99,6 +120,13 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 		raddoppiaButton.setEnabled(false);
 		dividiButton.setEnabled(false);
 		controller.passaTurno(punteggio);
+	}
+	
+	public void cambioButtonSplit() {
+		System.out.println("Cambio tasti (ActionPlayerMenu)");
+		staiButton.setVisible(true); // Mostra passaTurno
+		staiButton.setEnabled(true);
+		passaManoButton.setVisible(false);
 	}
 
 	public void chiediNuovaPartita() {
@@ -112,9 +140,6 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 		if (risposta == JOptionPane.YES_OPTION) {
 			// Reset del gioco e inizio nuova partita
 			System.out.println("Nuova Partita");
-			//tavoloDaGioco.resetPartita();
-			//playerPanel.resetPartita();
-			//gamePage.resetGame();
 			controller.nuovaPartita();
 			frame.dispose();
 			new MenuPage();
@@ -124,4 +149,3 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 	}
 
 }
-

@@ -190,11 +190,18 @@ public class Player implements Serializable{
 		indexMano +=1;
 	}
 	
-	// non lo utilizzo controlla se serve
+	public boolean isSplit() {
+		return isSplit;
+	}
+	
+	public Integer getIndexMano() {
+		return indexMano;
+	}
+	
 	public void resetPartita() {
 		mano.clear();
 		manoSplit.clear();
 		indexMano = null;
+		isSplit = false;
 	}
-	
 }

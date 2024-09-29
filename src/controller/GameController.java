@@ -128,6 +128,13 @@ public class GameController {
 				raddoppiaAction();
 			}
 		});
+		
+		actionPlayerPanel.getPassaManoButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				passaManoAction();
+			}
+		});
 	}
 
 	 private void cartaAction() {
@@ -140,8 +147,16 @@ public class GameController {
 		 playerPanel.passaTurno(false);
 		 System.out.println("Passo turno (controller)");
 	 }
+	 
+	 private void passaManoAction() {
+		 updateIndexMano();
+		 playerPanel.updateIndexManoPlayerPanel(false);
+		 cambioTastiSplit();
+		 System.out.println("Passa mano (Controller)");
+	 }
 
-	 private void raddoppiaAction() {
+
+	private void raddoppiaAction() {
 		 model.getDouble(model.getPlayer());
 		 System.out.println("Raddoppia (controller)");
 	 }
@@ -164,6 +179,7 @@ public class GameController {
 		 model.resetPartita();
 		 playerPanel.resetPartita();
 		 gamePage.resetGame();
+		 model.getPlayer().resetPartita();
 	 }
 	 
 	public void startGame() {
@@ -173,5 +189,10 @@ public class GameController {
 	public void updateIndexMano() {
 		model.updateIndexMano();
 	}
-
+	
+	public void cambioTastiSplit() {
+		System.out.println("Cambio tasti (controller)");
+		actionPlayerPanel.cambioButtonSplit();
+	}
+	
 }

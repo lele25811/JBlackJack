@@ -261,9 +261,9 @@ public class PlayerPanel extends JPanel implements Observer{
 					if(indexMano >= 1) {
 						passaTurno(true);
 					}else {
-						indexMano +=1;
+						updateIndexManoPlayerPanel(false);						
 						controller.updateIndexMano();
-						passaMano();
+						controller.cambioTastiSplit();
 					}
 				} else if (raddoppio) {
 					if(indexMano >= 1) {
@@ -275,16 +275,23 @@ public class PlayerPanel extends JPanel implements Observer{
 					}else {
 						controller.updateIndexMano();
 						passaTurno(false);
-						indexMano +=1;
+						updateIndexManoPlayerPanel(true);
+						controller.cambioTastiSplit();
 					}
 				}
 			}
 		});
 	}
 
-	private void passaMano() {
-		MyPopup myPopup = new MyPopup("Passa turno!", "Hai passato la "+ indexMano +" mano con "+puntiAttuali);
-		myPopup.showMessage();
+	private void passaMano(boolean sballato) {
+		int nMano = indexMano+1;
+		if(!sballato) {
+			MyPopup myPopup = new MyPopup("Passa mano!", "Hai passato la "+ nMano +" mano con "+puntiAttuali);
+			myPopup.showMessage();
+		}else {
+			MyPopup myPopup = new MyPopup("Sballato mano!", "Hai Sballato la "+ nMano +" mano con "+puntiAttuali);
+			myPopup.showMessage();
+		}
 	}
 
 	public int scegliPunteggioAsso(int[] punteggi) {
@@ -386,5 +393,14 @@ public class PlayerPanel extends JPanel implements Observer{
 
 	public void resetPartita() {
 		puntiAttuali = 0;
+	}
+
+	public void updateIndexManoPlayerPanel(boolean raddoppio) {
+		if(indexMano == 0 && puntiAttuali < 21 && !raddoppio) {
+			passaMano(false);
+		}else if (indexMano == 0 && puntiAttuali > 21 && !raddoppio) {
+			passaMano(true);
+		}
+		indexMano +=1;
 	}
 }
