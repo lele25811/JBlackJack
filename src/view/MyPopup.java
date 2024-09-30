@@ -20,5 +20,4 @@ public class MyPopup {
 			JOptionPane.INFORMATION_MESSAGE
 			);
 	}
-	
 }

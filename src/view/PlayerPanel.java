@@ -231,13 +231,9 @@ public class PlayerPanel extends JPanel implements Observer{
 				if ("Asso".equals(player.getLastCartaSplit(indexMano))) {
 					if(indexMano == 0) {
 						int valoreMano = player.getLastCartaValoreSplit(indexMano);
-						System.out.println("Ho trovato un asso puntiAttuali: "+puntiMano1);
-						System.out.println("sommando l'asso "+valoreMano+" / "+valoreMano+10);
 						puntiMano1 += scegliPunteggioAsso(new int[]{valoreMano, valoreMano + 10});
 					}else if(indexMano == 1) {
 						int valoreMano = player.getLastCartaValoreSplit(indexMano);
-						System.out.println("Ho trovato un asso puntiAttuali: "+puntiMano2);
-						System.out.println("sommando l'asso "+valoreMano+" / "+valoreMano+10);
 						puntiMano2 += scegliPunteggioAsso(new int[]{valoreMano, valoreMano + 10});
 					}
 				}else {
@@ -360,7 +356,6 @@ public class PlayerPanel extends JPanel implements Observer{
 	
 	
 	public void passaTurno(boolean sballato) {
-		System.out.println("VADO DI POPUP: sballato???" +sballato);
 		if(!isSplit) {
 			if(sballato) {
 				MyPopup myPopup = new MyPopup("Sballato!", "Hai sballato con "+puntiAttuali);
@@ -387,7 +382,7 @@ public class PlayerPanel extends JPanel implements Observer{
 	}
 	
 	private void popUpRisultato(String title , String parola) {
-		audioManager.play("./src/sound/"+title+"+wav");
+		audioManager.play("./src/sounds/"+title+".wav");
 		String testo = player.getNickname()+" ha "+parola+"!!"; 
 		MyPopup myPopup = new MyPopup(title, testo);
 		myPopup.showMessage();

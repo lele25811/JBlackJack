@@ -149,8 +149,8 @@ public class GameController {
 	}
 
 	private void staiAction() {
-		playerPanel.passaTurno(false);
 		audioManager.play("./src/sounds/button.wav");
+		playerPanel.passaTurno(false);
 		System.out.println("Passo turno (controller)");
 	}
 
