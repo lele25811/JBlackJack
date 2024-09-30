@@ -44,9 +44,11 @@ public class PlayerPanel extends JPanel implements Observer{
 	private ActionPlayerPanel actionPlayerPanel;
 	private boolean isSplit = false;
 	private GameController controller;
+	private AudioManager audioManager;
 	
 	public PlayerPanel(String name, BlackJackPlayer player) {
 		this.player = player;
+		audioManager = AudioManager.getInstance();
 		controller = GameController.getIstance();
 		
 		carteImages = new ArrayList<>();
@@ -187,7 +189,8 @@ public class PlayerPanel extends JPanel implements Observer{
 	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
 	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
 	        }
-	    } 
+	    }
+        audioManager.play("./src/sounds/card.wav");
 	    revalidate(); // Forza la rilettura del layout
 	    repaint(); // Ridisegna il pannello
 	}
