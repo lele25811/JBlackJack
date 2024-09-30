@@ -60,10 +60,12 @@ public class LoginPage extends JPanel implements ActionListener{
 	
 	private BlackJackPlayer player;
 	private GameController controller;
+	private AudioManager audioManager;
 	
 	
 	public LoginPage() {
 		frame = new Frame();
+		audioManager = AudioManager.getInstance();
 		controller = GameController.getIstance();
 		setLayout(new BorderLayout());
 			
@@ -236,6 +238,7 @@ public class LoginPage extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		try {
 			if(e.getSource() == buttonNewPlayer) {
+				audioManager.play("./src/sounds/button.wav");
 				String nickname = nicknameTextField.getText();
 				ButtonModel selectedModel = group.getSelection();
 				if(nickname.isEmpty() || selectedModel == null) {
@@ -245,17 +248,15 @@ public class LoginPage extends JPanel implements ActionListener{
 				player = new BlackJackPlayer(nickname, avatar);
 				controller.addDbPlayer(player);
 				controller.addPlayer(player);
-				System.out.println("Creato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
 				caricaMenu();
 			}else if(e.getSource() == buttonLoadPlayer) {
-				System.out.println("load Player");
+				audioManager.play("./src/sounds/button.wav");
 				int indexPlayer = listaGiocatori.getSelectedIndex();
 				if(indexPlayer == -1) {
 					throw new LoginException("Nessuno profilo selezionato");
 				}else {
 					player = controller.getDbPlayerByIndex(indexPlayer);
 					controller.addPlayer(player);
-					System.out.println("Caricato nuovo player "+player.getNickname()+ " con avatar "+player.getAvatar());
 					caricaMenu();
 				}
 			}

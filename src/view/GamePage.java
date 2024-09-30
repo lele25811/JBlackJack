@@ -33,7 +33,6 @@ public class GamePage extends JPanel{
 	private PlayerPanel playerPanel;
 	private BotPanel bot2Panel;
 	private JPanel gamePanel;
-	//private ActionPlayerPanel actionPlayerMenu;
 	private ActionPlayerPanel actionPlayerMenu;
 	private GameController controller;
 	
@@ -71,21 +70,7 @@ public class GamePage extends JPanel{
 			gamePanel.add(bancoPanel); // Banco sopra
 			gamePanel.add(playerPanel); // Player sotto
 			
-		}else if (numeroGiocatori == 3) {
-			/*
-			bancoPanel = new BotPanel("Banco", (BlackJackBot) controller.getBanco());
-			bot1Panel = new BotPanel("Bot1", (BlackJackBot) controller.getBot1());
-			playerPanel = new PlayerPanel("Player", (BlackJackPlayer) controller.getPlayer());
-
-			gamePanel = new JPanel(new GridLayout(2, 2)); // 2 righe, 2 colonne
-			gamePanel.setBackground(new Color(120, 0, 0, 0));
-			gamePanel.setOpaque(false);
-
-			gamePanel.add(bancoPanel);  // Banco sopra a sinistra
-			gamePanel.add(bot1Panel);   // Bot1 sopra a destra
-			gamePanel.add(playerPanel); // Player sotto
-			*/
-			
+		}else if (numeroGiocatori == 3) {			
 			bancoPanel = new BotPanel("Banco", (BlackJackBot) controller.getBanco());
 			bot1Panel = new BotPanel("Bot1", (BlackJackBot) controller.getBot1());
 			playerPanel = new PlayerPanel("Player", (BlackJackPlayer) controller.getPlayer());

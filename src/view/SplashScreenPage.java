@@ -14,10 +14,11 @@ public class SplashScreenPage extends JPanel implements ActionListener{
 	private Frame frame;
 	private Image img;
 	private MyButton playButton;
+	private AudioManager audioManager;
 	
 	public SplashScreenPage() {
 		frame = new Frame();
-		
+		audioManager = AudioManager.getInstance();
 		// Carica e scala l'immagine
         ImageIcon icon = new ImageIcon("./src/graphics/BlackJack.png"); 
         //img = new ImageIcon("./src/graphics/BlackJack.png").getImage();
@@ -51,6 +52,7 @@ public class SplashScreenPage extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 	    // Verifica se l'evento è stato generato dal pulsante di invio
 		if(e.getSource()== playButton) {
+			audioManager.play("./src/sounds/button.wav");
 			// Chiude il frame corrente
 			frame.dispose();
 		    // Avvia l'interfaccia grafica del gioco con il nuovo giocatore

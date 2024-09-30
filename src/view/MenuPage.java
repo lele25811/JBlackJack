@@ -52,8 +52,11 @@ public class MenuPage extends JPanel implements ActionListener{
 	private GameController controller;
 	private BlackJackPlayer player;
 
+	private AudioManager audioManager;
+	
 	public MenuPage() {
 		frame = new Frame();
+		audioManager = AudioManager.getInstance();
 		controller = GameController.getIstance();
 		
 		player = GameController.getIstance().getPlayer();
@@ -179,6 +182,7 @@ public class MenuPage extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == playButton) {
+			audioManager.play("./src/sounds/button.wav");
 			String nBot = group.getSelection().getActionCommand();
 			controller.addBot(nBot);
 			frame.dispose();

@@ -387,6 +387,7 @@ public class PlayerPanel extends JPanel implements Observer{
 	}
 	
 	private void popUpRisultato(String title , String parola) {
+		audioManager.play("./src/sound/"+title+"+wav");
 		String testo = player.getNickname()+" ha "+parola+"!!"; 
 		MyPopup myPopup = new MyPopup(title, testo);
 		myPopup.showMessage();
