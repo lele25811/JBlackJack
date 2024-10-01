@@ -1,6 +1,5 @@
-/controller/
-/graphics/
-/model/
-/sounds/
-/testBlackJack/
 /view/
+/controller/
+/jblackjack/
+/sounds/
+/model/

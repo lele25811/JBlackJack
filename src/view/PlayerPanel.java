@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.lang.ModuleLayer.Controller;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -25,59 +24,81 @@ import model.Carta;
 import model.TavoloDaGioco;
 import model.UpdateEvent;
 
-/*
- * Ambiente di gioco grafico dove vengono messe le carte per il player
+/**
+ * PlayerPanel è una classe che estende JPanel e implementa l'interfaccia Observer per gestire la visualizzazione
+ * delle carte e dei punteggi di un giocatore nel gioco di BlackJack. La classe si occupa di aggiornare la UI
+ * quando il giocatore riceve nuove carte, calcola il punteggio attuale, gestisce, se necessario, lo split delle mani, e 
+ * fornisce interazioni con l'utente per scegliere il valore dell'asso. 
+ * Inoltre, la classe gestisce la visualizzazione dei risultati del giocatore come vittoria, sconfitta o sballo.
  */
 @SuppressWarnings("deprecation")
 public class PlayerPanel extends JPanel implements Observer{
-	
-	private TitledBorder titledBorder;
-	private BlackJackPlayer player;
-	private ArrayList<Carta> mano;
-	private ArrayList<Image> carteImages;
-	private JLabel punti;
-	private Integer puntiAttuali = 0;
-	private Integer puntiMano1 = 0;
-	private Integer puntiMano2 = 0;
-	private Integer indexMano = 0;
-	private boolean isPrimeDueCarte = true;
-	private ActionPlayerPanel actionPlayerPanel;
-	private boolean isSplit = false;
-	private GameController controller;
-	private AudioManager audioManager;
-	
+
+	private TitledBorder titledBorder;	/** Un bordo con titolo utilizzato per visualizzare il nome del giocatore */
+	private BlackJackPlayer player;	/** L'istanza del giocatore associato a questo pannello. */
+	private ArrayList<Carta> mano;	/** Una lista che contiene le carte attualmente in mano al giocatore. */
+	private ArrayList<Image> carteImages;	/** Una lista di immagini delle carte che rappresenta graficamente le carte nella mano del giocatore. */
+	private JLabel punti;	/** Etichetta che visualizza il punteggio corrente del giocatore nel pannello. */
+	private Integer puntiAttuali = 0;	/** Il punteggio attuale del giocatore basato sulle carte in mano. */
+	private Integer puntiMano1 = 0;		/** Il punteggio associato alla prima mano quando il giocatore effettua uno split. */
+	private Integer puntiMano2 = 0;		/** Il punteggio associato alla seconda mano quando il giocatore effettua uno split. */
+	private Integer indexMano = 0;		/** Un indice che rappresenta quale mano il giocatore sta giocando in caso di split. */
+	private boolean isPrimeDueCarte = true;		/** Indica se il giocatore ha ricevuto solo le prime due carte. */
+	private ActionPlayerPanel actionPlayerPanel;	/** Il pannello associato alle azioni del giocatore. */
+	private boolean isSplit = false;		/** Indica se il giocatore ha diviso la mano (split). Se vero, il giocatore sta giocando due mani separate. */
+	private GameController controller;		/** Controller principale per gestire la logica di gioco. */
+	private AudioManager audioManager;		/** Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. */
+
+	/**
+	 * Costruttore della classe PlayerPanel.
+	 * Inizializza il pannello del giocatore con il nome e l'oggetto BlackJackPlayer associato.
+	 * Imposta il bordo, l'audio manager e il controller.
+	 * @param name  Il nome del pannello (non utilizzato direttamente).
+	 * @param player L'istanza di BlackJackPlayer associata al pannello.
+	 */
 	public PlayerPanel(String name, BlackJackPlayer player) {
 		this.player = player;
 		audioManager = AudioManager.getInstance();
 		controller = GameController.getIstance();
-		
+
 		carteImages = new ArrayList<>();
 		punti = new JLabel("", SwingConstants.CENTER);
-		
-		setPreferredSize(new Dimension(200, 200));
-		
-		titledBorder = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.RED),  // Bordo rosso
-                player.getNickname(),                      // Titolo con il nome del giocatore
-                TitledBorder.CENTER,                       // Posiziona il titolo al centro
-                TitledBorder.TOP,                          // Posiziona il titolo in alto
-                getFont(),                                 // Font del titolo
-                Color.WHITE                               // Colore del titolo (bianco)
-        );
 
-        setBorder(titledBorder);
+		setPreferredSize(new Dimension(200, 200));
+
+		titledBorder = BorderFactory.createTitledBorder(
+				BorderFactory.createLineBorder(Color.RED),
+				player.getNickname(),                     
+				TitledBorder.CENTER,                      
+				TitledBorder.TOP,                         
+				getFont(),                                
+				Color.WHITE                     
+				);
+
+		setBorder(titledBorder);
 		setBackground(new Color(120, 0, 0, 0));
 		setOpaque(false);
 		setLayout(new BorderLayout());
-		
+
 		add(punti, BorderLayout.NORTH);
 	}
-	
+
+	/**
+	 * Imposta il titolo del pannello utilizzando il nickname del giocatore.
+	 * Aggiorna il titolo e ridisegna il pannello.
+	 */
 	public void setPanelTitle() {
 		titledBorder.setTitle(player.getNickname());
 		repaint();
 	}
 
+	/**
+	 * Metodo che gestisce gli aggiornamenti provenienti dall'oggetto osservato (TavoloDaGioco).
+	 * Riceve notifiche su eventi come la distribuzione delle carte, nuove carte, raddoppio, split, vittoria o sconfitta,
+	 * e aggiorna di conseguenza il pannello del giocatore.
+	 * @param o   L'oggetto osservato (in questo caso, TavoloDaGioco).
+	 * @param arg L'argomento passato dall'oggetto osservato (in questo caso, un UpdateEvent).
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
 		if (o instanceof TavoloDaGioco && arg instanceof UpdateEvent) {
@@ -95,32 +116,26 @@ public class PlayerPanel extends JPanel implements Observer{
 						drawCard();
 						calcolaPunteggioNuovaCarta(false);
 					}else {
-						// chiedo carta mentre sono nello split
 						if (indexMano == 0) {
-				            // Prima mano
-				            drawCard();  // Disegna la carta nella prima mano
-				            calcolaPunteggioNuovaCarta(false);
-				        } else if (indexMano == 1) {
-				            // Seconda mano
-				            drawCard();  // Disegna la carta nella seconda mano
-				            calcolaPunteggioNuovaCarta(false);
-				        }
+							drawCard();
+							calcolaPunteggioNuovaCarta(false);
+						} else if (indexMano == 1) {
+							drawCard();
+							calcolaPunteggioNuovaCarta(false);
+						}
 					}
 				}else if(action.equals("Raddoppio")) {
 					if(!isSplit) {
 						drawCard();
 						calcolaPunteggioNuovaCarta(true);
 					}else {
-						// chiedo raddoppio mentre sono nello split
 						if (indexMano == 0) {
-				            // Prima mano
-				            drawCard();  // Disegna la carta nella prima mano
-				            calcolaPunteggioNuovaCarta(true);
-				        } else if (indexMano == 1) {
-				            // Seconda mano
-				            drawCard();  // Disegna la carta nella seconda mano
-				            calcolaPunteggioNuovaCarta(true);
-				        }
+							drawCard();
+							calcolaPunteggioNuovaCarta(true);
+						} else if (indexMano == 1) {
+							drawCard();
+							calcolaPunteggioNuovaCarta(true);
+						}
 					}
 				}else if(action.equals("Dividi")) {
 					isSplit = true;
@@ -140,10 +155,18 @@ public class PlayerPanel extends JPanel implements Observer{
 		}
 	}
 
+	/**
+	 * Aggiunge il pannello delle azioni del giocatore (ActionPlayerPanel) al PlayerPanel.
+	 * @param actionPlayerMenu Il pannello che gestisce le azioni del giocatore.
+	 */
 	public void addActionPlayer(ActionPlayerPanel actionPlayerMenu) {
 		this.actionPlayerPanel = actionPlayerMenu;
 	}
 
+	/**
+	 * Aggiorna il punteggio del giocatore e lo visualizza nell'etichetta punti.
+	 * Se il giocatore ha effettuato uno split, visualizza i punteggi delle due mani.
+	 */
 	private void updatePunteggio() {
 		if(!isSplit) {
 			punti.setText("Punti attuali: " + puntiAttuali);
@@ -153,81 +176,82 @@ public class PlayerPanel extends JPanel implements Observer{
 		punti.revalidate();
 		punti.repaint();
 	}
-	
-	public void drawCard() {
-	    carteImages.clear(); // Pulisce la lista delle immagini precedenti
-	    if (isSplit) {
-			player.StampaManiSplit();
 
-	        // Gestione dello split: due mani
-	        ArrayList<Carta> mano1 = player.getMano1();
-	        ArrayList<Carta> mano2 = player.getMano2();
-	        
-	        // Aggiungi le carte della mano1
-	        for (Carta carta : mano1) {
-	            String imagePath = carta.getPath(); // Ottieni il percorso dell'immagine
-	            ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
-	            Image img = cartaIcon.getImage(); 
-	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
-	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
-	        }
-	        // Aggiungi le carte della mano2
-	        for (Carta carta : mano2) {
-	            String imagePath = carta.getPath(); // Ottieni il percorso dell'immagine
-	            ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
-	            Image img = cartaIcon.getImage();
-	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
-	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
-	        }
-	    } else {
-	        // Gestione normale: una sola mano
-	        mano = player.getMano(); // Ottieni la mano del giocatore
-	        for (Carta carta : mano) {
-	            String imagePath = carta.getPath(); // Ottieni il percorso dell'immagine
-	            ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
-	            Image img = cartaIcon.getImage(); 
-	            Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
-	            carteImages.add(imgScaled); // Aggiungi immagine ridimensionata alla lista
-	        }
-	    }
-        audioManager.play("./src/sounds/card.wav");
-	    revalidate(); // Forza la rilettura del layout
-	    repaint(); // Ridisegna il pannello
+	/**
+	 * Disegna una nuova carta nel pannello, caricando l'immagine associata e ridimensionandola per essere mostrata.
+	 * Gestisce sia il caso di una mano singola che di due mani (in caso di split).
+	 */
+	public void drawCard() {
+		carteImages.clear();
+		if (isSplit) {
+			ArrayList<Carta> mano1 = player.getMano1();
+			ArrayList<Carta> mano2 = player.getMano2();
+
+			for (Carta carta : mano1) {
+				String imagePath = carta.getPath();
+				ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
+				Image img = cartaIcon.getImage(); 
+				Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+				carteImages.add(imgScaled);
+			}
+			for (Carta carta : mano2) {
+				String imagePath = carta.getPath();
+				ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
+				Image img = cartaIcon.getImage();
+				Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+				carteImages.add(imgScaled);
+			}
+		} else {
+			mano = player.getMano();
+			for (Carta carta : mano) {
+				String imagePath = carta.getPath();
+				ImageIcon cartaIcon = new ImageIcon("./src/graphics/" + imagePath);
+				Image img = cartaIcon.getImage(); 
+				Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+				carteImages.add(imgScaled);
+			}
+		}
+		audioManager.play("./src/sounds/card.wav");
+		revalidate();
+		repaint();
 	}
-	
+
+	/**
+	 * Calcola il punteggio iniziale del giocatore con le prime due carte.
+	 * Se è presente un Asso, consente di scegliere se contarlo come 1 o 11.
+	 */
 	public void calcolaPunteggioIniziale() {
 		SwingUtilities.invokeLater(() -> {
 			int[] punteggi = player.getPuntiMano();
 			if (isPrimeDueCarte) {
-				// Se sono le prime due carte, calcola il punteggio iniziale
 				if (player.haveAsso() && punteggi.length == 2) {
-					// Se c'è un asso, chiedi se contarlo come 1 o 11
 					puntiAttuali = scegliPunteggioAsso(punteggi);
 				} else {
-					// Altrimenti prendi il punteggio normale
 					puntiAttuali = punteggi[0];
 				}
-				isPrimeDueCarte = false; // Da ora in poi, considera le nuove carte separatamente
+				isPrimeDueCarte = false;
 			}
 			updatePunteggio();
 		});
 	}
 
+	/**
+	 * Calcola il punteggio del giocatore quando riceve una nuova carta.
+	 * Se viene eseguito il raddoppio, il turno termina dopo l'aggiunta della carta.
+	 * Gestisce anche il calcolo del punteggio in caso di split.
+	 * @param raddoppio True se il giocatore ha effettuato un raddoppio, false altrimenti.
+	 */
 	public void calcolaPunteggioNuovaCarta(boolean raddoppio) {		
 		SwingUtilities.invokeLater(() -> {
 			if(!isSplit) {
-				// Per ogni nuova carta, aggiungi il suo valore al punteggio attuale
 				Carta ultimaCarta = mano.get(mano.size() - 1);
 				int valoreCarta = ultimaCarta.getValore();
-
 				if ("Asso".equals(ultimaCarta.getStringValore())) {
-					// Se l'ultima carta è un asso, chiedi se contarlo come 1 o 11
 					valoreCarta = scegliPunteggioAsso(new int[]{valoreCarta, valoreCarta + 10});
 				}
-				// Aggiungi il valore della nuova carta al punteggio attuale
 				puntiAttuali += valoreCarta;
 			}else {
-				
+
 				if ("Asso".equals(player.getLastCartaSplit(indexMano))) {
 					if(indexMano == 0) {
 						int valoreMano = player.getLastCartaValoreSplit(indexMano);
@@ -280,6 +304,11 @@ public class PlayerPanel extends JPanel implements Observer{
 		});
 	}
 
+	/**
+	 * Mostra un popup con il risultato della mano corrente. Se il giocatore non ha sballato,
+	 * viene mostrato un messaggio di passaggio mano, altrimenti un messaggio dove dice che ha sballato.
+	 * @param sballato Indica se il giocatore ha sballato (true) o meno (false).
+	 */
 	private void passaMano(boolean sballato) {
 		int nMano = indexMano+1;
 		if(!sballato) {
@@ -291,70 +320,78 @@ public class PlayerPanel extends JPanel implements Observer{
 		}
 	}
 
+	/**
+	 * Permette al giocatore di scegliere il valore dell'Asso tra 1 o 11 tramite un popup.
+	 * Mostra un messaggio che visualizza il punteggio aggiornato in base alla scelta.
+	 * @param punteggi Array di due valori contenenti le opzioni di punteggio per l'Asso (1 e 11).
+	 * @return Il valore scelto dall'utente (1 o 11).
+	 */
 	public int scegliPunteggioAsso(int[] punteggi) {
-	    if (punteggi.length == 2) { // Se ci sono due opzioni di punteggio (con Asso)
-	    	System.out.println("Da dentro punteggi asso "+punteggi[0]+ " / "+punteggi[1]);
-	        // Crea il messaggio e le opzioni per il popup
-	    	int puntiAggiornatiUno = puntiAttuali+punteggi[0];
-	    	int puntiAggiornatiUndici = puntiAttuali+punteggi[1];
-	    	System.out.println("1: "+puntiAggiornatiUno + " 11: " + puntiAggiornatiUndici);
-	        String message = "Vuoi contare l'Asso come 1 ("+puntiAggiornatiUno+") o 11 ("+puntiAggiornatiUndici+")?";
-	        String[] options = {"Asso = 1 ("+puntiAggiornatiUno+")", "Asso = 11 ("+puntiAggiornatiUndici+")"};
-	        
-	        // Mostra il menu popup con le opzioni
-	        int scelta = JOptionPane.showOptionDialog(
-	            null, //componente padre della finestra 
-	            message, // testo da visualizzare nella finestra
-	            "Scegli il valore dell'Asso", // titolo finestra
-	            JOptionPane.DEFAULT_OPTION, // tipo di operazioni che verranno mostrate
-	            JOptionPane.QUESTION_MESSAGE, // tipo di messaggio che viene mostrato
-	            null, // icona
-	            options, // risposta 1
-	            options[0] //risposta 2
-	        );
-	        if (scelta == 0) { // Asso = 1
-	            return punteggi[0];
-	        } else if (scelta == 1) { // Asso = 11
-	            return punteggi[1];
-	        }
-	    }
-	    return punteggi[0];
+		if (punteggi.length == 2) { // Se ci sono due opzioni di punteggio (con Asso)
+			int puntiAggiornatiUno = puntiAttuali+punteggi[0];
+			int puntiAggiornatiUndici = puntiAttuali+punteggi[1];
+			String message = "Vuoi contare l'Asso come 1 ("+puntiAggiornatiUno+") o 11 ("+puntiAggiornatiUndici+")?";
+			String[] options = {"Asso = 1 ("+puntiAggiornatiUno+")", "Asso = 11 ("+puntiAggiornatiUndici+")"};
+
+			int scelta = JOptionPane.showOptionDialog(
+					null, 
+					message,
+					"Scegli il valore dell'Asso",
+					JOptionPane.DEFAULT_OPTION,
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					options,
+					options[0] 
+					);
+			if (scelta == 0) { 
+				return punteggi[0];
+			} else if (scelta == 1) { 
+				return punteggi[1];
+			}
+		}
+		return punteggi[0];
 	}
-	
+
+
+	/**
+	 * Disegna le carte del giocatore sul pannello, gestendo il caso di split.
+	 * Se lo split è attivo, le carte vengono separate graficamente in due mani.
+	 * @param g L'oggetto Graphics utilizzato per disegnare le carte sul pannello.
+	 */
 	@Override
 	protected void paintComponent(Graphics g) {
-	    super.paintComponent(g);
+		super.paintComponent(g);
 
-	    int xOffset = 10; // Offset iniziale per la prima mano
-	    int yOffset = getHeight() - 210; // Posiziona le carte alla base del pannello
+		int xOffset = 10;
+		int yOffset = getHeight() - 210;
 
-	    if (isSplit) {
-	        // Disegna le carte della prima mano (mano 1)
-	        for (int i = 0; i < player.getMano1().size(); i++) {
-	            Image img = carteImages.get(i); // Ottieni l'immagine della carta dalla lista
-	            g.drawImage(img, xOffset, yOffset, this); // Disegna la carta
-	            xOffset += 35; // Sposta per la prossima carta nella prima mano
-	        }
-	        
-	        // Offset per disegnare la seconda mano
-	        int xOffsetSecondHand = 210; // Larghezza separazione tra le due mani
-	        int xOffeset = 1;
-	        for (int i = 0; i < player.getMano2().size(); i++) {
-	        	xOffeset = 30 * player.getMano1().size(); 
-	            Image img = carteImages.get(player.getMano1().size() + i); // Le carte della seconda mano sono dopo quelle della prima
-	            g.drawImage(img, xOffsetSecondHand+xOffeset, yOffset, this); // Disegna la carta
-	            xOffsetSecondHand += 35; // Sposta per la prossima carta nella seconda mano
-	        }
-	    } else {
-	        // Disegna le carte normalmente (senza split)
-	        for (Image carta : carteImages) {
-	            g.drawImage(carta, xOffset, yOffset, this); // Disegna la carta
-	            xOffset += 40; // Sposta la prossima carta di 40px a destra
-	        }
-	    }
+		if (isSplit) {
+			for (int i = 0; i < player.getMano1().size(); i++) {
+				Image img = carteImages.get(i);
+				g.drawImage(img, xOffset, yOffset, this); 
+				xOffset += 35; 
+			}
+			int xOffsetSecondHand = 210;
+			int xOffeset = 1;
+			for (int i = 0; i < player.getMano2().size(); i++) {
+				xOffeset = 30 * player.getMano1().size(); 
+				Image img = carteImages.get(player.getMano1().size() + i); 
+				g.drawImage(img, xOffsetSecondHand+xOffeset, yOffset, this); 
+				xOffsetSecondHand += 35;
+			}
+		} else {
+			for (Image carta : carteImages) {
+				g.drawImage(carta, xOffset, yOffset, this);
+				xOffset += 40;
+			}
+		}
 	}
-	
-	
+
+	/**
+	 * Mostra un popup alla fine del turno o della mano per informare se il giocatore ha sballato o
+	 * ha passato il turno con i punti attuali. Se lo split è attivo, gestisce la visualizzazione per ogni mano.
+	 * @param sballato Indica se il giocatore ha sballato (true) o meno (false).
+	 */
 	public void passaTurno(boolean sballato) {
 		if(!isSplit) {
 			if(sballato) {
@@ -366,7 +403,6 @@ public class PlayerPanel extends JPanel implements Observer{
 			}
 			actionPlayerPanel.passaTurno(puntiAttuali);
 		}else {
-			System.out.println("Siamo nello split");
 			int numeroMano = indexMano +1;
 			if(sballato) {
 				MyPopup myPopup = new MyPopup("Sballato!", "Hai sballato la "+ numeroMano +" mano con "+puntiAttuali);
@@ -380,7 +416,13 @@ public class PlayerPanel extends JPanel implements Observer{
 		}
 		controller.setPuntiPlayerSplit(puntiMano1, puntiMano2);
 	}
-	
+
+	/**
+	 * Mostra un popup con il risultato della partita. Il popup contiene il nickname del giocatore e
+	 * il risultato (vittoria, sconfitta, pareggio). Riproduce anche un suono in base al risultato.
+	 * @param title Titolo del popup e nome del file audio da riprodurre.
+	 * @param parola Parola che descrive il risultato del giocatore (ad esempio, "vinto" o "perso").
+	 */
 	private void popUpRisultato(String title , String parola) {
 		audioManager.play("./src/sounds/"+title+".wav");
 		String testo = player.getNickname()+" ha "+parola+"!!"; 
@@ -389,10 +431,18 @@ public class PlayerPanel extends JPanel implements Observer{
 		actionPlayerPanel.chiediNuovaPartita();
 	}
 
+	/**
+	 * Resetta il punteggio attuale del giocatore a 0 per iniziare una nuova partita.
+	 */
 	public void resetPartita() {
 		puntiAttuali = 0;
 	}
 
+	/**
+	 * Aggiorna l'indice della mano corrente e passa automaticamente alla mano successiva
+	 * se la prima mano è conclusa.
+	 * @param raddoppio Indica se il giocatore ha raddoppiato la puntata.
+	 */
 	public void updateIndexManoPlayerPanel(boolean raddoppio) {
 		if(indexMano == 0 && puntiAttuali < 21 && !raddoppio) {
 			passaMano(false);

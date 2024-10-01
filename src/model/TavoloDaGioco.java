@@ -2,67 +2,133 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Observable;
-import java.util.Observer;
 import java.util.Random;
 
-import javax.swing.SwingUtilities;
-
-/*
- * Classe che modella le regole di gioco, le mani, i punti e la logica
+/**
+ * La classe TavoloDaGioco modella le regole di gioco, la gestione dei turni, delle mani e dei punti 
+ * per una partita di BlackJack. Implementa la logica per distribuire carte, gestire i turni dei giocatori, 
+ * inclusi bot e mazziere, e gestire lo stato finale della partita.
  */
 @SuppressWarnings("deprecation")
 public class TavoloDaGioco extends Observable{
 	
-	// punteggio per mano, [player,...,mazziere]
+	/**
+	 * tavoloDaGiocoInstance unica istanza della classe TavoloDaGioco.
+	 */
 	private static TavoloDaGioco tavoloDaGiocoInstance;
 	
+	/**
+	 * Punti accumulati per ogni giocatore in una partita.
+	 */
 	private int[] punti;
+	
+	/**
+	 * Mazzo di carte utilizzato nel gioco.
+	 */
 	private MazzoDaGioco mazzo;
+	
+	/**
+	 * Lista dei giocatori (inclusi player, bot e mazziere).
+	 */
 	private ArrayList<Player> giocatori = new ArrayList<Player>();
+	
+	/**
+	 * Istanza del giocatore umano.
+	 */
 	private BlackJackPlayer player;
+	
+	/**
+	 * L'indice del giocatore corrente nel turno.
+	 */
 	private int currentPlayerIndex;
-	// Oggetto per la sincronizzazione dei turni
+	
+	/**
+	 * Oggetto per la sincronizzazione dei turni tra i giocatori.
+	 */
 	private final Object lock = new Object();
+	
+	/**
+	 * Oggetto Random per le decisioni dei bot.
+	 */
 	private Random random = new Random();
+	
+	/**
+	 * Thread per la gestione della distribuzione delle carte e dei turni.
+	 */
 	private Thread threadGioco;
+	
+	/**
+	 * Database per la gestione dei dati del giocatore.
+	 */
 	private Database db;
+	
+	/**
+	 * Flag per gestire lo stato di split delle carte.
+	 */
 	private boolean isSplit = false;
 	
+	/**
+	 * Restituisce l'istanza singleton di TavoloDaGioco.
+	 * @return l'unica istanza di TavoloDaGioco
+	 */
 	public static TavoloDaGioco getInstance() {
 		if(tavoloDaGiocoInstance == null) tavoloDaGiocoInstance = new TavoloDaGioco();
 		return tavoloDaGiocoInstance;
 	}
 	
+	/**
+	 * Costruttore privato che inizializza il mazzo e il database.
+	 */
 	private TavoloDaGioco() {
 		mazzo = new MazzoDaGioco();
-		db = db.getIstance();
+		db = Database.getIstance();
 	}
 		
+	/**
+	 * Metodo che ritorna il giocatore umano.
+	 * @return il giocatore umano
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 	
+	/**
+	 * Metodo che ritorna il banco.
+	 * @return il bot che fa da banco
+	 */
 	public Player getBanco() {
 		return giocatori.get(giocatori.size()-1);
 	}
 	
+	/**
+	 * Metodo che ritorna il bot numero 1.
+	 * @return il bot numero 1
+	 */
 	public Player getBot1() {
 		return giocatori.get(0);
 	}
 	
+	/**
+	 * Metodo che ritorna il bot numero 2.
+	 * @return il bot numero 2
+	 */
 	public Player getBot2() {
 		return giocatori.get(2);
 	}
 	
-	
+	/**
+	 * Metodo che aggiunge il giocatore umano alla classe TavoloDaGioco.
+	 * @param player il giocatore umano da aggiungere
+	 */
 	public void addPlayer(BlackJackPlayer player) {
 		this.player = player;
-		System.out.println("E' STATO AGGIUNTO IL PLAYER AL TAVOLO "+player.getNickname());
 	}
 	
+	/**
+	 * Metodo che inizializza i punteggi dei giocatori a 0.
+	 * @param size numero di giocatori
+	 */
 	private void inizializzaPunti(int size) {
 		punti = new int[size];
 		for(int i = 0; i<size; i++) {
@@ -70,6 +136,10 @@ public class TavoloDaGioco extends Observable{
 		}
 	}
 	
+	/**
+	 * Metodo che aggiunge i bot al tavolo in base al numero di giocatori scelto.
+	 * @param nBot numero di bot da aggiungere (1,2 o 3)
+	 */
 	public void addBot(String nBot) {
 		BlackJackBot banco = new BlackJackBot("Banco", "avatarBanco", true);
 		BlackJackBot franco;
@@ -97,14 +167,18 @@ public class TavoloDaGioco extends Observable{
 		inizializzaPunti(giocatori.size());
 	}
 	
-	// metodo di inizio gioco
+	/**
+	 * Metodo di inizio gioco
+	 */
 	public void startGame() {
 		distribuisciCarteIniziali();
 	}
 
+	/**
+	 * Metodo che gestisce il ciclo dei turni tra giocatori fino alla fine della partita.
+	 */
 	private void turnazione() {
 		while(hasNext()) {
-			System.out.println("Giocatore attuale "+currentPlayerIndex+" su "+giocatori.size()+"-1");
 			if(currentPlayerIndex == giocatori.size()) {
 				break;
 			}
@@ -113,68 +187,80 @@ public class TavoloDaGioco extends Observable{
 				try {
 					Thread.sleep(1500);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				if(((BlackJackBot)p).getIsBanco()) {
 					setChanged();
 					notifyObservers(new UpdateEvent("TurnoBanco", p));
 				}
-				System.out.println("MODEL.È il turno di bot, "+p.getNickname());
 				turnoBot((BlackJackBot) p);
 				setChanged();
 				notifyObservers(new UpdateEvent("FineTurno", p));
 			}
 			if(p instanceof BlackJackPlayer) {
 				((BlackJackPlayer) p).addPartita();
-				System.out.println("MODEL.È il turno di Player, "+p.getNickname());
-				turnoPlayer();
+				setChanged();
+				notifyObservers(new UpdateEvent("TurnoPlayer", player));
 				waitForPlayerTurn();
 			}
 			nextPlayer();
 		}
-		System.out.println("Turnazione Terminata");
 		finePartita();
 	}
 	
+	/**
+	 * Metodo che blocca il thread di gioco finchè il giocatore umano non termina il turno.
+	 */
 	private void waitForPlayerTurn() {
 		synchronized (lock) {
             try {
-                lock.wait();  // Attende che il turno del giocatore sia completato
+                lock.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 	}
 	
+	/**
+	 * Metodo che notifica la fine del turno del giocatore.
+	 */
 	public void playerFinishedTurn() {
         synchronized (lock) {
-        	System.out.println("Turno finito");
-            lock.notify();  // Notifica che il turno del giocatore è finito
+            lock.notify();
         }
     }
 
-	// Da modificare per l assegnazione punti
+	/**
+	 * Metodo che assegna i punti finali ai giocatori.
+	 * @param punteggioFinale il punteggio del giocatore
+	 */
 	public void setPuntiTavolo(int punteggioFinale) {
 		punti[currentPlayerIndex] = punteggioFinale;
 	}
 	
+	/**
+	 * Metodo che restituisce il punteggio di un determinato giocatore.
+	 * @param p il giocatore
+	 * @return punteggio del giocatore
+	 */
 	public int getPunti(Player p) {
 		return punti[giocatori.indexOf(p)];
 	}
 
-	// Entry point per il turno del bot
+	/**
+	 * Metodo che gestisce il turno di un bot.
+	 * @param bot il bot che deve giocare
+	 * @return il punteggio finale del bot
+	 */
 	private int turnoBot(BlackJackBot bot) {
 		boolean raddoppio = false;
 		int punti = bot.getPunti();
 		while(true) {
 			if(isSballato(punti)) {
-				System.out.println("Ho sballato con "+punti);
 				bot.setPunti(punti);
 				setPuntiTavolo(punti);
 				return punti;
 			}else if(punti >= 18 || raddoppio) {
-				System.out.println("Sto con "+punti);
 				bot.setPunti(punti);
 				setPuntiTavolo(punti);
 				return punti;
@@ -188,7 +274,6 @@ public class TavoloDaGioco extends Observable{
 							break;
 					case 1: {
 						getCardBot(bot);
-						System.out.println("Raddoppio");
 						raddoppio = true;
 						break;
 					}
@@ -200,18 +285,20 @@ public class TavoloDaGioco extends Observable{
 		}
 	}
 
+	/**
+	 * Metodo che distribuisce le carte iniziali a tutti i giocatori.
+	 */
 	private void distribuisciCarteIniziali() {
 		threadGioco = new Thread(() -> {
 			try {
-				for (int i = 0; i < 2; i++) {  // Due carte per ciascun giocatore
+				for (int i = 0; i < 2; i++) {
 					for (Player p : giocatori) {
-						Thread.sleep(1500);  // Attesa di 1 secondi tra una carta e l'altra
+						Thread.sleep(1500);
 						p.addCarta(mazzo.prossimaCarta());
 						setChanged();
 						notifyObservers(new UpdateEvent("DistribuisciCarteIniziali", p));
 					}
 				}
-				System.out.println("Distribuzione della carte completata, La partita può iniziare");
 				setChanged();
 				notifyObservers(new UpdateEvent("DistribuzioneTerminata", player));
 				turnazione();
@@ -223,53 +310,57 @@ public class TavoloDaGioco extends Observable{
 		threadGioco.start();
 	}
 	
+	/**
+	 * Metodo che restituisce il numero di giocatori attualmente al tavolo.
+	 * @return il numero di giocatori
+	 */
 	public int getNumeroGiocatori() {
 		return giocatori.size();
 	}
 	
-	public void getCarte() {
-		mazzo.mazzoStampa();
-	}
-	
-	public void turnoPlayer() {
-		setChanged();
-		notifyObservers(new UpdateEvent("TurnoPlayer", player));
-	}
-	
-	/*
-	 * Gestione della turnazione
+	/**
+	 * Metodo che ritorna il giocatore corrente.
+	 * @return il giocatore corrente
 	 */
-
-	// Ritorna il giocatore corrente
 	public Player getCurrentPlayer() {
 		return giocatori.get(currentPlayerIndex);
 	}
 	
+	/**
+	 * Metodo che passa il turno al giocatore successivo.
+	 */
 	public void nextPlayer() {
 		if (currentPlayerIndex <= giocatori.size()) {
             currentPlayerIndex++;
         } else {
-            // Tutti i giocatori hanno giocato
-            currentPlayerIndex = 0; // Reset currentPlayer 
+            currentPlayerIndex = 0;
         }
 	}
 	
+	/**
+	 * Metodo che verifica se ci sono ancora giocatori che devono giocare.
+	 * @return true se ci sono giocatori che devono giocare, altrimenti false
+	 */
 	public boolean hasNext() {
 		return currentPlayerIndex < giocatori.size();
 	}
 	
+	/**
+	 * Metodo che richiede una carta per il giocatore.
+	 * @param p giocatore che richiede una carta
+	 */
 	public void getCard(Player p) {
-		System.out.println("Chiedo carta");
 		p.addCarta(mazzo.prossimaCarta());
-		System.out.println(p.getMano());
 		setChanged();
 		notifyObservers(new UpdateEvent("NuovaCarta", p));
 	}
 	
-	public void getCardBot(Player p) {
-		System.out.println("Chiedo carta");
+	/**
+	 * Metodo che richiede una carta per il bot.
+	 * @param p il bot che richiede una carta
+	 */
+	private void getCardBot(Player p) {
 		p.addCarta(mazzo.prossimaCarta());
-		System.out.println(p.getMano());
 		try {
 			Thread.sleep(2000);
 		}catch (Exception e) {
@@ -279,35 +370,45 @@ public class TavoloDaGioco extends Observable{
         notifyObservers(new UpdateEvent("NuovaCartaBot", p));
 	}
 	
+	/**
+	 * Metodo che passa al prossimo player.
+	 */
 	public void stay() {
 		nextPlayer();
 	}
 	
+	/**
+	 * Metodo che richiede il raddoppio.
+	 * @param p il giocatore che richiede il raddoppio
+	 */
 	public void getDouble(Player p) {
-		System.out.println("Chiedo raddoppio");
 		p.addCarta(mazzo.prossimaCarta());
-		System.out.println(p.getMano());
 		setChanged();
 		notifyObservers(new UpdateEvent("Raddoppio", p));
 	}
 	
+	/**
+	 * Metodo che richiede lo Split.
+	 * @param p il giocatore che richiede lo Split
+	 */
 	public void getSplit(Player p) {
-		System.out.println("Chiedo split");
 		isSplit = true;
-		// Divide le mani di gioco (Map<Integer,ArrayList<Carta>>)
 		p.maniSplit();
 		setChanged();
 		notifyObservers(new UpdateEvent("Dividi", p));
 	}
 	
-	
+	/**
+	 * Metodo che controlla se il punteggio è maggiore di 21.
+	 * @param punto punteggio da controllare
+	 * @return true se il punteggio è maggiore di 21, altrimenti false
+	 */
 	public boolean isSballato(int punto) {
 		return punto > 21;
 	}
 	
-	/*
-	 *  Gestione fine della partita
-	 *  punti tiene i punteggi (manca player) in sequenza fai confronti vari
+	/**
+	 *  Gestione fine della partita, calcolando il vincitore.
 	 */
 	public void finePartita() {
 		boolean vittoriaPlayer = false;
@@ -316,27 +417,20 @@ public class TavoloDaGioco extends Observable{
 		if(punti == null) {
 			inizializzaPunti(giocatori.size());
 		}
-		puntiBanco = punti[giocatori.size()-1];
-		System.out.println("Il banco ha totalizzato: "+puntiBanco);
-		
+		puntiBanco = punti[giocatori.size()-1];		
 		if(puntiBanco > 21) {
-			System.out.println("Il banco ha sballato");
 			for(int i=0; i<giocatori.size()-1; i++) {
 				if(punti[i] <= 21) {
 					giocatoriVincitori.add(giocatori.get(i));
 				}
 			}
 		}else {
-			System.out.println("Il banco non ha sballato");
 			for(int i=0; i<giocatori.size()-1; i++) {
 				if(giocatori.get(i) instanceof BlackJackPlayer && isSplit) {
-					System.out.println("Giocatore "+giocatori.get(i).getNickname()+" e isSplit "+isSplit);
 					if(player.getRisultatoSplit(puntiBanco)) {
-						System.out.println("Abbiamo vinto? yes");
 						giocatoriVincitori.add(player);
 					}
 				}else if(!isSplit){
-					System.out.println("Ciao no");
 					if(punti[i] <= 21 && punti[i] > puntiBanco) {
 						giocatoriVincitori.add(giocatori.get(i));
 					}
@@ -350,8 +444,6 @@ public class TavoloDaGioco extends Observable{
 	        		vittoriaPlayer = true;
 	        	}
 	        }
-	    }else {
-	        System.out.println("Il banco ha vinto.");
 	    }
 		if(vittoriaPlayer) {
 			setChanged();
@@ -361,19 +453,25 @@ public class TavoloDaGioco extends Observable{
 			setChanged();
 			notifyObservers(new UpdateEvent("Sconfitta", player));
 		}
-		System.out.println("Aggiornamento db...");
 		db.updatePlayer(player);
 	}
 
+	/**
+	 * Metodo che resetta i parametri della classe TavoloDaGioco per la prossima partita
+	 */
 	public void resetPartita() {
 		for(Player player: giocatori) {
 			player.resetMano();
 		}
 		currentPlayerIndex = 0;
 		giocatori.clear();
-		System.out.println("Giocatori dopo il reset "+giocatori);
 	}
 
+	/**
+	 * Metodo che controlla se il valore di due carte è uguale oppure no.
+	 * @param p il giocatore che deve controllare le carte
+	 * @return true se il valore delle carte è uguale, altrimenti false
+	 */
 	public boolean carteUguali(Player p) {
 		if(p.getMano().size() == 2) {
 			return p.getMano().get(0).getValore() == p.getMano().get(1).getValore();
@@ -381,6 +479,9 @@ public class TavoloDaGioco extends Observable{
 		return false;
 	}
 
+	/**
+	 * Metodo che aggiorna il conteggio della mano nello Split
+	 */
 	public void updateIndexMano() {
 		getPlayer().updateIndexMano();
 	}

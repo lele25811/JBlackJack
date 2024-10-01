@@ -8,30 +8,66 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Classe che si occupa di salvare/caricare i dati su/da file
+/**
+ * La classe Database si occupa di gestire la persistenza dei dati dei giocatori 
+ * del gioco BlackJack, adottando il pattern Singleton. Questa classe permette 
+ * di salvare, caricare, aggiornare e ottenere la lista dei giocatori dal file
+ * di database.
+ * I dati dei giocatori vengono salvati e caricati utilizzando la serializzazione 
+ * Java, e il file utilizzato per salvare i dati è "DatabasePlayer.txt".
  */
 public class Database {
 	
+	/**
+	 * databaseInstance istanza unica della classe Database.
+	 */
 	private static Database databaseInstance;
+	
+	/**
+	 * Lista dei giocatori di BlackJack salvati nel database.
+	 */
 	private List<BlackJackPlayer> bjPlayers;
+	
+	/**
+	 * Nome del file usato come database per la persistenza dei dati dei giocatori.
+	 */
 	private final String FILENAME = "DatabasePlayer.txt";
 	
+	/**
+	 * Metodo statico per ottenere l'unica istanza della classe Database (Singleton).
+	 * Se non esiste un'istanza, ne viene creata una nuova.
+	 * @return l'istanza unica di Database
+	 */
 	public static Database getIstance() {
 		if (databaseInstance == null) databaseInstance = new Database();
 		return databaseInstance;
 	}
 	
+	/**
+	 * Costruttore privato per la classe Database.
+	 * Inizializza la lista dei giocatori come un'ArrayList vuota.
+	 * Essendo privato, impedisce la creazione di istanze multiple della classe.
+	 */
 	private Database() {
 		bjPlayers = new ArrayList<BlackJackPlayer>();
 	}
 	
+	/**
+	 * Aggiunge un nuovo giocatore alla lista dei giocatori e lo salva nel file di database.
+	 * @param player il giocatore da aggiungere al database
+	 */
 	public void addPlayer(BlackJackPlayer player) {
 		bjPlayers = loadPlayer();
 		bjPlayers.add(player);
 		savePlayer();
 	}
 	
+	/**
+	 * Aggiorna un giocatore esistente nella lista dei giocatori se il nickname e l'avatar 
+	 * coincidono con quelli del giocatore fornito.
+	 * @param updatePlayer il giocatore con i dati aggiornati
+	 */
+
 	public void updatePlayer(Player updatePlayer) {
 		bjPlayers = loadPlayer();
 		for(int i=0; i<bjPlayers.size(); i++) {
@@ -39,7 +75,6 @@ public class Database {
 			
 			if (currentPlayer.getNickname().equals(updatePlayer.getNickname()) &&
 		            currentPlayer.getAvatar().equals(updatePlayer.getAvatar())) {
-				System.out.println("Aggiornato "+updatePlayer.getNickname()+" avatar: "+updatePlayer.getAvatar());
 				bjPlayers.set(i, (BlackJackPlayer) updatePlayer);
 				break;
 			}
@@ -47,11 +82,20 @@ public class Database {
 		savePlayer();
 	}
 	
+	/**
+	 * Restituisce il giocatore presente nella lista all'indice specificato.
+	 * @param index l'indice del giocatore nella lista
+	 * @return il giocatore all'indice specificato
+	 */
 	public BlackJackPlayer getPlayerByIndex(int index) {
 		return bjPlayers.get(index);
 	}
 	
-	// Salva l'oggetto Player serializzato nel file
+	/**
+	 * Salva la lista dei giocatori nel file di database.
+	 * Serializza l'oggetto List<BlackJackPlayer> nel file specificato da FILENAME.
+	 * @throws DatabaseException se si verifica un errore durante il salvataggio dei dati
+	 */
 	private void savePlayer() {
 		try {
 			FileOutputStream file = new FileOutputStream(FILENAME);
@@ -60,11 +104,18 @@ public class Database {
 			out.close();
 			file.close();
 		}catch (IOException i) {
-			i.printStackTrace();
+			throw new DatabaseException("Errore durante il salvataggio dei giocatori nel file "+FILENAME, i);
 		}	
 	}
 	
-	// Carica l'oggetto player deserializzandolo dal file
+
+	/**
+	 * Carica la lista dei giocatori dal file di database.
+	 * Deserializza l'oggetto List<BlackJackPlayer> dal file specificato da FILENAME.
+	 * @return la lista dei giocatori caricata dal file
+	 * @throws DatabaseException se si verifica un errore durante il caricamento dei dati
+	 */
+	@SuppressWarnings("unchecked")
 	public List<BlackJackPlayer> loadPlayer() {
 		try {
 			FileInputStream file = new FileInputStream(FILENAME);
@@ -75,35 +126,28 @@ public class Database {
 			file.close();
 			return bjPlayers;
 		}catch(IOException | ClassNotFoundException i) {
-			i.printStackTrace();
-			return null;
+			throw new DatabaseException("Errore durante il caricamento dei giocatori nel file "+FILENAME, i);
 		}
 	 }
 	
-	 // Metodo per pulire il file
-	 public void clearDatabase() {
-	        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILENAME))) {
-	            bjPlayers.clear();
-	            out.writeObject(bjPlayers);
-	        } catch (IOException i) {
-	            i.printStackTrace();
-	        }
-	    }
-	
-	// Stampa la lista dei giocatori salvati
-	public void stampaPlayers() {
-		System.out.println("Grandezza ArrayList<BJPLAYER> "+bjPlayers.size());
-		if(bjPlayers.size() > 0) {
-			for(BlackJackPlayer p : bjPlayers) {
-				System.out.println(p.toString());
-			}
-		}else {
-			System.out.println("Nessun Player Presente");
+	/**
+	 * Pulisce il database, cancellando tutti i dati presenti nel file.
+	 * Inizializza nuovamente la lista dei giocatori come una lista vuota e la salva nel file.
+	 */
+	public void clearDatabase() {
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILENAME))) {
+			bjPlayers.clear();
+			out.writeObject(bjPlayers);
+		} catch (IOException i) {
+			i.printStackTrace();
 		}
 	}
 
-	public List<BlackJackPlayer> getPlayers() {
-		return loadPlayer();
-	}
-	
+	/**
+	  * Restituisce la lista di tutti i giocatori salvati nel file di database.
+	  * @return la lista dei giocatori
+	  */
+	 public List<BlackJackPlayer> getPlayers() {
+		 return loadPlayer();
+	 }
 }

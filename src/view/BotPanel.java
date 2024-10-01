@@ -14,7 +14,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import model.BlackJackBot;
@@ -22,59 +21,78 @@ import model.Carta;
 import model.TavoloDaGioco;
 import model.UpdateEvent;
 
+/**
+ * La classe BotPanel è una sottoclasse di JPanel che rappresenta il pannello
+ * di un bot nel gioco di BlackJack. Implementa l'interfaccia Observer per aggiornare
+ * il pannello quando ci sono cambiamenti di stato nel bot associato. Visualizza le carte
+ * e il punteggio del bot e gestisce eventi come l'inizio della partita, l'assegnazione delle carte 
+ * iniziali, la pescata di nuove carte e la fine del turno.
+ */
 @SuppressWarnings("deprecation")
 public class BotPanel extends JPanel implements Observer{
-	
-	private TitledBorder titledBorder;
-	private BlackJackBot bot;
-	private ArrayList<Carta> mano;
-	private ArrayList<Image> carteImages;
-	private JLabel punti;
-	private Integer puntiAttuali = 0;
-	private String cartaCopertaPath = "CartaRetro.png";
-	private AudioManager audioManager;
-	
+
+	private TitledBorder titledBorder;	/** Il bordo titolato che contiene il nome del bot. */
+	private BlackJackBot bot;	/** Riferimento al bot associato a questo pannello. */
+	private ArrayList<Carta> mano;	/** La mano attualmente in possesso del bot */
+	private ArrayList<Image> carteImages;	/** Una lista di immagini che rappresentano graficamente le carte attualmente in mano al bot. */
+	private JLabel punti;	/** Un'etichetta che visualizza il punteggio attuale del bot. */
+	private Integer puntiAttuali = 0;	/** Il punteggio attuale del bot. */
+	private String cartaCopertaPath = "CartaRetro.png";	/** Il percorso dell'immagine utilizzata per rappresentare la carta coperta */
+	private AudioManager audioManager;	/** Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. */
+
+	/**
+	 * Costruisce un BotPanel che rappresenta il bot specificato.
+	 * Inizializza il layout, il bordo, e le componenti di visualizzazione del punteggio.
+	 * @param name Il nome del pannello (non utilizzato attualmente).
+	 * @param bot  Il bot associato a questo pannello.
+	 */
 	public BotPanel(String name, BlackJackBot bot) {
 		this.bot = bot;
 		audioManager = AudioManager.getInstance();
 		carteImages = new ArrayList<>();
 		punti = new JLabel("", SwingConstants.CENTER);
-		
+
 		setPreferredSize(new Dimension(200, 200));
-		
+
 		titledBorder = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.WHITE),  // Bordo rosso
-                bot.getNickname(),                      // Titolo con il nome del giocatore
-                TitledBorder.CENTER,                       // Posiziona il titolo al centro
-                TitledBorder.TOP,                          // Posiziona il titolo in alto
-                getFont(),                                 // Font del titolo
-                Color.WHITE                               // Colore del titolo (bianco)
-        );
-		
-        setBorder(titledBorder);
-        
+				BorderFactory.createLineBorder(Color.WHITE),  
+				bot.getNickname(),                      
+				TitledBorder.CENTER,                    
+				TitledBorder.TOP,                       
+				getFont(),                              
+				Color.WHITE                             
+				);
+		setBorder(titledBorder);
+
 		setBackground(new Color(120, 0, 0, 0));
 		setOpaque(false);
-		
+
 		setLayout(new BorderLayout());
 		add(punti, BorderLayout.NORTH);
-		
 	}
-	
+
+	/**
+	 * Imposta il titolo del bordo con il nome corrente del bot.
+	 */
 	public void setPanelTitle() {
 		titledBorder.setTitle(bot.getNickname());
 		revalidate();
 		repaint();
 	}
 
+	/**
+	 * Metodo dell'interfaccia Observer. Viene chiamato ogni volta che l'oggetto osservato
+	 * (in questo caso TavoloDaGioco) notifica un cambiamento. Il metodo aggiorna
+	 * il pannello del bot in base all'evento ricevuto.
+	 * @param o   L'oggetto osservato (in questo caso il TavoloDaGioco).
+	 * @param arg L'evento di aggiornamento passato dall'oggetto osservato.
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
 		if (o instanceof TavoloDaGioco && arg instanceof UpdateEvent) {
 			UpdateEvent event = (UpdateEvent) arg;
-
 			String action = event.getAction();
 			Object data = event.getData();
-			// Controlla il tipo di evento
 			if (data instanceof BlackJackBot && bot.equals((BlackJackBot) data)) {
 				if(action.equals("DistribuisciCarteIniziali")) {
 					if(bot.getIsBanco()) {
@@ -101,6 +119,10 @@ public class BotPanel extends JPanel implements Observer{
 		}
 	}
 
+	/**
+	 * Aggiorna il punteggio attuale visualizzato nel pannello.
+	 * Ottiene il punteggio corrente del bot e aggiorna il JLabel dei punti.
+	 */
 	private void updatePunti() {
 		puntiAttuali = bot.getPunti();
 		punti.setText("Punti attuali: "+puntiAttuali);
@@ -108,60 +130,72 @@ public class BotPanel extends JPanel implements Observer{
 		punti.repaint();
 	}
 
+	/**
+	 * Calcola il punteggio attuale della mano del bot.
+	 * Utilizza i punteggi disponibili della mano del bot per scegliere il punteggio migliore.
+	 */
 	private void calcolaPunteggio() {
 		int[] punteggiDisponibili = bot.getValoreManoIniziale();
 		puntiAttuali = bot.getSceltaPunti(punteggiDisponibili);
 	}
-	
+
+	/**
+	 * Disegna le carte attualmente in mano al bot. Aggiunge le immagini delle carte
+	 * alla lista di carte da visualizzare e ridimensiona ogni carta a 200x200 pixel.
+	 * Riproduce un effetto sonoro durante l'aggiornamento.
+	 */
 	public void drawCards() {
 		carteImages.clear();
 		mano = bot.getMano();
 		for (Carta carta : mano) {
-			// Crea l'icona della carta usando il percorso dell'immagine ottenuto da carta.getNome()
-		    String imagePath = carta.getPath(); // getNome() restituisce il path dell'immagine della carta
-		    ImageIcon cartaIcon = new ImageIcon("./src/graphics/"+imagePath);
-		    Image img = cartaIcon.getImage(); // Ottieni l'oggetto Image dall'ImageIcon
-	        Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Ridimensiona l'immagine
-	        carteImages.add(imgScaled);
+			String imagePath = carta.getPath(); 
+			ImageIcon cartaIcon = new ImageIcon("./src/graphics/"+imagePath);
+			Image img = cartaIcon.getImage(); 
+			Image imgScaled = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+			carteImages.add(imgScaled);
 		}
-        audioManager.play("./src/sounds/card.wav");
+		audioManager.play("./src/sounds/card.wav");
 		revalidate();
 		repaint();
 	}
-	
+
+	/**
+	 * Disegna le carte iniziali del banco, mostrando solo la prima carta scoperta
+	 * e la seconda coperta. Viene utilizzato durante il turno del banco.
+	 */
 	public void drawCardsInizialiBanco() {
 		carteImages.clear();
 		mano = bot.getMano();
 		if (mano.size() > 0) {
-			// Prima carta visibile
 			Carta primaCarta = mano.get(0);
-			String primaCartaPath = primaCarta.getPath(); // Ottieni il percorso dell'immagine della prima carta
+			String primaCartaPath = primaCarta.getPath();
 			ImageIcon primaCartaIcon = new ImageIcon("./src/graphics/" + primaCartaPath);
 			Image primaCartaImage = primaCartaIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
 			carteImages.add(primaCartaImage);
 		}
-		
 		if (mano.size() > 1) {
 			ImageIcon cartaCopertaIcon = new ImageIcon("./src/graphics/" + cartaCopertaPath);
 			Image cartaCopertaImage = cartaCopertaIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
 			carteImages.add(cartaCopertaImage);
 		}
-        audioManager.play("./src/sounds/card.wav");
+		audioManager.play("./src/sounds/card.wav");
 		revalidate();
 		repaint();
 	}
-	
+
+	/**
+	 * Override del metodo paintComponent per disegnare graficamente le carte sul pannello.
+	 * Le carte vengono disegnate in modo sovrapposto, con un offset orizzontale tra ciascuna.
+	 * @param g Il contesto grafico in cui disegnare le carte.
+	 */
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
-	    // Disegna ogni carta, sovrapponendole orizzontalmente
-	    int xOffset = 10;  // Offset iniziale
-	    int yOffset = getHeight() - 210;  // Posiziona le carte alla base del pannello
-
-	    for (Image carta : carteImages) {
-	    	g.drawImage(carta, xOffset, yOffset, this);
-	        xOffset += 40;  // Sposta la prossima carta di 50px a destra
-	    }
+		int xOffset = 10;  
+		int yOffset = getHeight() - 210;  
+		for (Image carta : carteImages) {
+			g.drawImage(carta, xOffset, yOffset, this);
+			xOffset += 40; 
+		}
 	}
 }

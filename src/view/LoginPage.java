@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.BorderLayout;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -16,8 +17,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -29,53 +28,63 @@ import javax.swing.border.TitledBorder;
 
 import controller.GameController;
 import model.BlackJackPlayer;
-import model.Database;
 import model.Player;
-import model.TavoloDaGioco;
 
+/**
+ * La classe LoginPage rappresenta la schermata di login del gioco 
+ * BlackJack. Permette agli utenti di aggiungere un nuovo giocatore oppure di 
+ * caricare un giocatore esistente. La schermata include un'interfaccia grafica 
+ * con la possibilità di scegliere un nickname e un avatar.
+ * 
+ * Questa classe estende JPanel e implementa 
+ * ActionListener per gestire le azioni degli utenti.
+ */
 public class LoginPage extends JPanel implements ActionListener{
-	private Frame frame;
-	
-	private Image backgroudImage;
-	
+
+	private Frame frame;	/** Frame principale in cui viene visualizzata la pagina del menu. */
+
+	private Image backgroundImage;	/** Immagine di background. */
+
 	// Register
-	private JPanel newPlayer;
-	private MyButton buttonNewPlayer;
-	private JLabel nicknameLabel;
-	private JTextField nicknameTextField;
+	private JPanel newPlayer;	/** Panel dove avviene la registrazione. */
+	private MyButton buttonNewPlayer;	/** MyButton per effettuare la registrazione. */
+	private JLabel nicknameLabel;	/** Etichetta nickname della registrazione */
+	private JTextField nicknameTextField;	/** Campo di testo per inserire il nickname del giocatore. */
 	// Avatar 
-	private JLabel avatar1ImageLabel;
-	private JRadioButton avatar1Button;
-	private JLabel avatar2ImageLabel;
-	private JRadioButton avatar2Button;
-	private JLabel avatar3ImageLabel;
-	private JRadioButton avatar3Button;
-	private JLabel avatar4ImageLabel;
-	private JRadioButton avatar4Button;
-	private ButtonGroup group;
+	private JLabel avatar1ImageLabel;	/** Etichetta del avatar 1. */
+	private JRadioButton avatar1Button;	/** Bottone scelta per l'avatar 1. */
+	private JLabel avatar2ImageLabel;	/** Etichetta del avatar 2. */
+	private JRadioButton avatar2Button;	/** Bottone scelta per l'avatar 2. */
+	private JLabel avatar3ImageLabel;	/** Etichetta del avatar 3. */
+	private JRadioButton avatar3Button;	/** Bottone scelta per l'avatar 3. */
+	private JLabel avatar4ImageLabel;	/** Etichetta del avatar 4. */
+	private JRadioButton avatar4Button;	/** Bottone scelta per l'avatar 4. */
+	private ButtonGroup group;	/** Gruppo dei bottoni per la scelta del avatar. */
 	// Login
-	private JPanel loadPlayer;
-	private MyButton buttonLoadPlayer;
-	private JList<String> listaGiocatori;
-	
-	private BlackJackPlayer player;
-	private GameController controller;
-	private AudioManager audioManager;
-	
-	
+	private JPanel loadPlayer;	/** Panel del login. */
+	private MyButton buttonLoadPlayer;	/** Bottone del login. */
+	private JList<String> listaGiocatori;	/** Lista dei giocatori già registrati precedentemente. */
+
+	private GameController controller;	/** Controller principale per gestire la logica di gioco. */
+	private AudioManager audioManager;	/** Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. */
+
+	/**
+	 * Costruttore della classe LoginPage. Inizializza i componenti 
+	 * dell'interfaccia utente, inclusi i pannelli per la registrazione di un 
+	 * nuovo giocatore e il caricamento di un giocatore esistente. Carica anche 
+	 * l'immagine di sfondo per la schermata di accesso.
+	 */
 	public LoginPage() {
 		frame = new Frame();
 		audioManager = AudioManager.getInstance();
 		controller = GameController.getIstance();
 		setLayout(new BorderLayout());
-			
-		//Carica l'immagine dal percorso specificato
+
 		ImageIcon icon = new ImageIcon("./src/graphics/backgroundGame.png");
-		backgroudImage = icon.getImage();
+		backgroundImage = icon.getImage();
 
 		newPlayer = new JPanel();
 		newPlayer.setPreferredSize(new Dimension(640, 360));
-		// set JPanel trasparent
 		newPlayer.setBackground(new Color(0, 0, 0, 0));
 		newPlayer.setOpaque(false);
 		buttonNewPlayer = new MyButton("Add Player", this);
@@ -84,7 +93,6 @@ public class LoginPage extends JPanel implements ActionListener{
 		nicknameTextField = new JTextField(30);
 		nicknameTextField.setFont(nicknameTextField.getFont().deriveFont(18f));
 
-		//Avatar
 		avatar1Button = new JRadioButton("Male");
 		avatar1Button.setActionCommand("Male");
 		avatar2Button = new JRadioButton("Female");
@@ -102,26 +110,26 @@ public class LoginPage extends JPanel implements ActionListener{
 
 		ImageIcon avatar1ImageIcon = new ImageIcon("./src/graphics/avatar/Male.png"); 
 		Image image = avatar1ImageIcon.getImage();
-		avatar1ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
+		avatar1ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, Image.SCALE_SMOOTH));
 		avatar1ImageLabel = new JLabel(avatar1ImageIcon);
 
 		ImageIcon avatar2ImageIcon = new ImageIcon("./src/graphics/avatar/Female.png"); 
 		image = avatar2ImageIcon.getImage();
-		avatar2ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
+		avatar2ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, Image.SCALE_SMOOTH));
 		avatar2ImageLabel = new JLabel(avatar2ImageIcon);
 
 		ImageIcon avatar3ImageIcon = new ImageIcon("./src/graphics/avatar/Alien.png"); 
 		image = avatar3ImageIcon.getImage();
-		avatar3ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
+		avatar3ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, Image.SCALE_SMOOTH));
 		avatar3ImageLabel = new JLabel(avatar3ImageIcon);
 
 		ImageIcon avatar4ImageIcon = new ImageIcon("./src/graphics/avatar/Dog.png"); 
 		image = avatar4ImageIcon.getImage();
-		avatar4ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, image.SCALE_SMOOTH));
+		avatar4ImageIcon = new ImageIcon(image.getScaledInstance(100, 100, Image.SCALE_SMOOTH));
 		avatar4ImageLabel = new JLabel(avatar4ImageIcon);
 
 		TitledBorder border = BorderFactory.createTitledBorder("Add Player");
-		border.setTitleJustification(TitledBorder.CENTER); // Centra il titolo sul bordo
+		border.setTitleJustification(TitledBorder.CENTER);
 		newPlayer.setBorder(border);
 
 		newPlayer.setLayout(new GridBagLayout());
@@ -139,7 +147,6 @@ public class LoginPage extends JPanel implements ActionListener{
 		gbc.gridy = 0;
 		newPlayer.add(nicknameTextField, gbc);
 
-		// da far scegliere gli avatar
 		gbc.gridx = 0; 
 		gbc.gridy = 1;
 		newPlayer.add(avatar1Button, gbc);
@@ -172,68 +179,72 @@ public class LoginPage extends JPanel implements ActionListener{
 		gbc.gridy = 4;
 		newPlayer.add(avatar4ImageLabel, gbc);
 
-		// Button
 		gbc.anchor = GridBagConstraints.SOUTH;
 		gbc.gridx = 0; 
 		gbc.gridy = 10;
 		gbc.gridwidth = 2;
 		newPlayer.add(buttonNewPlayer, gbc);
-		
 
-		//Load Player
 		loadPlayer = new JPanel();
 		loadPlayer.setPreferredSize(new Dimension(640, 360));
 		TitledBorder borderLoadPlayer = BorderFactory.createTitledBorder("Load Player");
-        borderLoadPlayer.setTitleJustification(TitledBorder.CENTER); // Centra il titolo sul bordo
-        loadPlayer.setBorder(borderLoadPlayer);
-        loadPlayer.setBackground(new Color(120, 0, 0, 0));
+		borderLoadPlayer.setTitleJustification(TitledBorder.CENTER);
+		loadPlayer.setBorder(borderLoadPlayer);
+		loadPlayer.setBackground(new Color(120, 0, 0, 0));
 		loadPlayer.setOpaque(false);
-        
-        
+
 		buttonLoadPlayer = new MyButton("load Player", this);
 		loadPlayer.setLayout(new BorderLayout());
 		loadPlayer.add(buttonLoadPlayer, BorderLayout.SOUTH);
-		
+
 		List<BlackJackPlayer> giocatori = controller.getDbPlayers();
-	    String[] playersName = giocatori.stream().map(Player::getNickname).toArray(String[]::new);
-	    String[] avatarName = giocatori.stream().map(Player::getAvatar).toArray(String[]::new);
-	    String[] playersNameAvatar = new String[playersName.length];
-	    for(int i=0; i<playersName.length; i++) {
-	    	playersNameAvatar[i] = "Nickname: "+ playersName[i] + ", Avatar: " + avatarName[i];
-	    }
-	    
+		String[] playersName = giocatori.stream().map(Player::getNickname).toArray(String[]::new);
+		String[] avatarName = giocatori.stream().map(Player::getAvatar).toArray(String[]::new);
+		String[] playersNameAvatar = new String[playersName.length];
+		for(int i=0; i<playersName.length; i++) {
+			playersNameAvatar[i] = "Nickname: "+ playersName[i] + ", Avatar: " + avatarName[i];
+		}
+
 		listaGiocatori = new JList<String>(playersNameAvatar);
 		listaGiocatori.setBackground(new Color(120, 0, 0, 0));
 		listaGiocatori.setOpaque(false);
 		Font font = listaGiocatori.getFont();
-	    Font newFont = font.deriveFont(font.getSize() + 10f); // Aumenta la dimensione di 10 punti
-	    listaGiocatori.setFont(newFont);
-	    listaGiocatori.setFixedCellHeight(25); 
-		
+		Font newFont = font.deriveFont(font.getSize() + 10f);
+		listaGiocatori.setFont(newFont);
+		listaGiocatori.setFixedCellHeight(25); 
+
 		listaGiocatori.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		loadPlayer.add(listaGiocatori, BorderLayout.CENTER);
-		
+
 		JScrollPane scrollPane = new JScrollPane(listaGiocatori);
 		scrollPane.setOpaque(false);
 		scrollPane.getViewport().setOpaque(false);
 		loadPlayer.add(scrollPane, BorderLayout.CENTER);
-		
-        frame.setLayout(new BorderLayout());
+
+		frame.setLayout(new BorderLayout());
 		this.add(newPlayer, BorderLayout.WEST);
 		this.add(loadPlayer, BorderLayout.EAST);
-		
-		// TODO bg sistemalo
+
 		frame.setContentPane(this);
 		frame.setVisible(true);
 	}
-	
+
+	/**
+	 * Disegna l'immagine di sfondo della schermata di accesso.
+	 * @param g L'oggetto Graphics utilizzato per il disegno.
+	 */
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(backgroudImage, 0, 0, 1280, 720, this);
+		g.drawImage(backgroundImage, 0, 0, 1280, 720, this);
 	}
-	
 
+	/**
+	 * Gestisce gli eventi generati dai pulsanti dell'interfaccia. 
+	 * A seconda del pulsante premuto, registra un nuovo giocatore o 
+	 * carica un giocatore esistente. 
+	 * @param e L'evento dell'azione generato.
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
@@ -245,9 +256,7 @@ public class LoginPage extends JPanel implements ActionListener{
 					throw new LoginException("Registrazione non completa");
 				}
 				String avatar = selectedModel.getActionCommand();
-				player = new BlackJackPlayer(nickname, avatar);
-				controller.addDbPlayer(player);
-				controller.addPlayer(player);
+				controller.addDbPlayer(nickname, avatar);
 				caricaMenu();
 			}else if(e.getSource() == buttonLoadPlayer) {
 				audioManager.play("./src/sounds/button.wav");
@@ -255,8 +264,7 @@ public class LoginPage extends JPanel implements ActionListener{
 				if(indexPlayer == -1) {
 					throw new LoginException("Nessuno profilo selezionato");
 				}else {
-					player = controller.getDbPlayerByIndex(indexPlayer);
-					controller.addPlayer(player);
+					controller.getDbPlayerByIndex(indexPlayer);
 					caricaMenu();
 				}
 			}
@@ -266,6 +274,10 @@ public class LoginPage extends JPanel implements ActionListener{
 		}
 	}
 
+	/**
+	 * Carica il menu principale del gioco dopo la registrazione o il caricamento 
+	 * di un giocatore. Chiude la schermata di accesso attuale.
+	 */
 	private void caricaMenu() {
 		frame.dispose();
 		new MenuPage();

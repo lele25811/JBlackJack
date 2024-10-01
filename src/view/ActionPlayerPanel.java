@@ -1,8 +1,6 @@
 package view;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -29,6 +27,12 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 	private Frame frame;
 	private GameController controller;
 	
+	/**
+	 * La classe ActionPlayerPanel rappresenta il pannello di controllo per il giocatore umano,
+	 * dove può selezionare le azioni da intraprendere durante il gioco di BlackJack, come
+	 * chiedere una carta, stare, raddoppiare o dividere le carte.
+	 * Implementa Observer per reagire agli aggiornamenti del modello (TavoloDaGioco).
+	 */
 	public ActionPlayerPanel(Frame frame) {
 		this.frame = frame;
 		controller = GameController.getIstance();
@@ -61,29 +65,52 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 		passaManoButton.setVisible(false);
 	}
 	
+	/**
+	 * Restituisce il bottone per l'azione "Chiedi carta".
+	 * @return il bottone "Card"
+	 */
 	public JButton getCartaButton() {
 		return cartaButton;
 	}
 
+	/**
+	 * Restituisce il bottone per l'azione "Stai".
+	 * @return il bottone "Stay"
+	 */
 	public JButton getStaiButton() {
 		return staiButton;
 	}
 
-
+	/**
+	 * Restituisce il bottone per l'azione "Raddoppia".
+	 * @return il bottone "Double"
+	 */
 	public JButton getRaddoppiaButton() {
 		return raddoppiaButton;
 	}
 
-
+	/**
+	 * Restituisce il bottone per l'azione "Dividi".
+	 * @return il bottone "Split"
+	 */
 	public JButton getDividiButton() {
 		return dividiButton;
 	}
 	
-	// TODO
+	/**
+	 * Restituisce il bottone per l'azione "Passa Mano" (durante uno split).
+	 * @return il bottone "Next Hand"
+	 */
 	public JButton getPassaManoButton() {
 		return passaManoButton;
 	}
 
+	/**
+	 * Aggiorna lo stato del pannello in base agli eventi provenienti dal modello
+	 * osservato. Abilita o disabilita i bottoni in base all'azione corrente.
+	 * @param o l'oggetto osservato (TavoloDaGioco)
+	 * @param arg l'evento di aggiornamento (UpdateEvent)
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
 		if (o instanceof TavoloDaGioco && arg instanceof UpdateEvent) {
@@ -102,18 +129,22 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 			}else if (action.equals("Dividi")) {
 				Player player = (Player) data;
 				if (player.isSplit() && player.getIndexMano() == 0) {
-					staiButton.setVisible(false); // Nascondi passaTurno
-					passaManoButton.setVisible(true); // Mostra passaMano
+					staiButton.setVisible(false);
+					passaManoButton.setVisible(true);
 					passaManoButton.setEnabled(true);
 				} else {
-					staiButton.setVisible(true); // Mostra passaTurno
+					staiButton.setVisible(true);
 					staiButton.setEnabled(true);
-					passaManoButton.setVisible(false); // Nascondi passaMano
+					passaManoButton.setVisible(false);
 				}
 			}
 		}
 	}
 	
+	/**
+	 * Disabilita tutti i bottoni e passa il turno al giocatore successivo.
+	 * @param punteggio il punteggio del giocatore al termine del turno
+	 */
 	public void passaTurno(int punteggio) {
 		cartaButton.setEnabled(false);
 		staiButton.setEnabled(false);
@@ -122,13 +153,20 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 		controller.passaTurno(punteggio);
 	}
 	
+	/**
+	 * Aggiorna i bottoni per gestire la transizione tra le mani durante uno split.
+	 */
 	public void cambioButtonSplit() {
-		System.out.println("Cambio tasti (ActionPlayerMenu)");
-		staiButton.setVisible(true); // Mostra passaTurno
+		staiButton.setVisible(true); 
 		staiButton.setEnabled(true);
 		passaManoButton.setVisible(false);
 	}
 
+	/**
+	 * Chiede al giocatore se vuole iniziare una nuova partita attraverso un
+	 * pop-up di conferma. Se il giocatore sceglie "Yes", il gioco viene resettato.
+	 * Se sceglie "No", il gioco termina.
+	 */
 	public void chiediNuovaPartita() {
 		int risposta = JOptionPane.showConfirmDialog(
 				null, 
@@ -138,8 +176,6 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 				JOptionPane.QUESTION_MESSAGE);
 
 		if (risposta == JOptionPane.YES_OPTION) {
-			// Reset del gioco e inizio nuova partita
-			System.out.println("Nuova Partita");
 			controller.nuovaPartita();
 			frame.dispose();
 			new MenuPage();
@@ -147,5 +183,4 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 			System.exit(0);
 		}
 	}
-
 }

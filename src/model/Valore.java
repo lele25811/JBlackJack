@@ -1,7 +1,7 @@
 package model;
 
-/*
- *  Classe ENUM che definisce il nome del Valore delle carte con il rispettivo valore di gioco 
+/**
+ *  Classe ENUM che definisce il nome del Valore delle carte con il rispettivo valore di gioco. 
  */
 public enum Valore {
 	ASSO(1,"Asso"),
@@ -18,36 +18,39 @@ public enum Valore {
 	DONNA(10, "Donna"),
 	KAPPA(10, "Kappa");
 	
-	/*
-	 * nValore definisce il valore di gioco della carta, il valore numerico
+	/**
+	 * nValore definisce il valore (numerico) di gioco della carta.
 	 */
 	private final int nValore;
 	
-	/*
-	 * valore definisce il nome del Valore della carta
+	/**
+	 * valore definisce il nome del Valore della carta.
 	 */
 	private final String valore;
 	
-	/*
-	 * Costruttore della classe 
+	/**
+	 * Costruttore della classe Valore.
+	 * @param nValore il valore della carta
+	 * @param valore il nome della carta
 	 */
 	private Valore(int nValore, String valore) {
 		this.nValore = nValore;
 		this.valore = valore;
 	}
 	
-	/*
-	 *  Metodo che ritorna il valore di gioco
+	/**
+	 *  Metodo che ritorna il valore di gioco.
+	 *  @return il valore numerico della carta
 	 */
 	public int getValore() {
 		return nValore;
 	}
 	
-	/*
-	 *  Metodo che il nome del Valore
+	/**
+	 *  Metodo che il nome del Valore.
+	 *  @return il nome della carta
 	 */
 	public String stampaValore() {
 		return valore;
 	}
-
 }

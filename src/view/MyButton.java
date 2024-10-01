@@ -1,29 +1,32 @@
 package view;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 
+/**
+ * La classe MyButton estende JButton ed è utilizzata per creare un pulsante personalizzato
+ * con un testo specificato e un ActionListener associato. Il pulsante è configurato per
+ * non essere focalizzabile e posiziona il testo al centro sia orizzontalmente che verticalmente.
+ */
 public class MyButton extends JButton{
 	
+	 /**
+     * Costruttore della classe MyButton.
+     * Crea un pulsante con il testo specificato e un listener per gestire l'azione di clic.
+     * @param text Il testo da visualizzare sul pulsante.
+     * @param actionListener L'ActionListener associato al pulsante, che gestisce gli eventi di clic.
+     */
 	public MyButton(String text, ActionListener actionListener) {
-		// Imposta il pulsante in modo che non possa essere selezionato tramite il tab
+
 		this.setFocusable(false);
 
-		// Imposta il testo del pulsante
 		this.setText(text);
 
-		// Imposta la posizione orizzontale del testo al centro del pulsante
 		this.setHorizontalTextPosition(JButton.CENTER);
 
-		// Imposta la posizione verticale del testo al centro del pulsante
 		this.setVerticalTextPosition(JButton.CENTER);
 
-		// Aggiunge un ActionListener per gestire i clic sul pulsante
 		this.addActionListener(actionListener);
-
 	}
-
 }
