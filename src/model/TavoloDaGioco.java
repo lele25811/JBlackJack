@@ -194,8 +194,13 @@ public class TavoloDaGioco extends Observable{
 					notifyObservers(new UpdateEvent("TurnoBanco", p));
 				}
 				turnoBot((BlackJackBot) p);
-				setChanged();
-				notifyObservers(new UpdateEvent("FineTurno", p));
+				if(punti[currentPlayerIndex] > 21) {
+					setChanged();
+					notifyObservers(new UpdateEvent("Sballato", p));
+				}else {
+					setChanged();
+					notifyObservers(new UpdateEvent("Passa Turno", p));
+				}
 			}
 			if(p instanceof BlackJackPlayer) {
 				((BlackJackPlayer) p).addPartita();
@@ -273,7 +278,7 @@ public class TavoloDaGioco extends Observable{
 					case 0: getCardBot(bot);
 							break;
 					case 1: {
-						getCardBot(bot);
+						getRaddoppioBot(bot);
 						raddoppio = true;
 						break;
 					}
@@ -361,13 +366,18 @@ public class TavoloDaGioco extends Observable{
 	 */
 	private void getCardBot(Player p) {
 		p.addCarta(mazzo.prossimaCarta());
-		try {
-			Thread.sleep(2000);
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
 		setChanged();
-        notifyObservers(new UpdateEvent("NuovaCartaBot", p));
+        notifyObservers(new UpdateEvent("Carta", p));
+	}
+	
+	/**
+	 * Metodo che richiede il raddoppio per il bot.
+	 * @param p il bot che richiede una carta
+	 */
+	private void getRaddoppioBot(Player p) {
+		p.addCarta(mazzo.prossimaCarta());
+		setChanged();
+        notifyObservers(new UpdateEvent("Raddoppio", p));
 	}
 	
 	/**

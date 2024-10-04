@@ -10,10 +10,13 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import model.BlackJackBot;
@@ -36,6 +39,7 @@ public class BotPanel extends JPanel implements Observer{
 	private ArrayList<Carta> mano;	/** La mano attualmente in possesso del bot */
 	private ArrayList<Image> carteImages;	/** Una lista di immagini che rappresentano graficamente le carte attualmente in mano al bot. */
 	private JLabel punti;	/** Un'etichetta che visualizza il punteggio attuale del bot. */
+	private JLabel azione;
 	private Integer puntiAttuali = 0;	/** Il punteggio attuale del bot. */
 	private String cartaCopertaPath = "CartaRetro.png";	/** Il percorso dell'immagine utilizzata per rappresentare la carta coperta */
 	private AudioManager audioManager;	/** Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. */
@@ -51,6 +55,7 @@ public class BotPanel extends JPanel implements Observer{
 		audioManager = AudioManager.getInstance();
 		carteImages = new ArrayList<>();
 		punti = new JLabel("", SwingConstants.CENTER);
+		azione = new JLabel("", SwingConstants.CENTER);
 
 		setPreferredSize(new Dimension(200, 200));
 
@@ -67,8 +72,13 @@ public class BotPanel extends JPanel implements Observer{
 		setBackground(new Color(120, 0, 0, 0));
 		setOpaque(false);
 
-		setLayout(new BorderLayout());
-		add(punti, BorderLayout.NORTH);
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+		punti.setAlignmentX(CENTER_ALIGNMENT);
+		azione.setAlignmentX(CENTER_ALIGNMENT);
+
+		add(punti);
+		add(azione);
 	}
 
 	/**
@@ -106,12 +116,20 @@ public class BotPanel extends JPanel implements Observer{
 					drawCards();
 					calcolaPunteggio();
 					updatePunti();
-				}else if(action.equals("NuovaCartaBot")) {
+				}else if(action.equals("Carta") || action.equals("Raddoppio")) {
+					updateAzione(action, false);
+					try {
+						Thread.sleep(2000);
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
 					drawCards();
 					calcolaPunteggio();
 					updatePunti();
-				}else if(action.equals("FineTurno")) {
+					updateAzione(action, false);
+				}else if(action.equals("Passa Turno") || action.equals("Sballato")) {
 					updatePunti();
+					updateAzione(action, true);
 				}
 				revalidate();
 				repaint();
@@ -125,9 +143,24 @@ public class BotPanel extends JPanel implements Observer{
 	 */
 	private void updatePunti() {
 		puntiAttuali = bot.getPunti();
-		punti.setText("Punti attuali: "+puntiAttuali);
+		punti.setText("Punti Attuali: "+puntiAttuali);
 		punti.revalidate();
 		punti.repaint();
+	}
+	
+	/**
+	 * Aggiorna l'azione che viene fatta dal bot e viene visualizzata nel pannello.
+	 * @param action l'azione che viene fatta dal bot
+	 * @param fine true se il turno del bot termina dopo questa azione, altrimenti false
+	 */
+	private void updateAzione(String action, boolean fine) {
+		if (!fine) {
+			azione.setText("Ha chiesto: " + action);
+		} else {
+			azione.setText(action);
+		}
+		azione.revalidate();
+		azione.repaint();
 	}
 
 	/**
