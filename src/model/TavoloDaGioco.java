@@ -418,7 +418,7 @@ public class TavoloDaGioco extends Observable{
 	}
 	
 	/**
-	 *  Gestione fine della partita, calcolando il vincitore.
+	 *  Gestione fine della partita, calcolando i vincitori tra il banco e gli altri giocatori.
 	 */
 	public void finePartita() {
 		boolean vittoriaPlayer = false;
@@ -447,25 +447,50 @@ public class TavoloDaGioco extends Observable{
 				}
 			}
 		}
+		int indexP = 0;
 		if (!giocatoriVincitori.isEmpty()) {
-	        for(Player p: giocatoriVincitori) {
-	        	if(p instanceof BlackJackPlayer) {
-	        		((BlackJackPlayer) p).addVittoria();
-	        		vittoriaPlayer = true;
-	        	}
-	        }
-	    }
+			for(Player p: giocatoriVincitori) {
+				if(p instanceof BlackJackPlayer) {
+					((BlackJackPlayer) p).addVittoria();
+					vittoriaPlayer = true;
+				}
+			}
+		}
+		for(Player p: giocatori) {
+			if(p instanceof BlackJackBot && !((BlackJackBot)p).getIsBanco()) {
+				String risultato = risultatoBot(punti[indexP], puntiBanco);
+				setChanged();
+				notifyObservers(new UpdateEvent(risultato, p));
+			}
+			indexP++;
+		}
 		if(vittoriaPlayer) {
 			setChanged();
 			notifyObservers(new UpdateEvent("Vittoria", player));
-			
-		}else if(!vittoriaPlayer){
+		}else if(!vittoriaPlayer) {
 			setChanged();
 			notifyObservers(new UpdateEvent("Sconfitta", player));
 		}
 		db.updatePlayer(player);
 	}
 
+	/**
+	 * Metodo che confronta il punteggio di un giocatore (bot) con il punteggio del banco.
+	 * @param puntiBot punteggio del bot
+	 * @param puntiBanco punteggio del banco
+	 * @return la stringa con il risultato del confronto
+	 */
+	private String risultatoBot(int puntiBot, int puntiBanco) {
+		if(puntiBot <= 21 && puntiBanco > 21) {
+			return "Vittoria";
+		}else if(puntiBot > puntiBanco && puntiBot <= 21) {
+			return "Vittoria";
+		} else if(puntiBot > 21 || puntiBot < puntiBanco) {
+			return "Sconfitta";
+		}
+		return "";
+	}
+	
 	/**
 	 * Metodo che resetta i parametri della classe TavoloDaGioco per la prossima partita
 	 */

@@ -1,9 +1,0 @@
-/**
- * 
- */
-/**
- * @author emanuele
- *
- */
-module JTrash {
-}

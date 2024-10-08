@@ -130,6 +130,8 @@ public class BotPanel extends JPanel implements Observer{
 				}else if(action.equals("Passa Turno") || action.equals("Sballato")) {
 					updatePunti();
 					updateAzione(action, true);
+				}else if(action.equals("Sconfitta") || action.equals("Vittoria")) {
+					updateAzione(action, true);
 				}
 				revalidate();
 				repaint();
