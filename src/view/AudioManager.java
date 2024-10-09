@@ -36,12 +36,11 @@ public class AudioManager {
 	 * Riproduce un file audio specificato dal percorso fornito, effettuando una conversione 
 	 * del formato audio originale, se necessario, per assicurare la compatibilità con i 
 	 * formati supportati dal sistema audio.
-	 *
+	 * Eccezioni gestite all'interno del blocco try-catch:
+	 * throws UnsupportedAudioFileException se il formato del file audio non è supportato
+	 * throws LineUnavailableException se la linea audio non è disponibile per la riproduzione
+	 * throws IOException se si verifica un errore durante la lettura del file audio
 	 * @param filePath il percorso del file audio da riprodurre
-	 * 
-	 * @throws UnsupportedAudioFileException se il formato del file audio non è supportato
-	 * @throws LineUnavailableException se la linea audio non è disponibile per la riproduzione
-	 * @throws IOException se si verifica un errore durante la lettura del file audio
 	 */
 	public void play(String filePath) {
 		try {

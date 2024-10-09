@@ -41,32 +41,105 @@ import model.Player;
  */
 public class LoginPage extends JPanel implements ActionListener{
 
-	private Frame frame;	/** Frame principale in cui viene visualizzata la pagina del menu. */
+	/** 
+	 * Frame principale in cui viene visualizzata la pagina del menu. 
+	 */
+	private Frame frame;
 
-	private Image backgroundImage;	/** Immagine di background. */
+	/** 
+	 * Immagine di background. 
+	 */
+	private Image backgroundImage;	
 
-	// Register
-	private JPanel newPlayer;	/** Panel dove avviene la registrazione. */
-	private MyButton buttonNewPlayer;	/** MyButton per effettuare la registrazione. */
-	private JLabel nicknameLabel;	/** Etichetta nickname della registrazione */
-	private JTextField nicknameTextField;	/** Campo di testo per inserire il nickname del giocatore. */
-	// Avatar 
-	private JLabel avatar1ImageLabel;	/** Etichetta del avatar 1. */
-	private JRadioButton avatar1Button;	/** Bottone scelta per l'avatar 1. */
-	private JLabel avatar2ImageLabel;	/** Etichetta del avatar 2. */
-	private JRadioButton avatar2Button;	/** Bottone scelta per l'avatar 2. */
-	private JLabel avatar3ImageLabel;	/** Etichetta del avatar 3. */
-	private JRadioButton avatar3Button;	/** Bottone scelta per l'avatar 3. */
-	private JLabel avatar4ImageLabel;	/** Etichetta del avatar 4. */
-	private JRadioButton avatar4Button;	/** Bottone scelta per l'avatar 4. */
-	private ButtonGroup group;	/** Gruppo dei bottoni per la scelta del avatar. */
-	// Login
-	private JPanel loadPlayer;	/** Panel del login. */
-	private MyButton buttonLoadPlayer;	/** Bottone del login. */
-	private JList<String> listaGiocatori;	/** Lista dei giocatori già registrati precedentemente. */
+	/** 
+	 * Panel dove avviene la registrazione. 
+	 */
+	private JPanel newPlayer;
 
-	private GameController controller;	/** Controller principale per gestire la logica di gioco. */
-	private AudioManager audioManager;	/** Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. */
+	/** 
+	 * MyButton per effettuare la registrazione. 
+	 */
+	private MyButton buttonNewPlayer;
+
+	/** 
+	 * Etichetta nickname della registrazione 
+	 */
+	private JLabel nicknameLabel;
+
+	/** 
+	 * Campo di testo per inserire il nickname del giocatore.
+	 */
+	private JTextField nicknameTextField;
+
+	/** 
+	 *del avatar 1.
+	 */
+	private JLabel avatar1ImageLabel;	
+
+	/**
+	 *  Bottone scelta per l'avatar 1. 
+	 */
+	private JRadioButton avatar1Button;
+
+	/** 
+	 * Etichetta del avatar 2. 
+	 */
+	private JLabel avatar2ImageLabel;
+
+	/**
+	 *  Bottone scelta per l'avatar 2.
+	 *   */
+	private JRadioButton avatar2Button;
+
+	/** 
+	 * Etichetta del avatar 3. 
+	 */
+	private JLabel avatar3ImageLabel;
+
+	/** 
+	 * Bottone scelta per l'avatar 3.
+	 */
+	private JRadioButton avatar3Button;	
+
+	/**
+	 *  Etichetta del avatar 4.
+	 */
+	private JLabel avatar4ImageLabel;
+
+	/** 
+	 * Bottone scelta per l'avatar 4.
+	 */
+	private JRadioButton avatar4Button;	
+
+	/** 
+	 * Gruppo dei bottoni per la scelta del avatar. 
+	 */
+	private ButtonGroup group;
+
+	/** 
+	 * Panel del login. 
+	 */
+	private JPanel loadPlayer;
+
+	/**
+	 *  Bottone del login. 
+	 */
+	private MyButton buttonLoadPlayer;
+
+	/**
+	 *  Lista dei giocatori già registrati precedentemente.
+	 */
+	private JList<String> listaGiocatori;
+
+	/** 
+	 * Controller principale per gestire la logica di gioco.
+	 */
+	private GameController controller;
+
+	/**
+	 *  Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. 
+	 */
+	private AudioManager audioManager;
 
 	/**
 	 * Costruttore della classe LoginPage. Inizializza i componenti 
@@ -243,6 +316,8 @@ public class LoginPage extends JPanel implements ActionListener{
 	 * Gestisce gli eventi generati dai pulsanti dell'interfaccia. 
 	 * A seconda del pulsante premuto, registra un nuovo giocatore o 
 	 * carica un giocatore esistente. 
+	 * Eccezione gestita all'interno del blocco try-catch:
+	 * throws LoginException se la registrazione non è completa o nessun profilo è selezionato.
 	 * @param e L'evento dell'azione generato.
 	 */
 	@Override

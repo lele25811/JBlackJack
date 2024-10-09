@@ -16,55 +16,90 @@ import model.Player;
 import model.TavoloDaGioco;
 import model.UpdateEvent;
 
+/**
+ * La classe ActionPlayerPanel rappresenta il pannello di controllo per il giocatore umano,
+ * dove può selezionare le azioni da intraprendere durante il gioco di BlackJack, come
+ * chiedere una carta, stare, raddoppiare o dividere le carte.
+ * Implementa Observer per reagire agli aggiornamenti del modello (TavoloDaGioco).
+ */
 @SuppressWarnings("deprecation")
 public class ActionPlayerPanel extends JPanel implements Observer{
 
+	/**
+	 * JButton utilizzato per permettere al giocatore di chiedere carta.
+	 */
 	private JButton cartaButton;
-	private JButton staiButton;
-	private JButton raddoppiaButton;
-	private JButton dividiButton;
-	private JButton passaManoButton;
-	private Frame frame;
-	private GameController controller;
 	
 	/**
-	 * La classe ActionPlayerPanel rappresenta il pannello di controllo per il giocatore umano,
-	 * dove può selezionare le azioni da intraprendere durante il gioco di BlackJack, come
-	 * chiedere una carta, stare, raddoppiare o dividere le carte.
-	 * Implementa Observer per reagire agli aggiornamenti del modello (TavoloDaGioco).
+	 * JButton utilizzato per permettere al giocatore di passare il turno.
+	 */
+	private JButton staiButton;
+	
+	/**
+	 * JButton utilizzato per permettere al giocatore di chiedere raddoppio.
+	 */
+	private JButton raddoppiaButton;
+	
+	/**
+	 * JButton utilizzato per permettere al giocatore di chiedere la divisione delle carte.
+	 */
+	private JButton dividiButton;
+	
+	/**
+	 * JButton utilizzato per permettere al giocatore di passare la mano.
+	 */
+	private JButton passaManoButton;
+	
+	/**
+	 * Riferimento al frame principale della finestra di gioco.
+	 */
+	private Frame frame;
+	
+	/**
+	 *  Riferimento al controller del gioco (GameController) che gestisce la logica tra il modello (TavoloDaGioco)
+     *  e la vista.
+	 */
+	private GameController controller;
+
+	/**
+	 * Crea un nuovo pannello di controllo per il giocatore umano, con i bottoni
+	 * per le azioni di gioco: "Chiedi carta", "Stai", "Raddoppia", "Dividi" e "Passa Mano".
+	 * I bottoni sono inizialmente disabilitati e verranno abilitati in base al turno del giocatore.
+	 * Il pannello è collegato al controller del gioco per gestire le interazioni.
+	 * @param frame il frame della finestra principale del gioco.
 	 */
 	public ActionPlayerPanel(Frame frame) {
 		this.frame = frame;
 		controller = GameController.getIstance();
-		
+
 		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.RED, 2), "Azioni di gioco");
-	    border.setTitleColor(Color.RED);
-	    setBorder(border);
-	    
-	    setBackground(new Color(120, 0, 0, 0));
+		border.setTitleColor(Color.RED);
+		setBorder(border);
+
+		setBackground(new Color(120, 0, 0, 0));
 		setOpaque(false);
-		
+
 		cartaButton = new JButton("Card");
 		staiButton = new JButton("Stay");
 		passaManoButton = new JButton("Next Hand");
 		raddoppiaButton = new JButton("Double");
 		dividiButton = new JButton("Split");
-		
+
 		cartaButton.setEnabled(false);
 		staiButton.setEnabled(false);
 		passaManoButton.setEnabled(false);
 		raddoppiaButton.setEnabled(false);
 		dividiButton.setEnabled(false);
-		
+
 		add(cartaButton);
 		add(staiButton);
 		add(passaManoButton);
 		add(raddoppiaButton);
 		add(dividiButton);
-		
+
 		passaManoButton.setVisible(false);
 	}
-	
+
 	/**
 	 * Restituisce il bottone per l'azione "Chiedi carta".
 	 * @return il bottone "Card"
@@ -96,7 +131,7 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 	public JButton getDividiButton() {
 		return dividiButton;
 	}
-	
+
 	/**
 	 * Restituisce il bottone per l'azione "Passa Mano" (durante uno split).
 	 * @return il bottone "Next Hand"
@@ -140,7 +175,7 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 			}
 		}
 	}
-	
+
 	/**
 	 * Disabilita tutti i bottoni e passa il turno al giocatore successivo.
 	 * @param punteggio il punteggio del giocatore al termine del turno
@@ -152,7 +187,7 @@ public class ActionPlayerPanel extends JPanel implements Observer{
 		dividiButton.setEnabled(false);
 		controller.passaTurno(punteggio);
 	}
-	
+
 	/**
 	 * Aggiorna i bottoni per gestire la transizione tra le mani durante uno split.
 	 */

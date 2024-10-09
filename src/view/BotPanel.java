@@ -34,15 +34,50 @@ import model.UpdateEvent;
 @SuppressWarnings("deprecation")
 public class BotPanel extends JPanel implements Observer{
 
-	private TitledBorder titledBorder;	/** Il bordo titolato che contiene il nome del bot. */
-	private BlackJackBot bot;	/** Riferimento al bot associato a questo pannello. */
-	private ArrayList<Carta> mano;	/** La mano attualmente in possesso del bot */
-	private ArrayList<Image> carteImages;	/** Una lista di immagini che rappresentano graficamente le carte attualmente in mano al bot. */
-	private JLabel punti;	/** Un'etichetta che visualizza il punteggio attuale del bot. */
+	/** 
+	 * Il bordo titolato che contiene il nome del bot. 
+	 */
+	private TitledBorder titledBorder;
+
+	/** 
+	 * Riferimento al bot associato a questo pannello. 
+	 */
+	private BlackJackBot bot;	
+
+	/** 
+	 * La mano attualmente in possesso del bot 
+	 */
+	private ArrayList<Carta> mano;
+
+	/**
+	 *  Una lista di immagini che rappresentano graficamente le carte attualmente in mano al bot. 
+	 */
+	private ArrayList<Image> carteImages;
+
+	/**
+	 *  Un'etichetta che visualizza il punteggio attuale del bot. 
+	 */
+	private JLabel punti;
+
+	/**
+	 * Un'etichetta che visualizza le azioni del bot attuale.
+	 */
 	private JLabel azione;
-	private Integer puntiAttuali = 0;	/** Il punteggio attuale del bot. */
-	private String cartaCopertaPath = "CartaRetro.png";	/** Il percorso dell'immagine utilizzata per rappresentare la carta coperta */
-	private AudioManager audioManager;	/** Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. */
+
+	/** 
+	 * Il punteggio attuale del bot. 
+	 */
+	private Integer puntiAttuali = 0;
+
+	/** 
+	 * Il percorso dell'immagine utilizzata per rappresentare la carta coperta 
+	 */
+	private String cartaCopertaPath = "CartaRetro.png";
+
+	/** 
+	 * Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente.
+	 */
+	private AudioManager audioManager;	
 
 	/**
 	 * Costruisce un BotPanel che rappresenta il bot specificato.
@@ -149,7 +184,7 @@ public class BotPanel extends JPanel implements Observer{
 		punti.revalidate();
 		punti.repaint();
 	}
-	
+
 	/**
 	 * Aggiorna l'azione che viene fatta dal bot e viene visualizzata nel pannello.
 	 * @param action l'azione che viene fatta dal bot

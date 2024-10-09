@@ -4,9 +4,25 @@ package model;
  * Classe ENUM che definisce il Seme della carta da gioco.
  */
 public enum Seme {
+	
+	/**
+	 * Seme di Cuori - "Cuori"
+	 */
 	CUORI("Cuori"),
+	
+	/**
+	 * Seme di Quadri - "Quadri"
+	 */
 	QUADRI("Quadri"),
+	
+	/**
+	 * Seme di Fiori - "Fiori"
+	 */
 	FIORI("Fiori"),
+	
+	/**
+	 * Seme di Picche - "Picche"
+	 */
 	PICCHE("Picche");
 	
 	/**

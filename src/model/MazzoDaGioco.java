@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
-/*
+/**
  * La classe MazzoDaGioco definisce le regole di funzionamento del mazzo da gioco.
  */
 public class MazzoDaGioco {

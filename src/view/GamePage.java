@@ -24,17 +24,55 @@ import model.BlackJackPlayer;
  */
 public class GamePage extends JPanel{
 
-	private Frame frame; /** Il frame principale della finestra di gioco. */
-	private Image backgroudImage;	/** L'immagine di sfondo del gioco. */
+	/** 
+	 * Il frame principale della finestra di gioco.
+	 */
+	private Frame frame;
 
-	private Integer numeroGiocatori;	/** Il numero di giocatori nel gioco. */
-	private BotPanel bancoPanel;    /** Pannello che rappresenta il banco nel gioco. */
-	private BotPanel bot1Panel;    /** Pannello che rappresenta il primo bot (se presente). */
-	private PlayerPanel playerPanel;    /** Pannello che rappresenta il giocatore umano. */
-	private BotPanel bot2Panel;    /** Pannello che rappresenta il secondo bot (se presente). */
-	private JPanel gamePanel;    /** Il pannello principale del gioco che contiene i pannelli dei giocatori. */
-	private ActionPlayerPanel actionPlayerMenu;    /** Il pannello contenente i controlli per il giocatore umano. */
-	private GameController controller;    /** Il controller che gestisce la logica di gioco. */
+	/** 
+	 * L'immagine di sfondo del gioco. 
+	 */
+	private Image backgroudImage;
+
+	/** 
+	 * Il numero di giocatori nel gioco. 
+	 */
+	private Integer numeroGiocatori;
+
+	/** 
+	 * Pannello che rappresenta il banco nel gioco. 
+	 */
+	private BotPanel bancoPanel;
+
+	/**
+	 *  Pannello che rappresenta il primo bot (se presente). 
+	 */
+	private BotPanel bot1Panel;
+
+	/** 
+	 * Pannello che rappresenta il giocatore umano. 
+	 */
+	private PlayerPanel playerPanel;
+
+	/**
+	 * Pannello che rappresenta il secondo bot (se presente).
+	 */
+	private BotPanel bot2Panel;
+
+	/** 
+	 * Il pannello principale del gioco che contiene i pannelli dei giocatori. 
+	 */
+	private JPanel gamePanel;  
+
+	/**
+	 *  Il pannello contenente i controlli per il giocatore umano.
+	 */
+	private ActionPlayerPanel actionPlayerMenu; 
+
+	/** 
+	 * Il controller che gestisce la logica di gioco.
+	 */
+	private GameController controller;   
 
 	/**
 	 * Costruttore della classe GamePage. Inizializza il frame, carica l'immagine di sfondo, 

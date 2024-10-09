@@ -140,7 +140,8 @@ public class GameController {
 
 	/**
 	 * Aggiunge un giocatore al database.
-	 * @param player il giocatore umano
+	 * @param nickname nome del giocatore
+	 * @param avatar avatar del giocatore
 	 */
 	public void addDbPlayer(String nickname, String avatar) {
 		BlackJackPlayer player = new BlackJackPlayer(nickname, avatar);
@@ -151,7 +152,6 @@ public class GameController {
 	/**
 	 * Recupera il giocatore dal database per indice e lo aggiunge al tavolo.
 	 * @param indexPlayer l'indice del giocatore
-	 * @return il giocatore dal database
 	 */	
 	public void getDbPlayerByIndex(int indexPlayer) {
 		BlackJackPlayer player = db.getPlayerByIndex(indexPlayer);

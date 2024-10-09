@@ -32,38 +32,115 @@ import model.BlackJackPlayer;
  */
 public class MenuPage extends JPanel implements ActionListener{
 
-	private Frame frame;	/** Frame principale in cui viene visualizzata la pagina del menu. */
+	/**
+	 *  Frame principale in cui viene visualizzata la pagina del menu. 
+	 */
+	private Frame frame;
 
-	private JPanel leftMenuPanel;	/** Pannello che contiene il pulsante "Play" e le opzioni per il numero di bot. */
-	private JPanel rightMenuPanel;	/** Pannello che contiene le statistiche del giocatore. */
-	private Image backgroundImage;	/** Immagine di sfondo per la pagina del menu. */
+	/**
+	 *  Pannello che contiene il pulsante "Play" e le opzioni per il numero di bot.
+	 */
+	private JPanel leftMenuPanel;
+	
+	/** 
+	 * Pannello che contiene le statistiche del giocatore. 
+	 */
+	private JPanel rightMenuPanel;
+	
+	/**
+	 *  Immagine di sfondo per la pagina del menu. 
+	 */
+	private Image backgroundImage;
 
-	private TitledBorder border;	/** Bordo titolato per separare la sezione del menu. */
-	private MyButton playButton;	/** Pulsante per avviare una nuova partita. */
-	private JLabel botLabel;	/** Etichetta che indica la selezione del numero di bot. */
-	private JRadioButton oneBot;	/** Pulsante di opzione per selezionare un solo bot. */
-	private JRadioButton twoBot;	/** Pulsante di opzione per selezionare due bot. */
-	private JRadioButton threeBot;	/** Pulsante di opzione per selezionare tre bot. */
-	private ButtonGroup group;	/** Gruppo di bottoni per la selezione del numero di bot. */
+	/** 
+	 * Bordo titolato per separare la sezione del menu. 
+	 */
+	private TitledBorder border;
+	
+	/**
+	 *  Pulsante per avviare una nuova partita. 
+	 */
+	private MyButton playButton;
+	
+	/**
+	 *  Etichetta che indica la selezione del numero di bot. 
+	 */
+	private JLabel botLabel;
+	
+	/**
+	 *  Pulsante di opzione per selezionare un solo bot. 
+	 */
+	private JRadioButton oneBot;
+	
+	/**
+	 *  Pulsante di opzione per selezionare due bot. 
+	 */
+	private JRadioButton twoBot;
+	
+	/**
+	 *  Pulsante di opzione per selezionare tre bot. 
+	 */
+	private JRadioButton threeBot;
+	
+	/**
+	 *  Gruppo di bottoni per la selezione del numero di bot. 
+	 */
+	private ButtonGroup group;	
 
-	private JLabel nicknameLabel;	/** Etichetta che mostra il nickname del giocatore. */
-	private ImageIcon avatarIcon;	/** Icona dell'avatar del giocatore. */
-	private JLabel avatarLabel;	/** Etichetta per visualizzare l'avatar del giocatore. */
-	private JLabel levelLabel;	/** Etichetta che mostra il livello del giocatore. */
-	private JLabel nGames;	/** Etichetta che mostra il numero di partite giocate dal giocatore. */
-	private JLabel nGamesWin;	/** Etichetta che mostra il numero di partite vinte dal giocatore. */
-	private JLabel nGamesLost;	/** Etichetta che mostra il numero di partite perse dal giocatore. */
+	/**
+	 *  Etichetta che mostra il nickname del giocatore. 
+	 */
+	private JLabel nicknameLabel;
+	
+	/**
+	 *  Icona dell'avatar del giocatore. 
+	 */
+	private ImageIcon avatarIcon;
+	
+	/**
+	 *  Etichetta per visualizzare l'avatar del giocatore. 
+	 */
+	private JLabel avatarLabel;
+	
+	/** 
+	 * Etichetta che mostra il livello del giocatore. 
+	 */
+	private JLabel levelLabel;
+	
+	/**
+	 *  Etichetta che mostra il numero di partite giocate dal giocatore. 
+	 */
+	private JLabel nGames;	
+	
+	/**
+	 *  Etichetta che mostra il numero di partite vinte dal giocatore. 
+	 */
+	private JLabel nGamesWin;
+	
+	/**
+	 *  Etichetta che mostra il numero di partite perse dal giocatore. 
+	 */
+	private JLabel nGamesLost;
 
-	private GameController controller;	/** Controller principale per gestire la logica di gioco. */
-	private BlackJackPlayer player;	/** Il giocatore umano le cui informazioni sono visualizzate nel pannello. */
+	/**
+	 *  Controller principale per gestire la logica di gioco. 
+	 */
+	private GameController controller;
+	
+	/**
+	 *  Il giocatore umano le cui informazioni sono visualizzate nel pannello. 
+	 */
+	private BlackJackPlayer player;	
 
-	private AudioManager audioManager;	/** Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. */
+	/**
+	 *  Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. 
+	 */
+	private AudioManager audioManager;	
 
 	/**
 	 * Costruttore che crea la pagina del menu principale. Inizializza il frame, i pannelli, 
 	 * le etichette e i bottoni. Aggiunge gli elementi nel layout e configura le interazioni.
 	 */
-
 	public MenuPage() {
 		frame = new Frame();
 		audioManager = AudioManager.getInstance();

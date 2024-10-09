@@ -34,20 +34,75 @@ import model.UpdateEvent;
 @SuppressWarnings("deprecation")
 public class PlayerPanel extends JPanel implements Observer{
 
-	private TitledBorder titledBorder;	/** Un bordo con titolo utilizzato per visualizzare il nome del giocatore */
-	private BlackJackPlayer player;	/** L'istanza del giocatore associato a questo pannello. */
-	private ArrayList<Carta> mano;	/** Una lista che contiene le carte attualmente in mano al giocatore. */
-	private ArrayList<Image> carteImages;	/** Una lista di immagini delle carte che rappresenta graficamente le carte nella mano del giocatore. */
-	private JLabel punti;	/** Etichetta che visualizza il punteggio corrente del giocatore nel pannello. */
-	private Integer puntiAttuali = 0;	/** Il punteggio attuale del giocatore basato sulle carte in mano. */
-	private Integer puntiMano1 = 0;		/** Il punteggio associato alla prima mano quando il giocatore effettua uno split. */
-	private Integer puntiMano2 = 0;		/** Il punteggio associato alla seconda mano quando il giocatore effettua uno split. */
-	private Integer indexMano = 0;		/** Un indice che rappresenta quale mano il giocatore sta giocando in caso di split. */
-	private boolean isPrimeDueCarte = true;		/** Indica se il giocatore ha ricevuto solo le prime due carte. */
-	private ActionPlayerPanel actionPlayerPanel;	/** Il pannello associato alle azioni del giocatore. */
-	private boolean isSplit = false;		/** Indica se il giocatore ha diviso la mano (split). Se vero, il giocatore sta giocando due mani separate. */
-	private GameController controller;		/** Controller principale per gestire la logica di gioco. */
-	private AudioManager audioManager;		/** Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. */
+	/**
+	 *  Un bordo con titolo utilizzato per visualizzare il nome del giocatore 
+	 */
+	private TitledBorder titledBorder;
+
+	/**
+	 *  L'istanza del giocatore associato a questo pannello. 
+	 */
+	private BlackJackPlayer player;	
+
+	/**
+	 *  Una lista che contiene le carte attualmente in mano al giocatore. 
+	 */
+	private ArrayList<Carta> mano;	
+
+	/**
+	 *  Una lista di immagini delle carte che rappresenta graficamente le carte nella mano del giocatore. 
+	 */
+	private ArrayList<Image> carteImages;
+
+	/**
+	 *  Etichetta che visualizza il punteggio corrente del giocatore nel pannello. 
+	 */
+	private JLabel punti;	
+
+	/**
+	 *  Il punteggio attuale del giocatore basato sulle carte in mano. 
+	 */
+	private Integer puntiAttuali = 0;
+
+	/**
+	 *  Il punteggio associato alla prima mano quando il giocatore effettua uno split. 
+	 */
+	private Integer puntiMano1 = 0;
+
+	/**
+	 *  Il punteggio associato alla seconda mano quando il giocatore effettua uno split. 
+	 */
+	private Integer puntiMano2 = 0;
+
+	/**
+	 *  Un indice che rappresenta quale mano il giocatore sta giocando in caso di split. 
+	 */
+	private Integer indexMano = 0;
+
+	/**
+	 *  Indica se il giocatore ha ricevuto solo le prime due carte. 
+	 */
+	private boolean isPrimeDueCarte = true;
+
+	/**
+	 *  Il pannello associato alle azioni del giocatore. 
+	 */
+	private ActionPlayerPanel actionPlayerPanel;
+
+	/**
+	 *  Indica se il giocatore ha diviso la mano (split). Se vero, il giocatore sta giocando due mani separate. 
+	 */
+	private boolean isSplit = false;
+
+	/**
+	 *  Controller principale per gestire la logica di gioco. 
+	 */
+	private GameController controller;
+
+	/**
+	 *  Gestore dell'audio per riprodurre suoni durante l'interazione con l'interfaccia utente. 
+	 */
+	private AudioManager audioManager;
 
 	/**
 	 * Costruttore della classe PlayerPanel.

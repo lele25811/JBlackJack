@@ -111,7 +111,7 @@ public class Database {
 
 	/**
 	 * Carica la lista dei giocatori dal file di database.
-	 * Deserializza l'oggetto List<BlackJackPlayer> dal file specificato da FILENAME.
+	 * Deserializza l'oggetto List di BlackJackPlayer dal file specificato da FILENAME.
 	 * @return la lista dei giocatori caricata dal file
 	 * @throws DatabaseException se si verifica un errore durante il caricamento dei dati
 	 */
