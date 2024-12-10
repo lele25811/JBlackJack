@@ -1,4 +1,5 @@
 # JBlackJack
+![image](https://github.com/user-attachments/assets/314b31f9-ab60-42ee-8937-a7945ffc6916)
 
 ## Project Overview
 **JBlackJack** is a Java-based simulation of the popular card game BlackJack. The project follows the Model-View-Controller (MVC) design pattern to separate game logic from the graphical user interface and input control. It supports multiple bot players. The graphical interface is implemented using Swing, providing an interactive display of cards, player actions.
